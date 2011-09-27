@@ -13,6 +13,10 @@ function Player() {
 	this.orientation = 0;
 	this.maxspeed = 10;
 	this.speedincr = 1;
+	this.propulsionMode = 'short';
+	this.mediumAccuracy = 5;
+	this.mediumMax = 200;
+	this.mediumRange = 20;
 }
 Player.prototype.cycle = function () {
 	this.draw();
@@ -33,6 +37,7 @@ Player.prototype.draw = function () {
 	ctx.fillStyle = '#00f';
 	ctx.fill();
 	ctx.strokeStyle = '#fff';
+	ctx.lineWidth = 1.1;
 	ctx.stroke();
 	
 	if(this.vel){
@@ -54,6 +59,8 @@ Player.prototype.draw = function () {
 	ctx.restore();
 }
 Player.prototype.setOrientation = function (dir) {
+	//change direction of ship based on user input
+	//any positive number rotates clockwise; anything else rotates counterclockwise
 	var amt = Math.PI/(18 + (this.vel * 6));
 	if(dir > 0){
 		this.orientation += amt;
@@ -69,7 +76,9 @@ Player.prototype.setOrientation = function (dir) {
 	}
 };
 Player.prototype.adjustVelocity = function (up) {
-	if(up){
+	//change speed based on user input
+	//any positive number increases speed, anything else decreases speed
+	if(up > 0){
 		if(this.vel < this.maxspeed){
 			this.vel += this.speedincr;
 		}
@@ -81,7 +90,22 @@ Player.prototype.adjustVelocity = function (up) {
 	}
 }
 Player.prototype.updateLocation = function () {
-	//update position
+	//update position based on current speed
 	this.x += this.vel * Math.cos(this.orientation);
 	this.y += this.vel * Math.sin(this.orientation);
+};
+Player.prototype.mediumJump = function (orientation, range) {
+	var range = range <= this.mediumMax ? range : this.mediumMax,
+		destX = (this.x + 15*range*Math.cos(orientation)),
+		destY = (this.y + 15*range*Math.sin(orientation));
+	
+	//jump
+	this.x = destX + Math.random() * range/this.mediumAccuracy - range/(2*this.mediumAccuracy);
+	this.y = destY + Math.random() * range/this.mediumAccuracy - range/(2*this.mediumAccuracy);
+	this.orientation = Math.random() * 2 * Math.PI;
+	
+	//cleanup
+	this.propulsionMode = 'short';
+	delete interactions.mediumJumpActivate;
+	delete interactions2.mediumJump;
 };
