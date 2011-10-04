@@ -104,6 +104,9 @@ Player.prototype.mediumJump = function (orientation, range) {
 	this.y = destY + Math.random() * range/this.mediumAccuracy - range/(2*this.mediumAccuracy);
 	this.orientation = Math.random() * 2 * Math.PI;
 	
+	//reset stars
+	this.parent.ministars = this.parent.generateMinistars();
+	
 	//cleanup
 	this.propulsionMode = 'short';
 	delete interactions.mediumJumpActivate;

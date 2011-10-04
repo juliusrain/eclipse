@@ -22,7 +22,7 @@ Space.prototype.draw = function () {
 	ctx.fillRect(0,0,CW,CH);
 	this.ministars.draw();
 }
-Space.prototype.ministars = (function () {
+Space.prototype.generateMinistars = function () {
 	var i, j, stars = [[],[],[],[]], quants = [10, 20, 20, 40];
 	function generate() {
 		return {
@@ -77,4 +77,5 @@ Space.prototype.ministars = (function () {
 			ctx.restore();
 		}
 	};
-}());
+};
+Space.prototype.ministars = Space.prototype.generateMinistars();
