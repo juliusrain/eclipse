@@ -1,0 +1,21 @@
+<canvas id="main" width="500" height="300" style="position:fixed;">hi</canvas>
+<canvas id="sec" width="500" height="300" style="position:fixed;">hi</canvas>
+<script type="text/javascript">
+	var m = document.getElementById('main');
+	var s = document.getElementById('sec');
+	var cm = m.getContext('2d');
+	var sm = s.getContext('2d');
+	cm.strokeRect(0,0,500,300);
+	sm.beginPath();
+	sm.moveTo(0,0);
+	sm.lineTo(500,300);
+	sm.moveTo(500,0);
+	sm.lineTo(0,300);
+	sm.stroke();
+	cm.fillText("Awesome", 300, 250);
+	var tw = cm.measureText("Awesome");
+	sm.fillText("ness", 300+tw.width, 250);
+	sm.fillText("In your", 300, 270);
+	tx = sm.measureText("In your ");
+	cm.fillText("face", 300+tx.width, 270);
+</script>
