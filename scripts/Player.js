@@ -1,14 +1,3 @@
-
-//chooser
-function ch(defined, def) {
-	if(typeof defined == "undefined"){
-		return def;
-	}
-	else{
-		return defined;
-	}
-}
-
 // Main player object
 function Player(ctx, loader) {
 	// pl stores the internal state of the player object
@@ -17,38 +6,38 @@ function Player(ctx, loader) {
 
 	// SETTINGS
 	// Current Status
-	pl.x = ch(pl.x, 0); // x-coordinate within the current solar system
-	pl.y = ch(pl.y, 0); // y-coordinate within the current solar system
-	pl.orientation = ch(pl.orientation, Math.random() * 2 * Math.PI); // clockwise angle in radians relative to due right
+	pl.x = Waldo.ch(pl.x, 0); // x-coordinate within the current solar system
+	pl.y = Waldo.ch(pl.y, 0); // y-coordinate within the current solar system
+	pl.orientation = Waldo.ch(pl.orientation, Math.random() * 2 * Math.PI); // clockwise angle in radians relative to due right
 
-	pl.health = ch(pl.health, 100); // percentage of overall health
-	pl.recoveryRate = ch(pl.recoveryRate, 0.01); // unaided recovery percentage per frame
+	pl.health = Waldo.ch(pl.health, 100); // percentage of overall health
+	pl.recoveryRate = Waldo.ch(pl.recoveryRate, 0.01); // unaided recovery percentage per frame
 
 	// Propulsion - Short Range
-	pl.curSpeed = ch(pl.curSpeed, 0); // current speed
-	pl.maxSpeed = ch(pl.maxSpeed, 20); // maximum sublight
-	pl.speedStep = ch(pl.speedStep, 2); // amount of increase/decrease in speed per keypress
-	pl.turnStep = ch(pl.turnStep, Math.PI / 9); // amount of turn in raidans per keypress (at standstill)
+	pl.curSpeed = Waldo.ch(pl.curSpeed, 0); // current speed
+	pl.maxSpeed = Waldo.ch(pl.maxSpeed, 20); // maximum sublight
+	pl.speedStep = Waldo.ch(pl.speedStep, 2); // amount of increase/decrease in speed per keypress
+	pl.turnStep = Waldo.ch(pl.turnStep, Math.PI / 9); // amount of turn in raidans per keypress (at standstill)
 
 	// Propulsion - Jump
-	pl.jumpCharge = ch(pl.jumpCharge, 100); // percentage of jump engine
-	pl.jumpRechargeRate = ch(pl.jumpRechargeRate, 1); // unaided engine recharge per frame
+	pl.jumpCharge = Waldo.ch(pl.jumpCharge, 100); // percentage of jump engine
+	pl.jumpRechargeRate = Waldo.ch(pl.jumpRechargeRate, 1); // unaided engine recharge per frame
 
 	// Propulsion - Medium Jump
-	pl.minMedJumpRange = ch(pl.minMedJumpRange, 200); // the closest the player can jump
-	pl.maxMedJumpRange = ch(pl.maxMedJumpRange, 1000); // the farthest the player can jump
-	pl.medJumpInaccuracy = ch(pl.medJumpInaccuracy, 50); // radius of inaccuracy at maximum range
-	pl.medJumpCost = ch(pl.medJumpCost, 40); // amount it costs to perform a medium jump (all medium jumps cost the same regardless of distance)
+	pl.minMedJumpRange = Waldo.ch(pl.minMedJumpRange, 200); // the closest the player can jump
+	pl.maxMedJumpRange = Waldo.ch(pl.maxMedJumpRange, 1000); // the farthest the player can jump
+	pl.medJumpInaccuracy = Waldo.ch(pl.medJumpInaccuracy, 50); // radius of inaccuracy at maximum range
+	pl.medJumpCost = Waldo.ch(pl.medJumpCost, 40); // amount it costs to perform a medium jump (all medium jumps cost the same regardless of distance)
 	
 	// Propulsion - Long Jump
-	pl.maxLongJumpRange = ch(pl.maxLongJumpRange, 1); // radius of solar systems reachable from the current location
-	pl.longJumpCost = ch(pl.longJumpCost, 90); // amount it costs to perform a long-range jump
+	pl.maxLongJumpRange = Waldo.ch(pl.maxLongJumpRange, 1); // radius of solar systems reachable from the current location
+	pl.longJumpCost = Waldo.ch(pl.longJumpCost, 90); // amount it costs to perform a long-range jump
 	
 	// Defence
 	//shielding?
 	
 	// Offence - weapons
-	pl.weapons = ch(pl.weapons, {}); // onboard weapons
+	pl.weapons = Waldo.ch(pl.weapons, {}); // onboard weapons
 	
 	return {
 		// return read-only copy of all private variables (usu. for saving)

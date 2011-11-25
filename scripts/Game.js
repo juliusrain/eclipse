@@ -18,12 +18,10 @@ function Game() {
 	function clickOnMain(x, y) {
 		console.log('click on main map, relative coords:');
 		console.log(x+"x"+y);
-	
 	}
 	
 	function clickOnMinimap(x, y) {
 		console.log('click on minimap, relative coords:');
 		console.log(x+"x"+y);
-		
 	}
 }
