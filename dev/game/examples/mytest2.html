@@ -1,0 +1,264 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color: #eee;
+				padding:0;
+				margin:0;
+				font-weight:bold;
+				overflow:hidden;
+
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+			b { color:orange }
+		</style>
+		
+		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="js/RequestAnimationFrame.js"></script>
+		<script type="text/javascript" src="js/Detector.js"></script>		
+		
+	</head>
+	
+	<body>
+
+		<script> 
+			var container, camera, controls, scene, renderer;
+			var width = window.innerWidth,
+				height = window.innerHeight;
+			var sphereGeometry, sphereMesh, sphereMaterial, sphereRotation = 0.0;
+			var laserMesh, laserDir, laserDuration = 100; laserDist = 0;
+			var cubeGeometry, cubeMesh, cubeMaterial;
+			var crosshairMesh;
+			var tiltLeft, tiltRight;
+			var skyboxTex, skybox, skyboxMateiral;
+			var dirLight1, dirLight2, ambLight;
+			var dummy;
+			var q1, q2, q3, d1, d2, d3, r1, r2;
+			var clock = new THREE.Clock();
+			
+			init();
+			animate();
+			
+			function init() {
+				if(!Detector.webgl) Detector.addGetWebGLMessage();		
+
+				//window stuff
+				container = document.createElement('div');
+				document.body.appendChild(container);
+				
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.setFaceCulling(0);
+				renderer.sortObjects = false;
+				renderer.autoClear = false;
+				
+				container.appendChild(renderer.domElement);					
+				
+				//scene
+				scene = new THREE.Scene();
+				
+				dummy = new THREE.Object3D();
+				scene.add(dummy);
+
+
+				
+				//camera
+				camera = new THREE.PerspectiveCamera(45.0, width/height, 0.1, 1e7);
+				//camera.position.set = (0, 0, 500);
+				dummy.add(camera);			
+				
+				//controls
+				controls = new THREE.FlyControls(dummy);
+
+				//controls.dragToLook = true;
+				controls.movementSpeed = 2;
+				
+
+
+				
+				//sphere
+				sphereGeometry = new THREE.SphereGeometry(100, 100, 100);
+				cubeGeometry = new THREE.CubeGeometry(10, 10, 10);
+
+				sphereMaterial = new THREE.MeshLambertMaterial({
+					//color: 0xffffff,
+					map: THREE.ImageUtils.loadTexture("textures/planets/moon_1024.jpg")
+				});
+				sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				sphereMesh.position.z = -500;
+				scene.add(sphereMesh);
+				
+				//ship
+				cubeMaterial = new THREE.MeshNormalMaterial({
+					color: 0xaa66ff
+				});
+				cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+				cubeMesh.scale.set(0.2, 0.02, 0.2);
+				dummy.add(cubeMesh);
+				
+				//crosshair
+				crosshairMesh = new THREE.Mesh(sphereGeometry, cubeMaterial);
+				crosshairMesh.scale.set(0.5, 0.5, 0.5);
+				dummy.add(crosshairMesh);
+				
+				//laser
+				laserDir = new THREE.Vector3();
+				laserMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
+				laserMesh.scale.set(0.05, 0.05, 1);
+				laserMesh.useQuaternion = true;
+				scene.add(laserMesh);
+				
+
+				
+				//skybox
+				skyboxTex = ["textures/cube/skybox/px.jpg", "textures/cube/skybox/nx.jpg", 
+							 "textures/cube/skybox/py.jpg", "textures/cube/skybox/ny.jpg",
+							 "textures/cube/skybox/pz.jpg", "textures/cube/skybox/nz.jpg"];
+				cubeTex = THREE.ImageUtils.loadTextureCube(skyboxTex);
+
+				var shader = THREE.ShaderUtils.lib["cube"];
+				shader.uniforms["tCube"].texture = cubeTex;
+				var skyboxMaterial = new THREE.ShaderMaterial({
+					fragmentShader: shader.fragmentShader,
+					vertexShader: shader.vertexShader,
+					uniforms: shader.uniforms,
+					depthWrite: false
+				});
+				skybox = new THREE.Mesh(new THREE.CubeGeometry(1000000, 1000000, 1000000), skyboxMaterial);
+				skybox.flipSided = true;
+				scene.add(skybox);
+				
+				
+				//lights
+				dirLight1 = new THREE.DirectionalLight(0xffffff);
+				dirLight1.position.set(1.0, 1.0, 1.0).normalize();
+				scene.add(dirLight1);
+				
+				dirLight2 = new THREE.DirectionalLight(0xffffff);
+				dirLight2.position.set(-1.0, 1.0, -1.0).normalize();
+				scene.add(dirLight2);
+			
+				ambLight = new THREE.AmbientLight(0xffffff);
+				scene.add(ambLight);				
+			
+				//initize random stuff
+				q1 = new THREE.Quaternion();
+				q2 = new THREE.Quaternion();
+				q3 = new THREE.Quaternion();
+			
+			}
+
+			
+			function render() {
+				controls.update(clock.getDelta()*50);
+				sphereMesh.rotation.y = sphereRotation%360;
+				sphereRotation += 0.0025;
+				
+				//ship positioning within dummy
+				cubeMesh.position.x = controls.rotationVector.y*2.5;
+				cubeMesh.position.y = -controls.rotationVector.x*1.25 - 2;
+				cubeMesh.position.z = -10;
+				
+				//crosshairMesh.position.x = -controls.rotationVector.y*2.5*500;
+				//crosshairMesh.position.y = controls.rotationVector.x*1.25*500;
+				crosshairMesh.position.z = -10000;
+
+/*
+				//limit ship rotation
+				if(Math.abs(controls.rotationVector.x) < 0.25) {
+					cubeMesh.rotation.x = controls.rotationVector.x;
+				}
+				if(Math.abs(controls.rotationVector.y) < 0.25) {
+					cubeMesh.rotation.y = controls.rotationVector.y;
+				}
+*/				
+				//roll tilt
+				if(controls.moveState.rollRight == 1) {
+					if(cubeMesh.rotation.z > -0.6) {
+						cubeMesh.rotation.z -= 0.02;
+					}
+				}
+				if(controls.moveState.rollLeft == 1) {
+					if(cubeMesh.rotation.z < 0.6) {
+						cubeMesh.rotation.z += 0.02;
+					}
+				}
+				if(controls.moveState.rollRight == 0) {
+					if(cubeMesh.rotation.z < 0) {
+						cubeMesh.rotation.z += (0.05 * Math.abs(cubeMesh.rotation.z));
+					}
+				}
+				if(controls.moveState.rollLeft == 0) {
+					if(cubeMesh.rotation.z > 0) {
+						cubeMesh.rotation.z -= (0.05 * Math.abs(cubeMesh.rotation.z));
+					}
+				}
+
+				
+				
+				//console.log(dummy.quaternion.x);
+				
+				if(laserDist == laserDuration) {
+					laserDist = 0;
+				}
+				
+				if(laserDist == 0) {
+					d1 = controls.rotationVector.x;
+					d2 = controls.rotationVector.y;		
+					
+					laserMesh.position.x = dummy.position.x;
+					laserMesh.position.y = dummy.position.y;
+					laserMesh.position.z = dummy.position.z;
+		
+
+					
+					//q1.setFromEuler(controls.rotationVector);
+					q2.setFromEuler(cubeMesh.rotation);
+					//q3.multiply(q1, q2);
+					laserMesh.quaternion.multiply(q2, dummy.quaternion);
+					
+					//laserMesh.translateX(-d2*2.5);
+					laserMesh.translateY(-2);
+					laserMesh.translateZ(-20);
+
+					//console.log(q1.quaternion.w);
+				} else {
+					//laserMesh.translateX(d2*2.5);
+					//laserMesh.translateY(- d1*1.25-2 );
+				
+					laserMesh.translateZ(-laserDist*10);
+					//console.log(laserMesh.quaternion.x);
+				}
+				laserDist += 1;		
+				
+				renderer.clear();
+				renderer.render(scene, camera);
+			}
+			
+			function animate() {
+				requestAnimationFrame(animate);			
+				render();
+			}
+		
+		</script>
+	</body>
+</html>
