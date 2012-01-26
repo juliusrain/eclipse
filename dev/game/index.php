@@ -3,6 +3,9 @@
 	<meta charset="UTF-8">
 	<title>GAME</title>
 	<style type="text/css">
+		* {
+			margin:0px;
+		}
 		body {
 			margin:0px;
 			padding:0px;
@@ -36,6 +39,10 @@
 			top:39px;
 			background-color:lightblue;
 			overflow:hidden;
+		}
+		#maindiv {
+			width:100%;
+			height:100%;
 		}
 		#right {
 			width:200px;
@@ -75,13 +82,19 @@
 			left
 			<div id="test">testing</div>
 		</div>
-		<div id="middle">middle</div>
+		<div id="middle"><div id="maindiv"></div></div>
 		<div id="right">right</div>
 		<div id="bottom">bottom</div>
 	</div>
 	<div id="foot"></div>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript" src="frame.js"></script>
+	<script type="text/javascript" src="build/Three.js"></script>
+	<script type="text/javascript" src="js/Detector.js"></script>
+	<script type="text/javascript" src="js/Stats.js"></script>
+	<script type="text/javascript" src="game.js"></script>
+	<script type="text/javascript" src="graphics.js"></script>
+	<!--<script type="text/javascript">
 		function sizeGame(){
 			if(window.innerWidth > 600 && window.innerHeight > 500){
 				sizeElements();
@@ -127,6 +140,6 @@
 		};
 		window.onload = sizeGame;
 		window.onresize = sizeGame;
-	</script>
+	</script>-->
 </body>
 </html>
