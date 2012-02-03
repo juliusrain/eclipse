@@ -1,0 +1,109 @@
+<canvas id="c" width="900" height="500">your browser does not support canvas.</canvas>
+<script>
+var cnv = document.getElementById('c');
+var ctx = cnv.getContext('2d');
+var width = cnv.width, height = cnv.height;
+ctx.fillStyle = '#000';
+ctx.strokeStyle = '#000';
+function Ship(x, y, z){
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.old = {
+		x: x || 0,
+		y: y || 0,
+		z: z || 0,
+	};
+	this.speed = {x:-10,y:0,z:0};
+}
+Ship.prototype.update = function (){
+	this.old.x = this.x;
+	this.old.y = this.y;
+	this.old.z = this.z;
+	this.x += this.speed.x;
+	this.y += this.speed.y;
+	this.z += this.speed.z;
+};
+Ship.prototype.draw = function (){
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, 10, 0, Math.PI*2, true);
+	ctx.fill();
+	ctx.fillText("ship: "+this.x+"x"+this.y+"x"+this.z, width-100, 20);
+}
+
+
+function Missile(x, y, z){
+	this.x = x || 0;
+	this.y = y || 0;
+	this.z = z || 0;
+	this.old = {
+		x: x || 0,
+		y: y || 0,
+		z: z || 0,
+	};
+	this.orientation = 7*Math.PI/4;
+}
+Missile.prototype.update = function (x, y, z){
+	this.old.x = this.x;
+	this.old.y = this.y;
+	this.old.z = this.z;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	//this.orientation = 
+};
+Missile.prototype.draw = function (){
+	ctx.save();
+	ctx.rotate(this.orientation);
+	ctx.beginPath();
+	ctx.fillRect(this.x, this.y, 5, 10);
+	ctx.restore();
+	ctx.beginPath();
+	ctx.moveTo(this.x, this.y);
+	ctx.lineTo(this.old.x, this.old.y);
+	ctx.stroke();
+};
+
+
+function ai(chaser, target){
+	//fill this in!
+}
+
+var ship, missile, interv;
+function sceneFrame(){
+	cnv.width = width;
+	ship.update();
+	ship.draw();
+	ai(missile, ship);
+	missile.draw();
+}
+function set(){
+	ship = new Ship(width, 100, 0);
+	missile = new Missile(width-20, height-20, 0);
+}
+set();
+sceneFrame();
+var mode = 1;
+window.addEventListener('keypress', function (e){
+	if(e.which == 32){
+		mode = (mode+1)%2;
+		switch(mode){
+			case 0:
+				interv = setInterval(sceneFrame, 30);
+				break;
+			case 1:
+				clearInterval(interv);
+				break;
+			default:
+				break;
+		}
+	}
+	else if(e.which == 114){
+		mode = 1;
+		clearInterval(interv);
+		set();
+		sceneFrame();
+	}
+});
+
+</script>
