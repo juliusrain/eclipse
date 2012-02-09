@@ -21,12 +21,35 @@
 		<div id="tabs-welcome" class="tabbox">
 			<h2>Welcome</h2>
 			<p>Friends lost in hostile territory, and it's up to you to rescue them. Play the action-packed game that has you fighting off aliens, finding clues, and turning the tides of a war!</p>
+			<p>
+				Browser Requirements:
+				<ul>
+					<li>javascript</li>
+					<li>canvas support</li>
+					<li>webGL (you may need to turn it on in your browser's settings)</li>
+					<li>GPU-acceleration is highly recommended</li>
+				</ul>
+			</p>
 			<div id="playnowbutton">PLAY NOW!</div>
+			<div id="signinbox">
+				<div class="">
+					<div>username</div>
+					<input type="text" name="uname" />
+				</div>
+				<div class="">
+					<div>password</div>
+					<input type="password" name="password" />
+				</div>
+				<input type="submit" name="submit" value="Sign In" />
+			</div>
 		</div>
 		<div id="tabs-story" class="tabbox">
 			<h2>Story</h2>
-			<p>Same ship, different day.</p>
-			<p>Current faster-than-light travel allows inter-planetary voyages by means of an interdimentional drive, or "IDD". With an IDD, a ship can jump from one solar system to another instantaneously. With all of its virtues, contemporary IDD technology has a limited range and accuracy. Scientists have been researching to develop a special new engine that far exceeds anything now available. Two days ago, a prototype was tested at a secret facility in the &lt;insert name&gt; sector. The new drive performed far better than anyone involved predicted. Unfortunately, the test ship is now lost in a distant sector of space. This sector is inhabited by &lt;insert alien race/empire&gt;, who would love to get their hands on this technology. The test ship has minimal defenses. What's more, it was only equipped for a four-hour mission, with emergency supplies lasting 72 hours. It is assumed that they searched for an inhabitable planet to set down and hide. Your ship has been ordered to the &lt;insert name&gt; outpost on the outer edge of our territory, neighbouring that sector. Your mission is to find them, and escort them back to safety.</p>
+			<!--Same ship, different day.-->
+			<p>Current faster-than-light travel allows inter-planetary voyages by means of an interdimentional drive, or "IDD". With an IDD, a ship can jump from one solar system to another instantaneously. With all of its virtues, contemporary IDD technology has a limited range and accuracy.</p>
+			<p>Scientists have been researching to develop a special new engine that far exceeds anything now available. Two days ago, a prototype was tested at a secret facility in the &lt;insert name&gt; sector. The new drive performed far better than anyone involved predicted.</p>
+			<p>Unfortunately, the test ship did so well that it overshot its target, and is now lost in a distant sector of space. This sector is inhabited by &lt;insert alien race/empire&gt;, who would love to get their hands on this technology. The test ship has minimal defenses. What's more, it was only equipped for a four-hour mission, with emergency supplies lasting 72 hours. It is assumed that they searched for an inhabitable planet to set down and hide.<p/>
+			<p>Your ship has been ordered to the &lt;insert name&gt; outpost on the outer edge of our territory, neighbouring that sector. Your mission is to find them, and escort them back to safety.</p>
 		</div>
 		<div id="tabs-screenshots" class="tabbox">
 			<h2>Screenshots</h2>
@@ -56,8 +79,14 @@
 					event: "mouseover"
 				});
 				$("#playnowbutton").click(function (){
-					$("#tabs").tabs("select", "#tabs-register");
+					if( $("#signinbox:visible").length ){
+						$("#signinbox").slideUp();
+					}
+					else{
+						$("#signinbox").slideDown();
+					}
 				});
+				$("#signinbox").hide();
 			});
 		</script>
 	</body>
