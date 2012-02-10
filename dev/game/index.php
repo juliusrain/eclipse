@@ -72,6 +72,13 @@
 			width:90%;
 			padding:5%;
 		}
+		#minibox {
+			background-color:blue;
+			width:90%;
+			padding:0px;
+			margin:0px;
+			position:absolute;
+		}
 	</style>
 </head>
 <body>
@@ -81,6 +88,7 @@
 		<div id="left">
 			left
 			<div id="test">testing</div>
+			<div id="minibox"><canvas id="minimap"></canvas></div>
 		</div>
 		<div id="middle"><div id="maindiv"></div></div>
 		<div id="right">right</div>

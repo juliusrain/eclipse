@@ -41,6 +41,8 @@ function sizeElements(){
 		'top':centerTop,
 		'left':ww/6,
 	});
+	$('#minibox').height(parseInt($('#minibox').width())/1.5);
+	$('#minibox').css('top', parseInt($('#left').css('top'))+$('#left').height()-$('#minibox').height());
 };
 window.onload = sizeGame;
 window.onresize = sizeGame;
