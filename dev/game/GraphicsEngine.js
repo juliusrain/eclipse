@@ -1,5 +1,5 @@
 //game engine
-var sceneElements = {playerShip: [], AIShips: []};
+var sceneElements = {playerShip: [], AIShips: [], lasers: []};
 var HUDElements = [];
 /*
  * Create and initialize Threejs elements.
@@ -105,23 +105,23 @@ function GraphicsEngine() {
                     break;
                 }
 
-                case PLAYER_SHIP: { //if ship object
-                    loadShip(gameObject, this.gameplay_scene, loader);
-                    createCrosshair(gameObject, this.gameplay_scene);
+                case PLAYER_SHIP: {
+                    loadShip(gameObject, this.gameplay_scene);
+                    loadCrosshair(gameObject, this.gameplay_scene);
                     this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                     this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
                     break;
                 }
 
-                case AI_SHIP: { //if ship object
-                    loadShip(gameObject, this.gameplay_scene, loader);
+                case AI_SHIP: {
+                    loadShip(gameObject, this.gameplay_scene);
                     break;
                 }
             }
         }
 
-        function createCrosshair(gameObject, scene) {
-            var quad = new THREE.PlaneGeometry(0.015,0.015),
+        function loadCrosshair(gameObject, scene) {
+            var quad = new THREE.PlaneGeometry(0.02,0.02),
                 material = new THREE.MeshBasicMaterial({
                     map: THREE.ImageUtils.loadTexture(gameObject.drawParameters.crosshair),
                     blending: THREE.AdditiveBlending,
@@ -136,12 +136,8 @@ function GraphicsEngine() {
             scene.add(quadMesh);
         }
 
-        function loadLasers( ) {
-        
-        }
-        
         /*
-         *  Load skybox.
+         *  Load skybox. (gameObject)
          */
         function loadSkybox(gameObject, scene) {
             var shader = THREE.ShaderUtils.lib["cube"];
@@ -160,18 +156,20 @@ function GraphicsEngine() {
         }
 
         /*
-         *  Load ship.
+         *  Load ship. (gameObject)
          *
          */
-        function loadShip(gameObject, scene, loader) {
+        function loadShip(gameObject, scene) {
             var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
             loader.load(gameObject.drawParameters.geometry, callback);
         }
 
         /*
          *  Load model from JSON
-         *      objectType = 0 -> ship
-         *      objectType = 1 -> env_object
+         *      gameObject: gameObject to be loaded from model
+         *      scene: scene to add model to
+         *
+         *  (used only for gameObjects)
          */
         function loadJSON(geometry, gameObject, scene) {
 
@@ -181,24 +179,72 @@ function GraphicsEngine() {
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
 
-            switch(gameObject.type) {
+            switch(modelMesh.objectType) {
                 case PLAYER_SHIP: {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
+                    loadLasers(modelMesh, scene);
                     sceneElements.playerShip.push(modelMesh);
                     break;
                 }
                 case AI_SHIP: {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
+                    loadLasers(modelMesh, scene);
                     sceneElements.AIShips.push(modelMesh);
                     break;
                 }
             }
+            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
         }
-    }
 
+        /*
+         *  Creates lasers for a given ship (sceneObject).
+         *      parentShip: sceneObject that represents parent ship that lasers belong to
+         *      scene: scene to add lasers to
+         */
+        function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
+            var laserContainer = new THREE.Object3D();
+                callback = function(geometry) {loadJSONLasers(geometry, parentShip, laserContainer)};
+
+            loader.load(parentShip.drawParameters.laserModel, callback);
+
+            laserContainer.parentShipID = parentShip.id;
+            laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
+            sceneElements.lasers.push(laserContainer);
+            scene.add(laserContainer);
+
+        }
+
+        /*
+         *  Creates mesh based on model, fills in parameters based on parentShip's parameters,
+         *  fills in parameters necessary for drawing and computations, and populates container.
+         *  (called by loadLasers only)
+         *      parentShip: sceneObject representing parent ship the lasers belong to
+         *      laserContainer: Object3D to hold individual lasers
+         */
+        function loadJSONLasers(geometry, parentShip, laserContainer) {
+
+            var laserMesh;
+            var i;
+            for(i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
+                laserMesh = new THREE.Mesh(geometry, tempMaterial);
+                laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
+                laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
+                laserMesh.range = parentShip.gameParameters.weapons.lasers.range;
+                laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
+
+                laserMesh.useQuaternion = true;
+                laserMesh.fired = false;
+                laserMesh.currentDistance = 0;
+                laserMesh.direction = new THREE.Vector3();
+
+                laserContainer.add(laserMesh);
+            }
+
+        }
+    }
 
 
 
@@ -251,63 +297,6 @@ function GraphicsEngine() {
                 sceneObject = gameScene.objects[i];
                 switch(sceneObject.objectType) {
                     case PLAYER_SHIP: {
-//                         //position ship according to camera position
-//                         sceneObject.position.copy(gameCamera.position);
-//                         //tilt left or right depending on roll
-//                         var diff;
-//                         if(gameControls.moveState.rollRight == 1) {
-//                             if(sceneObject.tiltRotationCurrent < sceneObject.tiltRotationMax) {
-//                                 diff = sceneObject.tiltRotationMax - sceneObject.tiltRotationCurrent;
-//                                 sceneObject.tiltRotationCurrent += 0.05 * diff;
-//                                 if(sceneObject.tiltRotationCurrent > sceneObject.tiltRotationMax) {
-//                                     sceneObject.tiltRotationCurrent = sceneObject.tiltRotationMax;
-//                                 }
-//                             }
-//                         }
-//                         if(gameControls.moveState.rollLeft == 1) {
-//                             if(sceneObject.tiltRotationCurrent > -sceneObject.tiltRotationMax) {
-//                                 diff = sceneObject.tiltRotationMax + sceneObject.tiltRotationCurrent;
-//                                 sceneObject.tiltRotationCurrent -= 0.05 * diff;
-//                                 if(sceneObject.tiltRotationCurrent < -sceneObject.tiltRotationMax) {
-//                                     sceneObject.tiltRotationCurrent = -sceneObject.tiltRotationMax;
-//                                 }
-//                             }
-//                         }
-//                         if(gameControls.moveState.rollRight == 0) {
-//                             if(sceneObject.tiltRotationCurrent > 0) {
-//                                 diff =  sceneObject.tiltRotationMax - sceneObject.tiltRotationCurrent + 1;
-//                                 sceneObject.tiltRotationCurrent -= 5/diff;
-//                                 if( sceneObject.tiltRotationCurrent < 0) {
-//                                     sceneObject.tiltRotationCurrent = 0;
-//                                 }
-//                             }
-//                         }
-//                         if(gameControls.moveState.rollLeft == 0) {
-//                             if(sceneObject.tiltRotationCurrent < 0) {
-//                                 diff = sceneObject.tiltRotationMax + sceneObject.tiltRotationCurrent + 1;
-//                                 sceneObject.tiltRotationCurrent += 5/diff;
-//                                 if(sceneObject.tiltRotationCurrent > 0) {
-//                                     sceneObject.tiltRotationCurrent = 0;
-//                                 }
-//                             }
-//                         }
-//
-//                         tilt left or right depending on turn
-//                         var tempVec = new THREE.Vector3(),
-//                             tempQuat = new THREE.Quaternion();
-//                         sceneObject.quaternion.copy(gameCamera.quaternion);
-//                         tempVec.set(0, 0,  sceneObject.tiltRotationCurrent);
-//                         tempQuat.setFromEuler(tempVec);
-//                         sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
-//
-//                         tempVec.set(0, 0, -gameControls.rotationVector.x*gameControls.rotationVector.y * 25); //might not need to hard code 25
-//                         tempQuat.setFromEuler(tempVec);
-//                         sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
-//
-//                         sceneObject.translateX(gameControls.rotationVector.y * 2); //might not need to hardcode 2
-//                         sceneObject.translateY(-gameControls.rotationVector.x * 1.75 - 3); //ditto
-//                         sceneObject.translateZ(-15); //ditto
-
                         //position ship according to camera position
                         sceneObject.position.copy(gameCamera.position);
                         //tilt left or right depending on roll
@@ -372,7 +361,7 @@ function GraphicsEngine() {
                 }
             }
         }
-        
+
         function drawHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
             var i;

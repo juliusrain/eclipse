@@ -25,7 +25,8 @@ var playerShip = {  type: PLAYER_SHIP,
                                 damage: 0,
                                 range: 500,
                                 speed: 10,
-                                amount: 50
+                                amount: 50,
+
                             },
                             missiles: {
 
@@ -36,6 +37,7 @@ var playerShip = {  type: PLAYER_SHIP,
                     drawParameters: {   //graphics/drawing related parameters
 
                         geometry: "models/ships/prototype1.js",
+                        laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
 
@@ -48,26 +50,38 @@ var playerShip = {  type: PLAYER_SHIP,
 gameObjects.push(playerShip);
 
 var AIShip = {  type: AI_SHIP,
-                    gameParameters: {
-                        name: "aiShip", //model number?
-                        engine: {   level: 0,
-                                    speed: 1,
-                                    turnFactor: 1.2
-                        },
-                        armor: {},
-                        health: 100,
-                        weapons: {},
-                        inventory: {},
+                gameParameters: {
+                    name: "aiShip", //model number?
+                    engine: {   level: 0,
+                                speed: 1,
+                                turnFactor: 1.2
                     },
-                    drawParameters: {
+                    armor: {},
+                    health: 100,
+                    weapons: {
+                        lasers: {
+                            type: 0, //particle vs elongated?
+                            damage: 0,
+                            range: 500,
+                            speed: 10,
+                            amount: 25,
 
-                        geometry: "models/ships/prototype1.js",
-                        material: "", //not sure if this will be needed, still waiting on textured blender model
+                        },
+                        missiles: {
 
-                        tiltRotationCurrent: 0, //can make these specific to engine
-                        tiltRotationMax: 20,
+                        }
+                    },
+                    inventory: {},
+                },
+                drawParameters: {
 
-                        position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
-                    }
-                };
+                    geometry: "models/ships/prototype1.js",
+                    material: "", //not sure if this will be needed, still waiting on textured blender model
+                    laserModel: "models/lasers/laser.js",
+                    tiltRotationCurrent: 0, //can make these specific to engine
+                    tiltRotationMax: 20,
+
+                    position: {x: 0, y: 0, z: -50} //starting position in scene when not main ship
+                }
+            };
 gameObjects.push(AIShip);
