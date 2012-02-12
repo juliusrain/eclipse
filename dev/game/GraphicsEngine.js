@@ -1,5 +1,5 @@
 //game engine
-
+var entities = {ships: []};
 /*
  * Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
@@ -186,6 +186,7 @@ function GraphicsEngine() {
 //                 modelMesh.tiltRotationMax = gameObject.parameters.tiltRotationMax;
             }
             scene.add(modelMesh);
+	entities.ships.push(scene.objects[scene.objects.length-1]);
         }
     }
 
