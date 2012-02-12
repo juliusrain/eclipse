@@ -107,7 +107,7 @@ function GraphicsEngine() {
 
                 case PLAYER_SHIP: { //if ship object
                     loadShip(gameObject, this.gameplay_scene, loader);
-                    createCrosshair(gameObject, this.overlay_scene);
+                    createCrosshair(gameObject, this.gameplay_scene);
                     this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                     this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
                     break;
@@ -121,9 +121,9 @@ function GraphicsEngine() {
         }
 
         function createCrosshair(gameObject, scene) {
-            var quad = new THREE.PlaneGeometry(0.025,0.025),
+            var quad = new THREE.PlaneGeometry(0.015,0.015),
                 material = new THREE.MeshBasicMaterial({
-                    map: THREE.ImageUtils.loadTexture("textures/crosshair/crosshair.png"),
+                    map: THREE.ImageUtils.loadTexture(gameObject.drawParameters.crosshair),
                     blending: THREE.AdditiveBlending,
                     transparent: true
                 });
@@ -136,6 +136,10 @@ function GraphicsEngine() {
             scene.add(quadMesh);
         }
 
+        function loadLasers( ) {
+        
+        }
+        
         /*
          *  Load skybox.
          */
@@ -162,10 +166,6 @@ function GraphicsEngine() {
         function loadShip(gameObject, scene, loader) {
             var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
             loader.load(gameObject.drawParameters.geometry, callback);
-        }
-
-        function loadLasers(gameObject, ) {
-
         }
 
         /*
@@ -229,7 +229,7 @@ function GraphicsEngine() {
             stats.update();
 
             updateScene();
-            //drawHUD();
+            drawHUD();
 
             renderer.clear();
             renderer.render(gameScene, gameCamera); //actual game scene
@@ -357,7 +357,11 @@ function GraphicsEngine() {
                         tempQuat.setFromEuler(tempVec);
                         sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
-                        tempVec.set(0, 0, -gameControls.rotationVector.x*gameControls.rotationVector.y * 25); //might not need to hard code 25
+                        tempVec.set(0, 0, -gameControls.rotationVector.x); //might not need to hard code 25
+                        tempQuat.setFromEuler(tempVec);
+                        sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+
+                        tempVec.set(0, 0, -gameControls.rotationVector.y * 25); //might not need to hard code 25
                         tempQuat.setFromEuler(tempVec);
                         sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
@@ -368,7 +372,8 @@ function GraphicsEngine() {
                 }
             }
         }
-        function drawHUD() {
+        
+        function drawHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
             var i;
             var HUDObject;
@@ -376,14 +381,16 @@ function GraphicsEngine() {
                 HUDObject = HUDElements[i];
                 switch(HUDElements[i].objectType) {
                     case CROSSHAIR: {
-                        HUDObject.position.copy(sceneElements.playerShip[0].position);
-                        HUDObject.quaternion.copy(sceneElements.playerShip[0].quaternion);
-                        HUDObject.translateZ(-200);
+                        var tempVec = new THREE.Vector3(),
+                            tempQuat = new THREE.Quaternion();
+                        HUDObject.position.copy(gameCamera.position);
+                        HUDObject.quaternion.copy(gameCamera.quaternion);
+                        HUDObject.translateX(-gameControls.rotationVector.y*0.05);
+                        HUDObject.translateY(gameControls.rotationVector.x*0.05);
+                        HUDObject.translateZ(-1);
                         break;
                     }
                 }
             }
-
         }
-
     }
