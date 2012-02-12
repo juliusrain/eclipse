@@ -3,9 +3,9 @@ var gameObjects = []
 var skybox = {  type: SKYBOX,
                 parameters: {
                     name: "skybox",
-                    textures: [ "textures/cube/skybox/px.jpg", "textures/cube/skybox/nx.jpg",
-                                "textures/cube/skybox/py.jpg", "textures/cube/skybox/ny.jpg",
-                                "textures/cube/skybox/pz.jpg", "textures/cube/skybox/nz.jpg"]
+                    textures: [ "textures/skybox/px.jpg", "textures/skybox/nx.jpg",
+                                "textures/skybox/py.jpg", "textures/skybox/ny.jpg",
+                                "textures/skybox/pz.jpg", "textures/skybox/nz.jpg"]
                 }
             };
 gameObjects.push(skybox);
