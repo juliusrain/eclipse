@@ -10,16 +10,27 @@ var skybox = {  type: SKYBOX,
             };
 gameObjects.push(skybox);
 
-
 var playerShip = {  type: PLAYER_SHIP,
                     gameParameters: {   //game related parameters
                         name: "mainShip", //model number?
                         engine: {   level: 0,
+                                    speed: 1,
                                     turnFactor: 1.2 //also used by graphics engine
                         },
                         armor: {},
                         health: 100,
-                        weapons: {},
+                        weapons: {
+                            lasers: {
+                                type: 0, //particle vs elongated?
+                                damage: 0,
+                                range: 500,
+                                speed: 10,
+                                amount: 50
+                            },
+                            missiles: {
+
+                            }
+                        },
                         inventory: {},
                     },
                     drawParameters: {   //graphics/drawing related parameters
@@ -29,7 +40,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
 
                         tiltRotationCurrent: 0, //can make these specific to engine
-                        tiltRotationMax: 30,
+                        tiltRotationMax: 20,
 
                         position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
                     }
@@ -38,8 +49,9 @@ gameObjects.push(playerShip);
 
 var AIShip = {  type: AI_SHIP,
                     gameParameters: {
-                        name: "mainShip", //model number?
+                        name: "aiShip", //model number?
                         engine: {   level: 0,
+                                    speed: 1,
                                     turnFactor: 1.2
                         },
                         armor: {},
@@ -53,7 +65,7 @@ var AIShip = {  type: AI_SHIP,
                         material: "", //not sure if this will be needed, still waiting on textured blender model
 
                         tiltRotationCurrent: 0, //can make these specific to engine
-                        tiltRotationMax: 30,
+                        tiltRotationMax: 20,
 
                         position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
                     }

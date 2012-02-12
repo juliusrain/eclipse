@@ -1,5 +1,6 @@
 //game engine
-var entities = {ships: []};
+var sceneElements = {playerShip: [], AIShips: []};
+var HUDElements = [];
 /*
  * Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
@@ -21,13 +22,13 @@ function GraphicsEngine() {
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
-    this.gameplay_camera = new THREE.PerspectiveCamera(45, this.canvas_width/this.canvas_height, 0.1, 1e7);
+    this.gameplay_camera = new THREE.PerspectiveCamera(40, this.canvas_width/this.canvas_height, 0.1, 1e7);
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
 
     this.overlay_scene = new THREE.Scene();
-    this.overlay_camera = new THREE.PerspectiveCamera(45, this.canvas_width/this.canvas_height, 0.1, 1e7);
+    this.overlay_camera = new THREE.PerspectiveCamera(40, this.canvas_width/this.canvas_height, 0.1, 1e7);
     this.overlay_scene.add(this.overlay_camera);
 
 
@@ -106,8 +107,9 @@ function GraphicsEngine() {
 
                 case PLAYER_SHIP: { //if ship object
                     loadShip(gameObject, this.gameplay_scene, loader);
-                    drawCrosshair(gameObject, this.overlay_scene);
+                    createCrosshair(gameObject, this.overlay_scene);
                     this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
+                    this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
                     break;
                 }
 
@@ -118,7 +120,7 @@ function GraphicsEngine() {
             }
         }
 
-        function drawCrosshair(gameObject, scene) {
+        function createCrosshair(gameObject, scene) {
             var quad = new THREE.PlaneGeometry(0.025,0.025),
                 material = new THREE.MeshBasicMaterial({
                     map: THREE.ImageUtils.loadTexture("textures/crosshair/crosshair.png"),
@@ -126,9 +128,12 @@ function GraphicsEngine() {
                     transparent: true
                 });
             var quadMesh = new THREE.Mesh(quad, material);
-            quadMesh.position.z = -1;
+            quadMesh.useQuaternion = true;
+            quadMesh.objectType = CROSSHAIR;
+            quadMesh.name = "crosshair";
+            quadMesh.position.set(0, 0, -1);
+            HUDElements.push(quadMesh);
             scene.add(quadMesh);
-
         }
 
         /*
@@ -159,6 +164,10 @@ function GraphicsEngine() {
             loader.load(gameObject.drawParameters.geometry, callback);
         }
 
+        function loadLasers(gameObject, ) {
+
+        }
+
         /*
          *  Load model from JSON
          *      objectType = 0 -> ship
@@ -171,22 +180,22 @@ function GraphicsEngine() {
             modelMesh.direction = new THREE.Vector3();
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
-            if(gameObject.type == PLAYER_SHIP || gameObject.type == AI_SHIP) { //if ship, load ship-specific parameters
-                //load game related parameters
-                modelMesh.gameParameters = gameObject.gameParameters; //is this safe...?
-//                 modelMesh.gameParameters.engine = { level: gameObject.gameParameters.engine.level,
-//                                                     turnFactor: gameObject.gameParameters.engine.turnFactor
-//                                                   };
-//                 modelMesh.gameParameters.armor = {};
-//                 modelMesh.health = gameObject.gameParameters.health;
 
-                //load graphics/drawing related parameters
-                modelMesh.drawParameters = gameObject.drawParameters; //safe...........?
-//                 modelMesh.tiltRotationCurrent = gameObject.parameters.tiltRotationCurrent;
-//                 modelMesh.tiltRotationMax = gameObject.parameters.tiltRotationMax;
+            switch(gameObject.type) {
+                case PLAYER_SHIP: {
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    sceneElements.playerShip.push(modelMesh);
+                    break;
+                }
+                case AI_SHIP: {
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    sceneElements.AIShips.push(modelMesh);
+                    break;
+                }
             }
             scene.add(modelMesh);
-	entities.ships.push(scene.objects[scene.objects.length-1]);
         }
     }
 
@@ -220,7 +229,7 @@ function GraphicsEngine() {
             stats.update();
 
             updateScene();
-
+            //drawHUD();
 
             renderer.clear();
             renderer.render(gameScene, gameCamera); //actual game scene
@@ -324,7 +333,7 @@ function GraphicsEngine() {
                         if(gameControls.moveState.rollRight == 0) {
                             if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                                 diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent + 1;
-                                sceneObject.drawParameters.tiltRotationCurrent -= 5/diff;
+                                sceneObject.drawParameters.tiltRotationCurrent -= 3/diff;
                                 if( sceneObject.drawParameters.tiltRotationCurrent < 0) {
                                     sceneObject.drawParameters.tiltRotationCurrent = 0;
                                 }
@@ -333,7 +342,7 @@ function GraphicsEngine() {
                         if(gameControls.moveState.rollLeft == 0) {
                             if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
                                 diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent + 1;
-                                sceneObject.drawParameters.tiltRotationCurrent += 5/diff;
+                                sceneObject.drawParameters.tiltRotationCurrent += 3/diff;
                                 if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                                     sceneObject.drawParameters.tiltRotationCurrent = 0;
                                 }
@@ -352,13 +361,29 @@ function GraphicsEngine() {
                         tempQuat.setFromEuler(tempVec);
                         sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
-                        sceneObject.translateX(gameControls.rotationVector.y * 2); //might not need to hardcode 2
-                        sceneObject.translateY(-gameControls.rotationVector.x * 1.75 - 3); //ditto
+                        sceneObject.translateX(gameControls.rotationVector.y); //might not need to hardcode 2
+                        sceneObject.translateY(-gameControls.rotationVector.x - 3); //ditto
                         sceneObject.translateZ(-15); //ditto
                     }
                 }
             }
         }
+        function drawHUD() {
+            //draw crosshair
+            var i;
+            var HUDObject;
+            for(i = 0; i < HUDElements.length; i++) {
+                HUDObject = HUDElements[i];
+                switch(HUDElements[i].objectType) {
+                    case CROSSHAIR: {
+                        HUDObject.position.copy(sceneElements.playerShip[0].position);
+                        HUDObject.quaternion.copy(sceneElements.playerShip[0].quaternion);
+                        HUDObject.translateZ(-200);
+                        break;
+                    }
+                }
+            }
 
+        }
 
     }
