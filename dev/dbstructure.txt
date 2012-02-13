@@ -1,0 +1,21 @@
+CREATE TABLE games
+(
+gid int NOT NULL AUTO_INCREMENT,
+status int,
+owner int,
+PRIMARY KEY (gid),
+FOREIGN KEY (owner) REFERENCES users (uid)
+)
+
+CREATE TABLE single_games
+(
+gid int NOT NULL,
+uid int NOT NULL,
+ssid int,
+pid int,
+PRIMARY KEY (gid),
+FOREIGN KEY (gid) REFERENCES games (gid),
+FOREIGN KEY (uid) REFERENCES users (uid)
+)
+
+
