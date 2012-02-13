@@ -1,8 +1,6 @@
 //game engine
-var sceneElements = {playerShip: [], AIShips: [], lasers: []};
-var HUDElements = [];
-/*
- * Create and initialize Threejs elements.
+
+/* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
 function GraphicsEngine() {
@@ -27,14 +25,22 @@ function GraphicsEngine() {
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
 
+    //HUD elements (might not need this)
     this.overlay_scene = new THREE.Scene();
     this.overlay_camera = new THREE.PerspectiveCamera(40, this.canvas_width/this.canvas_height, 0.1, 1e7);
     this.overlay_scene.add(this.overlay_camera);
 
-
-    //threejs scene elements for map overlay
+    //threejs scene elements for map overlay (jump map)
     this.map_scene = new THREE.Scene();
     this.map_camera = new THREE.PerspectiveCamera(45, this.canvas_width/this.canvas_height, 0.1, 1e7);
+
+    //main renderer
+    this.renderer = new THREE.WebGLRenderer();
+    this.renderer.setSize(this.canvas_width, this.canvas_height);
+    this.renderer.autoClear = false;
+    this.container.appendChild(this.renderer.domElement);
+
+
 /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
     this.stats = new Stats();
@@ -43,18 +49,14 @@ function GraphicsEngine() {
     this.container.appendChild(this.stats.domElement);
 ///////////////////////////////////
 
-    //main renderer
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(this.canvas_width, this.canvas_height);
-    this.renderer.autoClear = false;
-    this.container.appendChild(this.renderer.domElement);
+///////////////////////////////////
 
     window.addEventListener('resize', onWindowResize, false);
 
-    var width, height,
-        renderer = this.renderer,
+    var renderer = this.renderer,
+        gameScene = this.gameplay_scene,
         gameCamera = this.gameplay_camera;
-        overlayCamera = this.overlay_camera;
+
 
     function onWindowResize(event) {
         width = window.innerWidth;
@@ -62,25 +64,18 @@ function GraphicsEngine() {
         renderer.setSize(width, height);
         gameCamera.aspect = (width/height);
         gameCamera.updateProjectionMatrix();
-        overlayCamera.aspect = (width/height);
-        overlayCamera.updateProjectionMatrix();
-
     }
+
+
+///////////////////////////////////////
 
 }
-
-
-    //for private use
-    var destroyObjects = function() {
-
-    }
-
-
+////////////////////////////////
                 //for testing purposes, remove for final
                 var tempMaterial = new THREE.MeshNormalMaterial({
                 });
+//////////////////////////////
 
-                //--------------------------------------
 
 //=======================================================================
 //==================== Loading Functions ===============================
@@ -184,7 +179,7 @@ function GraphicsEngine() {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
                     loadLasers(modelMesh, scene);
-                    sceneElements.playerShip.push(modelMesh);
+                    sceneElements.mainShip.push(modelMesh);
                     break;
                 }
                 case AI_SHIP: {
@@ -210,7 +205,8 @@ function GraphicsEngine() {
 
             loader.load(parentShip.drawParameters.laserModel, callback);
 
-            laserContainer.parentShipID = parentShip.id;
+            laserContainer.parentShip = parentShip; //assign pointer from lasers to its parent ship
+            parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
             sceneElements.lasers.push(laserContainer);
             scene.add(laserContainer);
@@ -246,8 +242,18 @@ function GraphicsEngine() {
         }
     }
 
+//=================================================================
+//================= Scene manipulation functions ==================
 
+    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) {
+        scene = this.gameplay_scene;
+        scene.remove(sceneObject);
+    }
 
+    GraphicsEngine.prototype.addSceneObject = function(sceneObject) {
+        scene = this.gameplay_scene;
+        scene.add(sceneObject);
+    }
 
 
 
