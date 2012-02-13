@@ -24,6 +24,7 @@ function GraphicsEngine() {
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
+    this.gameplay_controls.dragToLook = true;////////////////////////////////
 
     //HUD elements (might not need this)
     this.overlay_scene = new THREE.Scene();
@@ -78,7 +79,10 @@ function GraphicsEngine() {
                 var sphereGeometry = new THREE.SphereGeometry(1,10,10);
                 var tempSphere = new THREE.Mesh(sphereGeometry, tempMaterial);
                 var xpos = 0;
-                tempSphere.position.set(xpos,0,-200);
+                tempSphere.position.set(xpos,0,-100);
+
+                var axishelper = new THREE.AxisHelper();
+                
 
                 
 //////////////////////////////
@@ -93,6 +97,9 @@ function GraphicsEngine() {
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
 
 /////////////////////////////
+       
+        
+        this.gameplay_scene.add(axishelper);
         this.gameplay_scene.add(tempSphere);
 
 ////////////////////////////
@@ -183,7 +190,7 @@ function GraphicsEngine() {
 
             var modelMesh = new THREE.Mesh(geometry, tempMaterial);//(geometry, new THREE.MeshFaceMaterial());
             modelMesh.useQuaternion = true;
-            modelMesh.direction = new THREE.Vector3();
+            modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
 
@@ -198,6 +205,7 @@ function GraphicsEngine() {
                 case AI_SHIP: {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
+                    modelMesh.up.set(0, 1, 0);
                     loadLasers(modelMesh, scene);
                     sceneElements.AIShips.push(modelMesh);
                     break;
@@ -379,15 +387,26 @@ function GraphicsEngine() {
                         break;
                     }
                     case AI_SHIP: {
-                        xpos += 0.005;
+                        var tempVec = new THREE.Vector3().set(tempSphere.position.x - sceneObject.position.x, tempSphere.position.y - sceneObject.position.y, tempSphere.position.z - sceneObject.position.z);
+                        var tempQuat = new THREE.Quaternion();
+                        var tempMat = 
+                        tempQuat.multiplyVector3(tempVec, sceneObject.direction); //get direction from quaternion
+
+                        sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+
+                        //console.log(tempSphere.position.x, tempSphere.position.y, tempSphere.position.z);
+                        //sceneObject.rotation.y = Math.PI;
+
+                        xpos += 0.05;
                         xpos%360;
-                        tempSphere.position.x = 100*Math.cos(xpos);
-                        var tempVec = new THREE.Vector3(tempSphere.position.x - sceneObject.position.x, tempSphere.position.y - sceneObject.position.y, tempSphere.position.z - sceneObject.position.z).normalize();
-                        sceneObject.lookAt(tempVec);
+                        tempSphere.position.x = 30*Math.cos(xpos);
+                        sceneObject.lookAt(tempSphere.position);
                         break;
                     }
                 }
+
             }
+
         }
 
         function drawHUD() { //includes crosshair, ring around mainship to show other ships,
