@@ -65,15 +65,22 @@ function GraphicsEngine() {
         gameCamera.aspect = (width/height);
         gameCamera.updateProjectionMatrix();
     }
-
-
 ///////////////////////////////////////
-
 }
+
+
 ////////////////////////////////
                 //for testing purposes, remove for final
                 var tempMaterial = new THREE.MeshNormalMaterial({
                 });
+
+                
+                var sphereGeometry = new THREE.SphereGeometry(1,10,10);
+                var tempSphere = new THREE.Mesh(sphereGeometry, tempMaterial);
+                var xpos = 0;
+                tempSphere.position.set(xpos,0,-200);
+
+                
 //////////////////////////////
 
 
@@ -84,6 +91,12 @@ function GraphicsEngine() {
      *   Input: Array of gameObjects following specified format.
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
+
+/////////////////////////////
+        this.gameplay_scene.add(tempSphere);
+
+////////////////////////////
+
 
         this.gameplayObjects = objects;
 
@@ -205,7 +218,7 @@ function GraphicsEngine() {
 
             loader.load(parentShip.drawParameters.laserModel, callback);
 
-            laserContainer.parentShip = parentShip; //assign pointer from lasers to its parent ship
+            //laserContainer.parentShip = parentShip; //assign pointer from lasers to its parent ship
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
             sceneElements.lasers.push(laserContainer);
@@ -363,6 +376,15 @@ function GraphicsEngine() {
                         sceneObject.translateX(gameControls.rotationVector.y); //might not need to hardcode 2
                         sceneObject.translateY(-gameControls.rotationVector.x - 3); //ditto
                         sceneObject.translateZ(-15); //ditto
+                        break;
+                    }
+                    case AI_SHIP: {
+                        xpos += 0.005;
+                        xpos%360;
+                        tempSphere.position.x = 100*Math.cos(xpos);
+                        var tempVec = new THREE.Vector3(tempSphere.position.x - sceneObject.position.x, tempSphere.position.y - sceneObject.position.y, tempSphere.position.z - sceneObject.position.z).normalize();
+                        sceneObject.lookAt(tempVec);
+                        break;
                     }
                 }
             }
