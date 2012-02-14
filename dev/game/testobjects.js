@@ -50,6 +50,7 @@ var playerShip = {  type: PLAYER_SHIP,
 gameObjects.push(playerShip);
 
 var AIShip = {  type: AI_SHIP,
+
                 gameParameters: {
                     name: "aiShip", //model number?
                     engine: {   level: 0,
@@ -74,7 +75,7 @@ var AIShip = {  type: AI_SHIP,
                     inventory: {},
                 },
                 drawParameters: {
-
+                    shipID: 0,
                     geometry: "models/ships/prototype1.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
@@ -85,3 +86,41 @@ var AIShip = {  type: AI_SHIP,
                 }
             };
 gameObjects.push(AIShip);
+
+var AIShip2 = { type: AI_SHIP,
+
+                gameParameters: {
+                    name: "aiShip1", //model number?
+                    engine: {   level: 0,
+                                speed: 1,
+                                turnFactor: 1.2
+                    },
+                    armor: {},
+                    health: 100,
+                    weapons: {
+                        lasers: {
+                            type: 0, //particle vs elongated?
+                            damage: 0,
+                            range: 500,
+                            speed: 10,
+                            amount: 25,
+
+                        },
+                        missiles: {
+
+                        }
+                    },
+                    inventory: {},
+                },
+                drawParameters: {
+                    shipID: 1,
+                    geometry: "models/ships/prototype1.js",
+                    material: "", //not sure if this will be needed, still waiting on textured blender model
+                    laserModel: "models/lasers/laser.js",
+                    tiltRotationCurrent: 0, //can make these specific to engine
+                    tiltRotationMax: 20,
+
+                    position: {x: 30, y: 0, z: -20} //starting position in scene when not main ship
+                }
+            };
+gameObjects.push(AIShip2);

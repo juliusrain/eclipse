@@ -7,4 +7,5 @@ var SKYBOX = 0,
     AI_SHIP = 11,
 
 
-    CROSSHAIR = 90;
+    CROSSHAIR = 90,
+    RING = 91;
