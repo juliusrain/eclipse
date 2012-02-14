@@ -78,8 +78,7 @@ function GraphicsEngine() {
                 
                 var sphereGeometry = new THREE.SphereGeometry(1,10,10);
                 var tempSphere = new THREE.Mesh(sphereGeometry, tempMaterial);
-                var xpos = 0;
-                tempSphere.position.set(xpos,0,-100);
+                tempSphere.position.set(0,0,-100);
 
                 var axishelper = new THREE.AxisHelper();
                 
@@ -205,7 +204,6 @@ function GraphicsEngine() {
                 case AI_SHIP: {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
-                    modelMesh.up.set(0, 1, 0);
                     loadLasers(modelMesh, scene);
                     sceneElements.AIShips.push(modelMesh);
                     break;
@@ -267,13 +265,11 @@ function GraphicsEngine() {
 //================= Scene manipulation functions ==================
 
     GraphicsEngine.prototype.removeSceneObject = function(sceneObject) {
-        scene = this.gameplay_scene;
-        scene.remove(sceneObject);
+        this.gameplay_scene.remove(sceneObject);
     }
 
     GraphicsEngine.prototype.addSceneObject = function(sceneObject) {
-        scene = this.gameplay_scene;
-        scene.add(sceneObject);
+        this.gameplay_scene.add(sceneObject);
     }
 
 
@@ -387,20 +383,26 @@ function GraphicsEngine() {
                         break;
                     }
                     case AI_SHIP: {
+                    
+                        var t = Date.now() * 0.0005;
+                        tempSphere.position.x = 30*Math.cos(t);
+                        tempSphere.position.y = 30*Math.sin(t);
+                        
                         var tempVec = new THREE.Vector3().set(tempSphere.position.x - sceneObject.position.x, tempSphere.position.y - sceneObject.position.y, tempSphere.position.z - sceneObject.position.z);
-                        var tempQuat = new THREE.Quaternion();
-                        var tempMat = 
-                        tempQuat.multiplyVector3(tempVec, sceneObject.direction); //get direction from quaternion
-
-                        sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
-
+                        
+                        
+                        var tempMat = new THREE.Matrix4();
+                        tempMat.lookAt(sceneObject.position, tempSphere.position, sceneObject.up);
+                        
+                        var tempQuat = new THREE.Quaternion().setFromRotationMatrix(tempMat);
+                        sceneObject.quaternion.copy(tempQuat);
+                        
+                        //sceneObject.quaternion.multiplyVector3(tempVec, sceneObject.direction);
+                        //console.log(sceneObject.quaternion.w, sceneObject.quaternion.x, sceneObject.quaternion.y, sceneObject.quaternion.z);
+                        //console.log(sceneObject.direction.x, sceneObject.direction.y, sceneObject.direction.z);
+                        //console.log(tempVec.x, tempVec.y, tempVec.z);
                         //console.log(tempSphere.position.x, tempSphere.position.y, tempSphere.position.z);
-                        //sceneObject.rotation.y = Math.PI;
 
-                        xpos += 0.05;
-                        xpos%360;
-                        tempSphere.position.x = 30*Math.cos(xpos);
-                        sceneObject.lookAt(tempSphere.position);
                         break;
                     }
                 }
@@ -408,6 +410,7 @@ function GraphicsEngine() {
             }
 
         }
+        
 
         function drawHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
