@@ -24,6 +24,7 @@ function GraphicsEngine() {
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
+    //this.gameplay_controls.dragToLook = true;
 
     //HUD elements (might not need this)
     this.overlay_scene = new THREE.Scene();
@@ -76,7 +77,7 @@ function GraphicsEngine() {
                 var sphereGeometry = new THREE.SphereGeometry(1,10,10);
                 var tempSphere1 = new THREE.Mesh(sphereGeometry, tempMaterial);
                     tempSphere2 = new THREE.Mesh(sphereGeometry, tempMaterial);
-                
+
                 var infinityreverse = false;
                 var axishelper = new THREE.AxisHelper();
 
@@ -248,6 +249,7 @@ function GraphicsEngine() {
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
                 laserMesh.direction = new THREE.Vector3();
+                //laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
             }
@@ -283,8 +285,16 @@ function GraphicsEngine() {
             overlayCamera = this.overlay_camera,
             skyboxScene = this.skybox_scene,
             skyboxCamera = this.skybox_camera,
-            stats = this.stats;
+            stats = this.stats,
 
+            tempVec,
+            tempQuat,
+            tempMat,
+            tempVecForward,
+            tempVecDir;
+
+
+        init();
         animate();
         function render() { //can have a separate function to update scene
             gameControls.update(gameControls_factor);
@@ -296,7 +306,7 @@ function GraphicsEngine() {
 
             renderer.clear();
             renderer.render(gameScene, gameCamera); //actual game scene
-            renderer.render(overlayScene, overlayCamera); //draw hud, crosshair, ring, etc...
+            //renderer.render(overlayScene, overlayCamera); //draw hud, crosshair, ring, etc...
         }
 
         function animate() {
@@ -304,11 +314,22 @@ function GraphicsEngine() {
             render();
         }
 
+        function init() {
+            tempVec = new THREE.Vector3();
+            tempVecDir = new THREE.Vector3();
+            tempVecForward = new THREE.Vector3();
+            tempQuat = new THREE.Quaternion();
+            tempMat = new THREE.Matrix4();
+
+        }
+
+
+        var sceneObject,
+            diff;
         function drawMainShip() {
-            var sceneObject = sceneElements.mainShip;
+            sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(gameCamera.position);
             //tilt left or right depending on roll
-            var diff;
             if(gameControls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
                     diff = sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent;
@@ -330,7 +351,7 @@ function GraphicsEngine() {
             if(gameControls.moveState.rollRight == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                     diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent + 1;
-                    sceneObject.drawParameters.tiltRotationCurrent -= 3/diff;
+                    sceneObject.drawParameters.tiltRotationCurrent -= 0.0035 * diff;
                     if( sceneObject.drawParameters.tiltRotationCurrent < 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }
@@ -339,7 +360,7 @@ function GraphicsEngine() {
             if(gameControls.moveState.rollLeft == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
                     diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent + 1;
-                    sceneObject.drawParameters.tiltRotationCurrent += 3/diff;
+                    sceneObject.drawParameters.tiltRotationCurrent += 0.0035 * diff;
                     if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }
@@ -347,19 +368,15 @@ function GraphicsEngine() {
             }
 
             //tilt left or right depending on turn
-            var tempVec = new THREE.Vector3(),
-                tempQuat = new THREE.Quaternion();
             sceneObject.quaternion.copy(gameCamera.quaternion);
-            tempVec.set(0, 0,  sceneObject.drawParameters.tiltRotationCurrent);
-            tempQuat.setFromEuler(tempVec);
+
+            tempVec.set(0, 0, -1);
+            sceneObject.quaternion.multiplyVector3(tempVec, sceneObject.direction);
+
+            tempQuat.setFromAxisAngle(tempVec, sceneObject.drawParameters.tiltRotationCurrent);
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
-            tempVec.set(0, 0, -gameControls.rotationVector.x); //might not need to hard code 25
-            tempQuat.setFromEuler(tempVec);
-            sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
-
-            tempVec.set(0, 0, -gameControls.rotationVector.y * 25); //might not need to hard code 25
-            tempQuat.setFromEuler(tempVec);
+            tempQuat.setFromAxisAngle(tempVec, -gameControls.rotationVector.y * 0.35);
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
             sceneObject.translateX(gameControls.rotationVector.y); //might not need to hardcode 2
@@ -367,16 +384,14 @@ function GraphicsEngine() {
             sceneObject.translateZ(-15); //ditto (distance from camera)
         }
 
+        var HUDObject,
+            i;
         function drawHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
-            var i;
-            var HUDObject;
             for(i = 0; i < HUDElements.length; i++) {
                 HUDObject = HUDElements[i];
                 switch(HUDElements[i].objectType) {
                     case CROSSHAIR: {
-                        var tempVec = new THREE.Vector3(),
-                            tempQuat = new THREE.Quaternion();
                         HUDObject.position.copy(gameCamera.position);
                         HUDObject.quaternion.copy(gameCamera.quaternion);
                         HUDObject.translateX(-gameControls.rotationVector.y*0.05);
@@ -396,41 +411,73 @@ function GraphicsEngine() {
          *  Function to update the objects in the scene (~= game engine for now)
          */
         function updateScene() {
-            var i;
-            var sceneObject;
             for(i = 0; i < gameScene.objects.length; i++) {
                 sceneObject = gameScene.objects[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
-                        var tempMat = new THREE.Matrix4();
-                        var tempQuat = new THREE.Quaternion();
+                        tempVecForward.set(0, 0, -1);
                         switch(sceneObject.drawParameters.shipID) {
                             case 0: {
+
+                                //calculate object's current look direction
+                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                sceneObject.direction.normalize();
+
+                                //object's new look direction
+                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
+
+                                //invert ship quaternion and apply to new look dir
+                                tempQuat.copy(sceneObject.quaternion).inverse();
+                                tempQuat.multiplyVector3(tempVecDir, tempVec);
+
+                                //set a rotation based on x offset of forward dir and new look dir (local coords)
+                                tempQuat.setFromAxisAngle(tempVecForward, 0.5 * tempVec.x); //get max angle based on huy's direction vector
+
+                                //look at new dir (world coords)
                                 tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
-                                tempQuat.setFromRotationMatrix(tempMat);
-                                sceneObject.quaternion.copy(tempQuat);
+                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
+
+                                //apply turn rotation
+                                sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+
+                                //go forward
                                 sceneObject.translateZ(-0.8);
                                 break;
                             }
                             case 1: {
+
+                                //calculate object's current look direction
+                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                sceneObject.direction.normalize();
+
+                                //object's new look direction
+                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
+
+                                //invert ship quaternion and apply to new look dir
+                                tempQuat.copy(sceneObject.quaternion).inverse();
+                                tempQuat.multiplyVector3(tempVecDir, tempVec);
+
+                                //set a rotation based on x offset of forward dir and new look dir (local coords)
+                                tempQuat.setFromAxisAngle(tempVecForward, 0.5 * tempVec.x);
+
+                                //look at new dir (world coords)
                                 tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
-                                tempQuat.setFromRotationMatrix(tempMat);
-                                sceneObject.quaternion.copy(tempQuat);
+                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
+
+                                //apply turn rotation
+                                sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+
+                                //go forward
                                 sceneObject.translateZ(-0.5);
                                 break;
                             }
                         }
-                        //sceneObject.quaternion.multiplyVector3(tempVec, sceneObject.direction);
-                        //console.log(sceneObject.quaternion.w, sceneObject.quaternion.x, sceneObject.quaternion.y, sceneObject.quaternion.z);
-                        //console.log(sceneObject.direction.x, sceneObject.direction.y, sceneObject.direction.z);
-                        //console.log(tempVec.x, tempVec.y, tempVec.z);
-                        //console.log(tempSphere.position.x, tempSphere.position.y, tempSphere.position.z);
 
                         break;
                     }
                 }
-                var t = Date.now() * 0.001;
 
+                var t = Date.now() * 0.0008;
                 tempSphere1.position.x = 50*Math.cos(t);
                 tempSphere1.position.y = 30*Math.cos(t);
                 tempSphere1.position.z = 80*Math.sin(t) - 40;
