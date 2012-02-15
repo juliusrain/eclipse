@@ -117,6 +117,7 @@ function GraphicsEngine() {
                 case PLAYER_SHIP: {
                     loadShip(gameObject, this.gameplay_scene);
                     loadCrosshair(gameObject, this.gameplay_scene);
+                    loadRing(gameObject, this.gameplay_scene);
                     //set camera turning and movement speed based on main ship's parameters
                     this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                     this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
@@ -144,6 +145,30 @@ function GraphicsEngine() {
             quadMesh.position.set(0, 0, -1);
             HUDElements.push(quadMesh);
             scene.add(quadMesh);
+        }
+
+        function loadRing(gameObject, scene) { //pass gameobject to define radius maybe?
+            var ringGeometry = new THREE.Geometry(),
+                vertexPosition,
+                i;
+
+            for(i = 0; i <= 360; i++) {
+                vertexPosition = new THREE.Vector3(Math.cos(2 * Math.PI * i / 360), 0, Math.sin(2 * Math.PI * i / 360)); //replace 2 with radius
+                ringGeometry.vertices.push(new THREE.Vertex(vertexPosition));
+            }
+
+            var ringMaterial = new THREE.LineBasicMaterial({
+                    color: 0xffffff,
+                    opacity: 0.7,
+                    linewidth: 2
+            }),
+            ringLine = new THREE.Line(ringGeometry, ringMaterial);
+
+            ringLine.scale.set(4, 4, 4);
+            ringLine.name = "ship ring";
+            ringLine.objectType = RING;
+            scene.add(ringLine);
+            HUDElements.push(ringLine);
         }
 
         /*
@@ -398,6 +423,11 @@ function GraphicsEngine() {
                         HUDObject.translateY(gameControls.rotationVector.x*0.05);
                         HUDObject.translateZ(-1);
                         break;
+                    }
+                    case RING: {
+                        HUDObject.position.copy(sceneElements.mainShip.position);
+                        break;
+
                     }
                 }
             }
