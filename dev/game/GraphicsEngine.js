@@ -13,10 +13,13 @@ function GraphicsEngine() {
     //canvas dimensions
     this.canvas_width = window.innerWidth;
     this.canvas_height = window.innerHeight;
+    // this.canvas_width = parseInt($('#middle').css('width'));
+    // this.canvas_height = parseInt($('#middle').css('height'));
 
     //container
     this.container = document.createElement('game_div');
     document.body.appendChild(this.container);
+    // this.container = document.getElementById('maindiv');
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
@@ -96,6 +99,10 @@ function GraphicsEngine() {
         //this.gameplay_scene.add(axishelper);
         this.gameplay_scene.add(tempSphere1);
         this.gameplay_scene.add(tempSphere2);
+        
+
+        
+        
 ////////////////////////////
 
 
@@ -158,13 +165,13 @@ function GraphicsEngine() {
             }
 
             var ringMaterial = new THREE.LineBasicMaterial({
-                    color: 0xffffff,
-                    opacity: 0.7,
+                    color: 0xeeeeee,
+                    opacity: 0.9,
                     linewidth: 2
             }),
             ringLine = new THREE.Line(ringGeometry, ringMaterial);
 
-            ringLine.scale.set(4, 4, 4);
+            ringLine.scale.set(20, 20, 20);
             ringLine.name = "ship ring";
             ringLine.objectType = RING;
             scene.add(ringLine);
@@ -231,6 +238,7 @@ function GraphicsEngine() {
                 }
             }
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+            //modelMesh.scale.set(10, 10, 10);
             scene.add(modelMesh);
         }
 
@@ -284,14 +292,49 @@ function GraphicsEngine() {
 //=================================================================
 //================= Scene manipulation functions ==================
 
-    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) {
+    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
         this.gameplay_scene.remove(sceneObject);
     }
 
     GraphicsEngine.prototype.addSceneObject = function(sceneObject) {
         this.gameplay_scene.add(sceneObject);
     }
+    
+    GraphicsEngine.prototype.addExplosion = function(x, y, z) { //plus other vars
+        //will need multiple systems for the different textures
+        // var container = new THREE.Object3D();
+        // var geometry = new THREE.Geometry();
+        // var particlePosition, particleMaterial, particleSystem;
+        // var i;
+        // for(i = 0; i < 100; i++) {
+            // particlePosition = new THREE.Vector3(0, 0, 0);
+            // geometry.vertices.push(new THREE.Vertex(particlePosition));
+            // geometry.vertices[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+            // geometry.vertices[i].speed = Math.random() * 10;
+        // }
+        
+        // particleMaterial = new THREE.ParticleBasicMaterial({
+            // color: 0xff0000,
+            // size: 100,
+            
+        // });
+        
+        // particleSystem = new THREE.ParticleSystem(geometry, particleMaterial);
+        // //particleSystem.position.set(x, y, z);
+        // particleSystem.position.x = -10;
+        // particleSystem.name = "particle system";
+        
+        // this.gameplay_scene.add(particleSystem);
+        console.log("bfd");
+        var geometry = new THREE.SphereGeometry(20, 20, 20);
+        var mesh = new THREE.Mesh(geometry, tempMaterial);
+        mesh.position.set(-10, 0, 0);
+        mesh.name = "blah";
+        
+        this.gameplay_scene.add(mesh);
+    }
 
+//=================================================================
 
 
 //=============================================================
@@ -405,8 +448,8 @@ function GraphicsEngine() {
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
             sceneObject.translateX(gameControls.rotationVector.y); //might not need to hardcode 2
-            sceneObject.translateY(-gameControls.rotationVector.x - 3); //ditto
-            sceneObject.translateZ(-15); //ditto (distance from camera)
+            sceneObject.translateY(-gameControls.rotationVector.x - 20); //ditto
+            sceneObject.translateZ(-100); //ditto (distance from camera)
         }
 
         var HUDObject,
@@ -450,8 +493,8 @@ function GraphicsEngine() {
                             case 0: {
 
                                 //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
+                                // sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                // sceneObject.direction.normalize();
 
                                 //object's new look direction
                                 tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
@@ -459,9 +502,10 @@ function GraphicsEngine() {
                                 //invert ship quaternion and apply to new look dir
                                 tempQuat.copy(sceneObject.quaternion).inverse();
                                 tempQuat.multiplyVector3(tempVecDir, tempVec);
+                                tempVec.normalize();
 
                                 //set a rotation based on x offset of forward dir and new look dir (local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, 0.5 * tempVec.x); //get max angle based on huy's direction vector
+                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x); //get max angle based on huy's direction vector
 
                                 //look at new dir (world coords)
                                 tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
@@ -471,14 +515,14 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-0.8);
+                                sceneObject.translateZ(-5);
                                 break;
                             }
                             case 1: {
 
                                 //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
+                                // sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                // sceneObject.direction.normalize();
 
                                 //object's new look direction
                                 tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
@@ -486,9 +530,10 @@ function GraphicsEngine() {
                                 //invert ship quaternion and apply to new look dir
                                 tempQuat.copy(sceneObject.quaternion).inverse();
                                 tempQuat.multiplyVector3(tempVecDir, tempVec);
+                                tempVec.normalize();
 
                                 //set a rotation based on x offset of forward dir and new look dir (local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, 0.5 * tempVec.x);
+                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x);
 
                                 //look at new dir (world coords)
                                 tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
@@ -498,7 +543,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-0.5);
+                                sceneObject.translateZ(-3);
                                 break;
                             }
                         }
@@ -508,13 +553,13 @@ function GraphicsEngine() {
                 }
 
                 var t = Date.now() * 0.0008;
-                tempSphere1.position.x = 50*Math.cos(t);
-                tempSphere1.position.y = 30*Math.cos(t);
-                tempSphere1.position.z = 80*Math.sin(t) - 40;
+                tempSphere1.position.x = 500*Math.cos(t);
+                tempSphere1.position.y = 300*Math.cos(t);
+                tempSphere1.position.z = 800*Math.sin(t) - 400;
 
-                tempSphere2.position.x = 40*Math.sin(t);
-                tempSphere2.position.y = 50*Math.cos(t) + 15;
-                tempSphere2.position.z = 60*Math.cos(t);
+                tempSphere2.position.x = 400*Math.sin(t);
+                tempSphere2.position.y = 500*Math.cos(t) + 150;
+                tempSphere2.position.z = 600*Math.cos(t);
 
             }
 

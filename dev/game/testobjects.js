@@ -15,7 +15,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         name: "mainShip", //model number?
                         engine: {   level: 0,
                                     speed: 1,
-                                    turnFactor: 1.2 //also used by graphics engine
+                                    turnFactor: 1.5 //also used by graphics engine
                         },
                         armor: {},
                         health: 100,
@@ -36,7 +36,7 @@ var playerShip = {  type: PLAYER_SHIP,
                     },
                     drawParameters: {   //graphics/drawing related parameters
 
-                        geometry: "models/ships/prototype1.js",
+                        geometry: "models/ships/prototype1big.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
@@ -76,7 +76,7 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 0,
-                    geometry: "models/ships/prototype1.js",
+                    geometry: "models/ships/prototype1big.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
@@ -114,7 +114,7 @@ var AIShip2 = { type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/prototype1.js",
+                    geometry: "models/ships/prototype1big.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
