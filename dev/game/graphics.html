@@ -141,21 +141,22 @@
 
 
 
-				//shader material
-				uniforms = {
-					texture: {type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("textures/water.jpg")}
-				};
-
-				shaderMaterial = new THREE.ShaderMaterial({
-					uniforms: uniforms,
-					vertexShader: document.getElementById('vertexShader').textContent,
-					fragmentShader: document.getElementById('fragmentShader').textContent
-				});
+// 				//shader material
+// 				uniforms = {
+// 					texture: {type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("textures/water.jpg")}
+// 				};
+//
+// 				shaderMaterial = new THREE.ShaderMaterial({
+// 					uniforms: uniforms,
+// 					vertexShader: document.getElementById('vertexShader').textContent,
+// 					fragmentShader: document.getElementById('fragmentShader').textContent
+// 				});
 
 				//earth
-				earthMaterial = new THREE.MeshLambertMaterial({
-					map: THREE.ImageUtils.loadTexture("textures/planets/earth_atmos_2048.jpg"),
-				});
+// 				earthMaterial = new THREE.MeshLambertMaterial({
+// 					map: THREE.ImageUtils.loadTexture("textures/planets/earth_atmos_2048.jpg"),
+// 				});
+                earthMaterial = new THREE.MeshNormalMaterial();
 				earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
 				earthMesh.position.z = -1000;
 				earthMesh.rotation.z = 0.41;
@@ -163,9 +164,10 @@
 				scene.add(earthMesh);
 
 				//moon
-				moonMaterial = new THREE.MeshLambertMaterial({
-					map: THREE.ImageUtils.loadTexture("textures/planets/moon_1024.jpg")
-				});
+// 				moonMaterial = new THREE.MeshLambertMaterial({
+// 					map: THREE.ImageUtils.loadTexture("textures/planets/moon_1024.jpg")
+// 				});
+                moonMaterial = new THREE.MeshNormalMaterial();
 				moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
 				moonMesh.scale.set(0.25, 0.25, 0.25);
 				moonMesh.position.copy(earthMesh.position);
@@ -279,9 +281,9 @@
 
 
 				//skybox
-				skyboxTex = ["textures/cube/skybox/px.jpg", "textures/cube/skybox/nx.jpg",
-							 "textures/cube/skybox/py.jpg", "textures/cube/skybox/ny.jpg",
-							 "textures/cube/skybox/pz.jpg", "textures/cube/skybox/nz.jpg"];
+				skyboxTex = ["textures/skybox/px.jpg", "textures/skybox/nx.jpg",
+							 "textures/skybox/py.jpg", "textures/skybox/ny.jpg",
+							 "textures/skybox/pz.jpg", "textures/skybox/nz.jpg"];
 				cubeTex = THREE.ImageUtils.loadTextureCube(skyboxTex);
 
 				var shader = THREE.ShaderUtils.lib["cube"];
@@ -338,7 +340,7 @@
 
 				//model loader
 				loader = new THREE.JSONLoader();
-				loader.load("obj/game_stuff/prototype1.js", function(geometry) {createScene(geometry)});
+				loader.load("models/ships/prototype1.js", function(geometry) {createScene(geometry)});
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize(window.innerWidth, window.innerHeight);
