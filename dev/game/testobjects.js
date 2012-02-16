@@ -42,7 +42,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
 
                         tiltRotationCurrent: 0, //can make these specific to engine
-                        tiltRotationMax: 20,
+                        tiltRotationMax: 0.4, //radians
 
                         position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
                     }
