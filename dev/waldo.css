@@ -21,6 +21,27 @@ body {
 .tabbox {
 	padding:10px 5px;
 }
+.expandtrigger {
+	cursor:pointer;
+}
+.expandbox {
+	margin-top:10px;
+	margin-left:20px;
+}
+#playnowbutton {
+	margin:5px;
+	padding:10px;
+	width:8em;
+	text-align:center;
+	border:thin solid black;
+	font-weight:bold;
+	border-radius:5px;
+	background-color:#ddd;
+	cursor:pointer;
+}
+#regbox {
+	margin-top:10px;
+}
 #screenshots img {
 	width:60%;
 }

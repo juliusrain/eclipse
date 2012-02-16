@@ -16,6 +16,7 @@
 				<li><a href="#tabs-welcome">Welcome</a></li>
 				<li><a href="#tabs-story">Story</a></li>
 				<li><a href="#tabs-screenshots">Screenshots</a></li>
+				<li><a href="#tabs-instructions">How to Play</a></li>
 				<li><a href="#tabs-register">Register</a></li>
 			</ul>
 		<div id="tabs-welcome" class="tabbox">
@@ -41,6 +42,8 @@
 					<input type="password" name="password" />
 				</div>
 				<input type="submit" name="submit" value="Sign In" />
+				<a href="game">temporary bypass</a><br />
+				<div id="regoffer">Not registered? <a href="#" id="clicktoreg">Click here to sign up for free!</a></div>
 			</div>
 		</div>
 		<div id="tabs-story" class="tabbox">
@@ -57,6 +60,17 @@
 				<img src="screenshot01.png" /><br /><br />
 				<img src="screenshot02.png" /><br />
 			</div>
+		</div>
+		<div id="tabs-instructions" class="tabbox">
+			<h2>How to Play</h2>
+			<div class="expandframe"><div class="expandtrigger"><span>+</span> First, make sure that WebGL is enabled in your browser.</div>
+			<div class="expandbox">
+			<img src="flags.png" /><br />
+			
+			</div>
+			</div>
+
+			<p>shoot</p>
 		</div>
 		<div id="tabs-register" class="tabbox">
 			<h2>Register</h2>
@@ -87,6 +101,22 @@
 					}
 				});
 				$("#signinbox").hide();
+				$("#clicktoreg").click(function (){
+					$('#tabs').tabs('select', '#tabs-register');
+					return false;
+				});
+				$('.expandbox').hide();
+				$('.expandtrigger').click(function (){
+					if($(this).next(':visible').length){
+						$(this).children('span:first').text('+');
+						$(this).next().slideUp();
+					}
+					else{
+						$(this).children('span:first').text('-');
+						$(this).next().slideDown();
+					}
+					return false;
+				});
 			});
 		</script>
 	</body>
