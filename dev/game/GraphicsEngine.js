@@ -1,5 +1,8 @@
 //game engine
 
+var USEINDEXHTML = true;
+    
+    
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
@@ -10,16 +13,22 @@ function GraphicsEngine() {
     this.gameplayObjects = []; //array of gameplay objects
     this.mapObjects = []; //array of objects for map overlay (jumping)
 
-    //canvas dimensions
-    this.canvas_width = window.innerWidth;
-    this.canvas_height = window.innerHeight;
-    // this.canvas_width = parseInt($('#middle').css('width'));
-    // this.canvas_height = parseInt($('#middle').css('height'));
-
-    //container
-    this.container = document.createElement('game_div');
-    document.body.appendChild(this.container);
-    // this.container = document.getElementById('maindiv');
+    
+    if(USEINDEXHTML) { //remove stuff for final version
+        //canvas dimensions
+        this.canvas_width = parseInt($('#middle').css('width'));
+        this.canvas_height = parseInt($('#middle').css('height'));
+        //container
+        this.container = document.getElementById('maindiv');
+    } else {
+        //canvas dimensions
+        this.canvas_width = window.innerWidth;
+        this.canvas_height = window.innerHeight;
+        //container
+        this.container = document.createElement('game_div');
+        document.body.appendChild(this.container);
+        window.addEventListener('resize', onWindowResize, false);
+    }
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
@@ -27,6 +36,7 @@ function GraphicsEngine() {
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
+    
     //this.gameplay_controls.dragToLook = true;
 
     //HUD elements (might not need this)
@@ -54,13 +64,12 @@ function GraphicsEngine() {
 ///////////////////////////////////
 
 ///////////////////////////////////
-    window.addEventListener('resize', onWindowResize, false);
+    //window.addEventListener('resize', onWindowResize, false);
 
     var renderer = this.renderer,
         gameScene = this.gameplay_scene,
         gameCamera = this.gameplay_camera;
-
-
+        
     function onWindowResize(event) {
         width = window.innerWidth;
         height = window.innerHeight;
@@ -71,8 +80,7 @@ function GraphicsEngine() {
 
     var removed = false;
 
-    document.addEventListener('mousedown', onMouseDown, false);
-
+    //document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
             engine.removeSceneObject(sceneElements.AIShips[0]);
@@ -101,6 +109,17 @@ function GraphicsEngine() {
                 var axishelper = new THREE.AxisHelper();
 
 //////////////////////////////
+
+
+
+    //resizing function for index.html
+    GraphicsEngine.prototype.resizePlayWindow = function() {
+        this.canvas_width = parseInt($('#middle').css('width'));
+        this.canvas_height = parseInt($('#middle').css('height'));
+        this.renderer.setSize(this.canvas_width, this.canvas_height);
+        this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
+        this.gameplay_camera.updateProjectionMatrix();
+    }
 
 
 //=======================================================================
@@ -307,6 +326,7 @@ function GraphicsEngine() {
 
 //=================================================================
 //================= Scene manipulation functions ==================
+//adding/removing stuff after it's been created
 
     GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
         this.gameplay_scene.remove(sceneObject);
@@ -339,15 +359,15 @@ function GraphicsEngine() {
 
         });
 
-        var geometry2 = new THREE.Geometry();
-        var particleMaterial2, particleSystem2;
-
         particleSystem1 = new THREE.ParticleSystem(geometry1, particleMaterial1);
         particleSystem1.position.set(x, y, z);
         particleSystem1.name = "particle system1";
 
         container.add(particleSystem1);
-
+        
+        
+        var geometry2 = new THREE.Geometry();
+        var particleMaterial2, particleSystem2;
         for(i = 0; i < 50; i++) {
             particlePosition = new THREE.Vector3(0, 0, 0);
             geometry2.vertices.push(new THREE.Vertex(particlePosition));
@@ -364,6 +384,7 @@ function GraphicsEngine() {
 
         container.add(particleSystem2);
 
+        sceneElements.explosions.push(container);
         this.gameplay_scene.add(container);
     }
 
@@ -392,6 +413,7 @@ function GraphicsEngine() {
             tempQuat,
             tempMat,
             tempVecForward,
+            tempVecUp,
             tempVecDir;
 
 
@@ -403,7 +425,7 @@ function GraphicsEngine() {
 
             drawMainShip();
             drawHUD();
-            //updateScene();
+            updateScene();
 
             renderer.clear();
             renderer.render(gameScene, gameCamera); //actual game scene
@@ -419,6 +441,7 @@ function GraphicsEngine() {
             tempVec = new THREE.Vector3();
             tempVecDir = new THREE.Vector3();
             tempVecForward = new THREE.Vector3();
+            tempVecUp = new THREE.Vector3();
             tempQuat = new THREE.Quaternion();
             tempMat = new THREE.Matrix4();
 
@@ -522,17 +545,23 @@ function GraphicsEngine() {
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
                         tempVecForward.set(0, 0, -1);
+                        tempVecUp.set(0, 1, 0);
                         switch(sceneObject.drawParameters.shipID) {
                             case 0: {
 
+                                //TODO: NEED TO CONVERT THIS INTO aiTurn() function
+
                                 //calculate object's current look direction
-                                // sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                // sceneObject.direction.normalize();
+                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                sceneObject.direction.normalize();
+
+                                //multiply reference UP by quaternion to keep current UP
+                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
 
                                 //object's new look direction
                                 tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
 
-                                //invert ship quaternion and apply to new look dir
+                                //invert ship quaternion and apply to new look dir to get it in local coords
                                 tempQuat.copy(sceneObject.quaternion).inverse();
                                 tempQuat.multiplyVector3(tempVecDir, tempVec);
                                 tempVec.normalize();
@@ -554,8 +583,11 @@ function GraphicsEngine() {
                             case 1: {
 
                                 //calculate object's current look direction
-                                // sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                // sceneObject.direction.normalize();
+                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+                                sceneObject.direction.normalize();
+
+                                //multiply reference UP by quaternion to keep current UP
+                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
 
                                 //object's new look direction
                                 tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
@@ -594,6 +626,10 @@ function GraphicsEngine() {
                 tempSphere2.position.y = 500*Math.cos(t) + 150;
                 tempSphere2.position.z = 600*Math.cos(t);
 
+            }
+
+            for(i = 0; i < sceneElements.explosions.length; i++) {
+                sceneElements.explosions[i].position.x = 50*(i+1)*Math.cos(Date.now() * 0.005);
             }
 
         }

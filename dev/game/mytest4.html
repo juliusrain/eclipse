@@ -334,6 +334,7 @@
                 particleSystem = new THREE.ParticleSystem(pGeometry, pMaterial);
                 particleSystem.position.z = -1000;
                 particleSystem.position.x = -1000;
+                particleSystem.dynamic = true;
                 particleSystem.name = "particle system";
 
                 scene.add(particleSystem);
