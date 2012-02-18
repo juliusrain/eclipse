@@ -8,4 +8,5 @@ var SKYBOX = 0,
 
 
     CROSSHAIR = 90,
-    RING = 91;
+    RING = 91,
+    MINIMAP = 92;

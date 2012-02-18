@@ -1,8 +1,8 @@
 //game engine
 
 var USEINDEXHTML = false;
-    
-    
+
+
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
@@ -13,7 +13,7 @@ function GraphicsEngine() {
     this.gameplayObjects = []; //array of gameplay objects
     this.mapObjects = []; //array of objects for map overlay (jumping)
 
-    
+
     if(USEINDEXHTML) { //remove stuff for final version
         //canvas dimensions
         this.canvas_width = parseInt($('#middle').css('width'));
@@ -27,7 +27,10 @@ function GraphicsEngine() {
         //container
         this.container = document.createElement('game_div');
         document.body.appendChild(this.container);
+
+        window.addEventListener('resize', resizewindow, false);
     }
+
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
@@ -35,7 +38,7 @@ function GraphicsEngine() {
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
-    
+
     //this.gameplay_controls.dragToLook = true;
 
     //HUD elements (might not need this)
@@ -62,7 +65,19 @@ function GraphicsEngine() {
     this.container.appendChild(this.stats.domElement);
 ///////////////////////////////////
 
+
+
 ///////////////////////////////////
+
+//TEMPORARY
+    var renderer = this.renderer, gameplay_camera = this.gameplay_camera;
+    function resizewindow() {
+        this.canvas_width = window.innerWidth;
+        this.canvas_height = window.innerHeight;
+        renderer.setSize(this.canvas_width, this.canvas_height);
+        gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
+        gameplay_camera.updateProjectionMatrix();
+    }
 
     var removed = false;
     //document.addEventListener('mousedown', onMouseDown, false);
@@ -80,6 +95,8 @@ function GraphicsEngine() {
 
 
 ////////////////////////////////
+
+//TEMPORARY
                 //for testing purposes, remove for final
                 var tempMaterial = new THREE.MeshNormalMaterial({
                 });
@@ -105,14 +122,15 @@ function GraphicsEngine() {
             this.renderer.setSize(this.canvas_width, this.canvas_height);
             this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
             this.gameplay_camera.updateProjectionMatrix();
-        } else {
+        } else { //doesn't work
             this.canvas_width = window.innerWidth;
             this.canvas_height = window.innerHeight;
             this.renderer.setSize(this.canvas_width, this.canvas_height);
             this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
             this.gameplay_camera.updateProjectionMatrix();
+
+
         }
-        
     }
 
 
@@ -254,6 +272,10 @@ function GraphicsEngine() {
                 case PLAYER_SHIP: {
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
+                    //for 3rd person ship positioning
+                    modelMesh.currentRoll = 0;
+                    modelMesh.currentXOffset = 0;
+                    modelMesh.currentYOffset = 0;
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh;
                     break;
@@ -330,7 +352,7 @@ function GraphicsEngine() {
         this.gameplay_scene.add(sceneObject);
     }
 
-    //NEED TO FIX THIS UP
+    //TODO: NEED TO FIX THIS UP
     GraphicsEngine.prototype.addExplosion = function(x, y, z) { //plus other vars
         //will need multiple systems for the different textures
         var container = new THREE.Object3D();
@@ -358,8 +380,8 @@ function GraphicsEngine() {
         particleSystem1.name = "particle system1";
 
         container.add(particleSystem1);
-        
-        
+
+
         var geometry2 = new THREE.Geometry();
         var particleMaterial2, particleSystem2;
         for(i = 0; i < 50; i++) {
@@ -410,7 +432,6 @@ function GraphicsEngine() {
             tempVecUp,
             tempVecDir;
 
-
         initMathStructures();
         animate();
         function render() { //can have a separate function to update scene
@@ -442,7 +463,9 @@ function GraphicsEngine() {
         }
 
 
-        var sceneObject, diff;
+        var sceneObject, diff,
+            maxRoll, negRoll,
+            maxXOffset, maxYOffset, negX, negY;
         function drawMainShip() {
             sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(gameCamera.position);
@@ -467,8 +490,8 @@ function GraphicsEngine() {
             }
             if(gameControls.moveState.rollRight == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
-                    diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent + 1;
-                    sceneObject.drawParameters.tiltRotationCurrent -= (0.005 / diff);
+                    diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent;
+                    sceneObject.drawParameters.tiltRotationCurrent -= (0.0075 / (diff+1));
                     if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }
@@ -476,8 +499,8 @@ function GraphicsEngine() {
             }
             if(gameControls.moveState.rollLeft == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
-                    diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent + 1;
-                    sceneObject.drawParameters.tiltRotationCurrent += (0.005 / diff);
+                    diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent;
+                    sceneObject.drawParameters.tiltRotationCurrent += (0.0075 / (diff+1));
                     if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }
@@ -487,7 +510,7 @@ function GraphicsEngine() {
             //tilt left or right depending on turn
             sceneObject.quaternion.copy(gameCamera.quaternion);
 
-            //get ship direction
+            //set ship direction
             //tempVec.set(0, 0, -1);
             sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
 
@@ -495,14 +518,72 @@ function GraphicsEngine() {
             tempQuat.setFromAxisAngle(tempVecForward, sceneObject.drawParameters.tiltRotationCurrent);
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
-            //rotate ship based on turn
-            tempQuat.setFromAxisAngle(tempVecForward, -gameControls.rotationVector.y * 0.35);
+            //rotate ship based on turn (delaying turns to smooth animation)
+            maxRoll = -gameControls.rotationVector.y * 0.45;
+            if(maxRoll < 0) {
+                negRoll = true;
+            } else {
+                negRoll = false;
+            }
+            diff = Math.abs(maxRoll - sceneObject.currentRoll);
+            if(diff > 0) {
+                if(negRoll) {
+                    if(sceneObject.currentRoll < -0.1) {
+                        sceneObject.currentRoll -= 0.035 * diff;
+                    } else {
+                        sceneObject.currentRoll -= 0.05;
+                    }
+                    if(sceneObject.currentRoll < maxRoll) sceneObject.currentRoll = maxRoll;
+                } else {
+                    if(sceneObject.currentRoll > 0.1) {
+                        sceneObject.currentRoll += 0.035 * diff;
+                    } else {
+                        sceneObject.currentRoll += 0.05;
+                    }
+                    if(sceneObject.currentRoll > maxRoll) sceneObject.currentRoll = maxRoll;
+                }
+            }
+            tempQuat.setFromAxisAngle(tempVecForward, sceneObject.currentRoll);
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
             //translate ship according to turn
-            sceneObject.translateX(gameControls.rotationVector.y * 10); //might not need to hardcode 2
-            sceneObject.translateY(-gameControls.rotationVector.x * 5 - 20); //ditto
-            sceneObject.translateZ(-70); //ditto (distance from camera)
+            maxXOffset = gameControls.rotationVector.y * 10;
+            if(maxXOffset < 0) {
+                negX = true;
+            } else {
+                negX = false;
+            }
+            diff = Math.abs(maxXOffset - sceneObject.currentXOffset);
+            if(diff > 0) {
+                if(negX) {
+                    sceneObject.currentXOffset -= 0.1 * diff;
+                    if(sceneObject.currentXOffset < maxXOffset) sceneObject.currentXOffset = maxXOffset;
+                } else {
+                    sceneObject.currentXOffset += 0.1 * diff;
+                    if(sceneObject.currentXOffset > maxXOffset) sceneObject.currentXOffset = maxXOffset;
+                }
+            }
+            sceneObject.translateX(sceneObject.currentXOffset);
+
+            maxYOffset = -gameControls.rotationVector.x * 5 - 20;
+            if(maxYOffset < 0 ) {
+                negY = true;
+            } else {
+                negY = false;
+            }
+            diff = Math.abs(maxYOffset - sceneObject.currentYOffset);
+            if(diff > 0) {
+                if(negY) {
+                    sceneObject.currentYOffset -= 0.05 * diff;
+                    if(sceneObject.currentYOffset < maxYOffset) sceneObject.currentYOffset = maxYOffset;
+                } else {
+                    sceneObject.currentYOffset += 0.05 * diff;
+                    if(sceneObject.currentYOffset > maxYOffset) sceneObject.currentYOffset = maxYOffset;
+                }
+            }
+            sceneObject.translateY(sceneObject.currentYOffset);
+
+            sceneObject.translateZ(-70); //(distance from camera)
         }
 
         var HUDObject, i;
@@ -522,10 +603,16 @@ function GraphicsEngine() {
                     case RING: {
                         HUDObject.position.copy(sceneElements.mainShip.position);
                         break;
+                    }
+                    case MINIMAP: {
+                        //TODO
 
+                        break;
                     }
                 }
             }
+
+
         }
 
 
@@ -614,8 +701,8 @@ function GraphicsEngine() {
                 }
 
                 var t = Date.now() * 0.0008;
-                tempSphere1.position.x = 500*Math.cos(t);
-                tempSphere1.position.y = 300*Math.cos(t);
+                tempSphere1.position.x = 500*Math.cos(t)
+                tempSphere1.position.y = 300*Math.sin(t)
                 tempSphere1.position.z = 800*Math.sin(t) - 400;
 
                 tempSphere2.position.x = 400*Math.sin(t);
