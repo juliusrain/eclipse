@@ -9,6 +9,7 @@
  *  render to buffer, use as texture for quad, place quad in corner and add to graphics engine scene
  *  also add to HUDElements array
  *
+ *  draws based on contents of sceneElements array, uses graphics engine's renderer
  */
 
 
@@ -27,8 +28,9 @@ function Minimap(renderer) {
 
     this.renderer = renderer;
 
-    }
+}
 
+    //populate minimap with stuff, like graphics engine's load function
     Minimap.prototype.loadObjects = function() {
 
     }

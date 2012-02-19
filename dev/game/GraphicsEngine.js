@@ -53,7 +53,7 @@ function GraphicsEngine() {
     //main renderer
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(this.canvas_width, this.canvas_height);
-    this.renderer.autoClear = false;
+    this.renderer.autoClear = true;
     this.container.appendChild(this.renderer.domElement);
 
 
@@ -80,11 +80,11 @@ function GraphicsEngine() {
     }
 
     var removed = false;
-    //document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
             engine.removeSceneObject(sceneElements.AIShips[0]);
-            engine.addExplosion(-10, 0, 0);
+            //engine.addExplosion(-10, 0, 0);
         } else {
             engine.addSceneObject(sceneElements.AIShips[0]);
         }
@@ -141,14 +141,10 @@ function GraphicsEngine() {
      *   Input: Array of gameObjects following specified format.
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
-
 /////////////////////////////
         //this.gameplay_scene.add(axishelper);
         this.gameplay_scene.add(tempSphere1);
         this.gameplay_scene.add(tempSphere2);
-
-
-
 
 ////////////////////////////
 
@@ -240,7 +236,7 @@ function GraphicsEngine() {
             var skyboxMesh = new THREE.Mesh(new THREE.CubeGeometry(1e7, 1e7, 1e7), skyboxMaterial);
             skyboxMesh.flipSided = true;
             skyboxMesh.name = gameObject.parameters.name;
-            skyboxMesh.objectType = gameObject.type;  //assign object type so updateScene function knows what it is
+            skyboxMesh.objectType = gameObject.type;
             scene.add(skyboxMesh);
         }
 
@@ -340,10 +336,32 @@ function GraphicsEngine() {
         }
     }
 
+    /*
+     *  Delete everything in the scene.
+     *  TODO deallocate textures, remove from scenelements/hudelements arrays
+     */
+    GraphicsEngine.prototype.deleteScene = function() {
+
+        var sceneChildren = this.gameplay_scene.children,
+            sceneChild,
+            i = 0;
+
+        while(i < sceneChildren.length) {
+            sceneChild = sceneChildren[i];
+            if(sceneChild instanceof THREE.Camera) {
+                i++;
+                continue;
+            }
+            this.gameplay_scene.remove(sceneChild);
+            this.renderer.deallocateObject(sceneChild);
+        }
+    }
+
 //=================================================================
 //================= Scene manipulation functions ==================
 //adding/removing stuff after it's been created
 
+    //TODO deallocate from memory
     GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
         this.gameplay_scene.remove(sceneObject);
     }
@@ -442,7 +460,6 @@ function GraphicsEngine() {
             drawHUD();
             updateScene();
 
-            renderer.clear();
             renderer.render(gameScene, gameCamera); //actual game scene
             //renderer.render(overlayScene, overlayCamera); //draw hud, crosshair, ring, etc...
         }

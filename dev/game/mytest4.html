@@ -101,6 +101,7 @@
 
             var shipMesh;
             var shipOverlay, shipOverlayGeometry, shipOverlayMaterial;
+            var overlay2, overlay3, overlay4;
             var arrowGeometry, arrowMesh, arrowDir;
             var arrowGeometry2, arroeMesh2, arrowDir2;
 
@@ -137,7 +138,7 @@
                 controls.movementSpeed = 1.5;
 
                 //geometries
-                sphereGeometry = new THREE.SphereGeometry(100, 25, 25);
+                sphereGeometry = new THREE.SphereGeometry(100, 10, 10);
                 cubeGeometry = new THREE.CubeGeometry(10, 10, 10);
                 cylinderGeometry = new THREE.CylinderGeometry(1, 1, 20);
 
@@ -200,12 +201,29 @@
                 }
                 shipOverlayMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3 } );
                 shipOverlay = new THREE.Line(shipOverlayGeometry, shipOverlayMaterial);
+                overlay2 = new THREE.Line(shipOverlayGeometry, shipOverlayMaterial);
+                overlay3 = new THREE.Line(shipOverlayGeometry, shipOverlayMaterial);
+                overlay4 = new THREE.Line(shipOverlayGeometry, shipOverlayMaterial);
+                overlay5 = new THREE.Line(shipOverlayGeometry, shipOverlayMaterial);
                 //shipOverlay.position = shipMesh.position;
                 shipOverlay.scale.set(3,3,3);
+                overlay2.scale.set(3,3,3);
+                overlay2.name = "o2";
+                overlay3.scale.set(3,3,3);
+                overlay3.name = "o3";
+                overlay4.scale.set(3*Math.cos(Math.PI/3), 3*Math.cos(Math.PI/3), 3*Math.cos(Math.PI/3));
+                overlay4.name = "o4";
+                overlay5.scale.set(3*Math.cos(Math.PI/6), 3*Math.cos(Math.PI/6), 3*Math.cos(Math.PI/6));
                 shipOverlay.useQuaternion = true;
                 shipOverlay.name = "overlay";
                 //shipOverlay.quaternion = camera.quaternion;
                 scene.add(shipOverlay);
+                overlay2.rotation.z = Math.PI/2;
+                scene.add(overlay2);
+                overlay3.rotation.x = Math.PI/2;
+                scene.add(overlay3);
+                scene.add(overlay4);
+                scene.add(overlay5);
 
                 //arrow
                 arrowDir = new THREE.Vector3();
@@ -270,7 +288,7 @@
                 laserSystem = new THREE.ParticleSystem(laserPGeometry, laserPMaterial);
                 laserSystem.useQuaternion = true;
                 laserSystem.name = "laser particle system";
-                scene.add(laserSystem);
+                //scene.add(laserSystem);
 
 
                 //crosshair
@@ -380,6 +398,9 @@
                 shipMesh.useQuaternion = true;
                 shipMesh.direction = new THREE.Vector3();
                 shipOverlay.position = shipMesh.position;
+                overlay2.position = shipMesh.position;
+                overlay3.position = shipMesh.position;
+
                 laserSystem.position = shipMesh.position;
                 shipMesh.name = "ship";
                 scene.add(shipMesh);
@@ -640,10 +661,15 @@
                 //crosshairMesh.translateY(controls.rotationVector.x * 60);
                 crosshairMesh.translateZ(-11);
 
+
+
+
                 //position ship
                 shipMesh.position.x = camera.position.x;
                 shipMesh.position.y = camera.position.y;
                 shipMesh.position.z = camera.position.z;
+
+
 
                 //roll tilt
                 if(controls.moveState.rollRight == 1) {
@@ -725,6 +751,12 @@
                 arrowMesh2.translateX(arrowDir2.x*3);
                 //arrowMesh2.translateY(arrowDir2.y*2);
                 arrowMesh2.translateZ(arrowDir2.z*3);
+
+                overlay4.position.copy(shipMesh.position);
+                overlay4.position.y += 3*Math.sin(Math.PI/3);
+
+                overlay5.position.copy(shipMesh.position);
+                overlay5.position.y += 3*Math.sin(Math.PI/6);
 
 
                 //laser
