@@ -1,7 +1,9 @@
 //game engine
 
-var USEINDEXHTML = false;
+//contains HUD elements, updated by graphics engine (crosshairs, etc...)
+var HUDElements = [];
 
+var USEINDEXHTML = true;
 
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
@@ -16,10 +18,12 @@ function GraphicsEngine() {
 
     if(USEINDEXHTML) { //remove stuff for final version
         //canvas dimensions
-        this.canvas_width = parseInt($('#middle').css('width'));
-        this.canvas_height = parseInt($('#middle').css('height'));
+        this.canvas_width = window.innerWidth;
+        this.canvas_height = window.innerHeight;
+        //this.canvas_width = parseInt($('#main').css('width'));
+        //this.canvas_height = parseInt($('#main').css('height'));
         //container
-        this.container = document.getElementById('maindiv');
+        this.container = document.getElementById('main');
     } else {
         //canvas dimensions
         this.canvas_width = window.innerWidth;
@@ -96,13 +100,15 @@ function GraphicsEngine() {
 
     var removed = false,
         self = this;
-    //document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
-            self.removeSceneObject(sceneElements.AIShips[0]);
+            //self.removeSceneObject(sceneElements.AIShips[0]);
             //self.addExplosion(-10, 0, 0);
+            self.gameplay_controls.dragToLook = false;
         } else {
-            self.addSceneObject(sceneElements.AIShips[0]);
+            //self.addSceneObject(sceneElements.AIShips[0]);
+            self.gameplay_controls.dragToLook = true;
         }
         removed = !removed;
     }
@@ -132,13 +138,13 @@ function GraphicsEngine() {
 
     //resizing function for index.html
     GraphicsEngine.prototype.resizePlayWindow = function() {
-        if(USEINDEXHTML) {
+        /*if(USEINDEXHTML) {
             this.canvas_width = parseInt($('#middle').css('width'));
             this.canvas_height = parseInt($('#middle').css('height'));
             this.renderer.setSize(this.canvas_width, this.canvas_height);
             this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
             this.gameplay_camera.updateProjectionMatrix();
-        } else { //doesn't work
+        } else { //doesn't work*/
             this.canvas_width = window.innerWidth;
             this.canvas_height = window.innerHeight;
             this.renderer.setSize(this.canvas_width, this.canvas_height);
@@ -146,7 +152,7 @@ function GraphicsEngine() {
             this.gameplay_camera.updateProjectionMatrix();
 
 
-        }
+        //}
     }
 
 
@@ -411,6 +417,8 @@ function GraphicsEngine() {
         this.gameplay_scene.remove(sceneObject);
     }
 
+
+    //TODO change to take gameObject
     GraphicsEngine.prototype.addSceneObject = function(sceneObject) {
         this.gameplay_scene.add(sceneObject);
     }

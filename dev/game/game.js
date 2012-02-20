@@ -1,8 +1,16 @@
 /*
   Primary Game Module
     Encapsulates all the components of the game.
-  2012/01/26 - Brandon - created
 */
-function Game(){
 
-}
+//collection of sceneObjects to provide accessibility to all game components (ai, game engine)
+var sceneElements = {   mainShip: null,
+                        AIShips: [],
+                        lasers: [],
+                        missiles: [],
+                        env_objects: [],
+                        explosions: []
+                    };
+var graphicsEngine = new GraphicsEngine();
+graphicsEngine.loadGameplayObjects(gameObjects);
+graphicsEngine.startEngine();

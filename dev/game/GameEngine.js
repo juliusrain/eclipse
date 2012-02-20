@@ -1,6 +1,6 @@
 // Game Engine
 function GameEngine() {
-	this.gameID;//get from game maker?
+	this.gameID;// = <?php echo $number; ?>;//get from game maker?
 	this.solarSystem;
 	this.planet;
 	this.resources = {};//load from game constants!
@@ -8,15 +8,19 @@ function GameEngine() {
 	// new game portion - NO NEED FOR THIS!
 	   // call database, create new game(?)
 	   // call database, retrieve types info, generate solar systems/planets
-	this.load();
+    // create graphicsEngine
+	this.load(/*first planet*/);
 }
 
 //Jump function
 GameEngine.prototype.jump = function (ssid, pid){
 	this.solarSystem = ssid;
 	this.planet = pid;
+    graphicsEngine.stopEngine();
 	this.save();
+    graphicsEngine.deleteScene();
 	this.load();
+    // etc
 };
 
 // GameEngine save function
@@ -31,10 +35,14 @@ GameEngine.prototype.load = function (){
 	// wipe everything
 	//     *********clear
 	//     place loader screen
+	// determine winning or losing state
+	//     blah blah blah
 	// get information from network
 	var received = network.retrievePlanet(this.gameID, this.solarSystem, this.planet);
+    graphicsEngine.loadGamePlayObjects(received);
 	// trigger GraphicsEngine
-
+    graphicsEngine.startEngine();
+    // remove loader screen
 };
 
 // GameEngine update function
