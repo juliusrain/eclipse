@@ -32,22 +32,35 @@
     </head>
 
     <body>
+        <div id="gamediv"></div>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+
         <script type="text/javascript" src="build/Three.js"></script>
         <script type="text/javascript" src="js/Detector.js"></script>
         <script type="text/javascript" src="js/Stats.js"></script>
 
         <script type="text/javascript" src="GameConstants.js"></script>
+        <script type="text/javascript" src="Minimap.js"></script>
         <script type="text/javascript" src="SceneObjects.js"></script>
         <script type="text/javascript" src="GraphicsEngine.js"></script>
 
         <script type="text/javascript" src="testobjects.js"></script>
 
         <script>
+
                 var engine = new GraphicsEngine();
                 engine.loadGameplayObjects(gameObjects);
                 engine.startEngine();
 
+                //engine.stopEngine();
 
+
+
+
+
+
+                console.log("bfdbfdbf");
         </script>
 
     </body>

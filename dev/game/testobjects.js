@@ -35,7 +35,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         inventory: {},
                     },
                     drawParameters: {   //graphics/drawing related parameters
-
+                        shipID: 0,
                         geometry: "models/ships/prototype1big.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
@@ -65,7 +65,7 @@ var AIShip = {  type: AI_SHIP,
                             damage: 0,
                             range: 500,
                             speed: 10,
-                            amount: 25,
+                            amount: 30,
 
                         },
                         missiles: {
@@ -75,7 +75,7 @@ var AIShip = {  type: AI_SHIP,
                     inventory: {},
                 },
                 drawParameters: {
-                    shipID: 0,
+                    shipID: 1,
                     geometry: "models/ships/prototype1big.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
@@ -113,7 +113,7 @@ var AIShip2 = { type: AI_SHIP,
                     inventory: {},
                 },
                 drawParameters: {
-                    shipID: 1,
+                    shipID: 2,
                     geometry: "models/ships/prototype1big.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",

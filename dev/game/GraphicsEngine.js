@@ -25,12 +25,15 @@ function GraphicsEngine() {
         this.canvas_width = window.innerWidth;
         this.canvas_height = window.innerHeight;
         //container
-        this.container = document.createElement('game_div');
+//         this.container = document.getElementById('gamediv'); //how to get size of existing div without jquery?
+        this.container = document.createElement('gdiv');
         document.body.appendChild(this.container);
 
         window.addEventListener('resize', resizewindow, false);
     }
 
+    this.scene_loaded = false;
+    this.isRunning = false;
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
@@ -41,10 +44,13 @@ function GraphicsEngine() {
 
     //this.gameplay_controls.dragToLook = true;
 
+
     //HUD elements (might not need this)
-    this.overlay_scene = new THREE.Scene();
-    this.overlay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
-    this.overlay_scene.add(this.overlay_camera);
+//     var halfWidth = this.canvas_width / 2,
+//         halfHeight = this.canvas_height / 2;
+//     this.HUD_scene = new THREE.Scene();
+//     this.HUD_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e5);
+//     this.HUD_scene.add(this.HUD_camera);
 
     //threejs scene elements for map overlay (jump map)
     this.map_scene = new THREE.Scene();
@@ -53,40 +59,50 @@ function GraphicsEngine() {
     //main renderer
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(this.canvas_width, this.canvas_height);
-    this.renderer.autoClear = true;
+    this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
 
-
-/////////////////////////////////
+    /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
     this.stats = new Stats();
     this.stats.domElement.style.position = 'absolute';
     this.stats.domElement.style.top = '0px';
     this.container.appendChild(this.stats.domElement);
+    ///////////////////////////////////
+
+
 ///////////////////////////////////
 
-
-
-///////////////////////////////////
-
-//TEMPORARY
-    var renderer = this.renderer, gameplay_camera = this.gameplay_camera;
+//TEMPORARY event listenrs
+    var self = this;
+//         HUD_camera = this.HUD_camera;
     function resizewindow() {
-        this.canvas_width = window.innerWidth;
-        this.canvas_height = window.innerHeight;
-        renderer.setSize(this.canvas_width, this.canvas_height);
-        gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
-        gameplay_camera.updateProjectionMatrix();
+        self.canvas_width = window.innerWidth;
+        self.canvas_height = window.innerHeight;
+        self.renderer.setSize(self.canvas_width, self.canvas_height);
+
+        self.gameplay_camera.aspect = (self.canvas_width/self.canvas_height);
+        self.gameplay_camera.updateProjectionMatrix();
+
+//         var halfWidth = this.canvas_width / 2,
+//             halfHeight = this.canvas_height / 2;
+//         HUD_camera.aspect = (this.canvas_width/this.canvas_height);
+//         HUD_camera.left = -halfWidth;
+//         HUD_camera.right = halfWidth;
+//         HUD_camera.top = halfHeight;
+//         HUD_camera.bottom = -halfHeight;
+//         HUD_camera.updateProjectionMatrix();
     }
 
-    var removed = false;
-    document.addEventListener('mousedown', onMouseDown, false);
+    var removed = false,
+        self = this;
+    //document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
-            engine.removeSceneObject(sceneElements.AIShips[0]);
-            //engine.addExplosion(-10, 0, 0);
+            self.removeSceneObject(sceneElements.AIShips[0]);
+            //self.addExplosion(-10, 0, 0);
         } else {
-            engine.addSceneObject(sceneElements.AIShips[0]);
+            self.addSceneObject(sceneElements.AIShips[0]);
         }
         removed = !removed;
     }
@@ -149,7 +165,9 @@ function GraphicsEngine() {
 ////////////////////////////
 
 
+
         this.gameplayObjects = objects;
+        this.scene_loaded = true;
 
         //for loading models
         var loader = new THREE.JSONLoader();
@@ -182,7 +200,7 @@ function GraphicsEngine() {
         }
 
         function loadCrosshair(gameObject, scene) {
-            var quad = new THREE.PlaneGeometry(0.025,0.025),
+            var quad = new THREE.PlaneGeometry(2, 2),
                 material = new THREE.MeshBasicMaterial({
                     map: THREE.ImageUtils.loadTexture(gameObject.drawParameters.crosshair),
                     blending: THREE.AdditiveBlending,
@@ -192,7 +210,8 @@ function GraphicsEngine() {
             quadMesh.useQuaternion = true;
             quadMesh.objectType = CROSSHAIR;
             quadMesh.name = "crosshair";
-            quadMesh.position.set(0, 0, -1);
+            quadMesh.currentXOffset = 0;
+            quadMesh.currentYOffset = 0;
             HUDElements.push(quadMesh);
             scene.add(quadMesh);
         }
@@ -285,7 +304,6 @@ function GraphicsEngine() {
                 }
             }
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
-            //modelMesh.scale.set(10, 10, 10);
             scene.add(modelMesh);
         }
 
@@ -295,14 +313,14 @@ function GraphicsEngine() {
          *      scene: scene to add lasers to
          */
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
-            var laserContainer = new THREE.Object3D();
+            var laserContainer = new THREE.Object3D(),
                 callback = function(geometry) {loadJSONLasers(geometry, parentShip, laserContainer)};
 
             loader.load(parentShip.drawParameters.laserModel, callback);
 
-            //laserContainer.parentShip = parentShip; //assign pointer from lasers to its parent ship
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
+            laserContainer.parentShip = parentShip.drawParameters.shipID;
             sceneElements.lasers.push(laserContainer);
             scene.add(laserContainer);
 
@@ -324,6 +342,7 @@ function GraphicsEngine() {
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.range = parentShip.gameParameters.weapons.lasers.range;
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
+                laserMesh.parentShip = parentShip.drawParameters.shipID;
 
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
@@ -346,6 +365,7 @@ function GraphicsEngine() {
             sceneChild,
             i = 0;
 
+        //delete elements from gameplay_scene
         while(i < sceneChildren.length) {
             sceneChild = sceneChildren[i];
             if(sceneChild instanceof THREE.Camera) {
@@ -355,6 +375,31 @@ function GraphicsEngine() {
             this.gameplay_scene.remove(sceneChild);
             this.renderer.deallocateObject(sceneChild);
         }
+
+        sceneElements.mainShip = null;
+        for(i = sceneElements.AIShips.length; i > 0; i--) {
+            delete sceneElements.AIShips[i];
+            sceneElements.AIShips.length--;
+        }
+        for(i = sceneElements.env_objects.length; i > 0; i--) {
+            delete sceneElements.env_objects[i];
+            sceneElements.env_objects.length--;
+        }
+        for(i = sceneElements.explosions.length; i > 0; i--) {
+            delete sceneElements.explosions[i];
+            sceneElements.explosions.length--;
+        }
+        for(i = sceneElements.lasers.length; i > 0; i--) {
+            delete sceneElements.lasers[i];
+            sceneElements.lasers.length--;
+        }
+        for(i = sceneElements.missiles.length; i > 0; i--) {
+            delete sceneElements.missiles[i];
+            sceneElements.missiles.length--;
+        }
+
+
+        this.scene_loaded = false;
     }
 
 //=================================================================
@@ -427,22 +472,37 @@ function GraphicsEngine() {
 
 //=============================================================
 //================== Rendering functions ======================
+
+    /*
+     *  Check whether a scene is currently loaded.
+     */
+    GraphicsEngine.prototype.getSceneStatus = function() {
+        return this.scene_loaded;
+    }
+    GraphicsEngine.prototype.getRunningStatus = function() {
+        return this.isRunning;
+    }
+
+
+    GraphicsEngine.prototype.stopEngine = function() {
+        this.isRunning = false;
+        console.log("stopping");
+    }
+
+
     /*
      *  Start rendering
      *
      */
-    GraphicsEngine.prototype.startEngine = function() {
-        var renderer = this.renderer,
-            gameScene = this.gameplay_scene,
-            gameCamera = this.gameplay_camera,
-            gameControls = this.gameplay_controls,
-            gameControls_factor = this.gameplay_controls_factor,
-            overlayScene = this.overlay_scene,
-            overlayCamera = this.overlay_camera,
-            skyboxScene = this.skybox_scene,
-            skyboxCamera = this.skybox_camera,
-            stats = this.stats,
-
+   GraphicsEngine.prototype.startEngine = function() {
+        if(this.getRunningStatus()) {
+            console.log("already running");
+            return;
+        } else {
+            this.isRunning = true;
+            console.log("starting");
+        }
+        var self = this,
             tempVec,
             tempQuat,
             tempMat,
@@ -450,24 +510,41 @@ function GraphicsEngine() {
             tempVecUp,
             tempVecDir;
 
+
         initMathStructures();
         animate();
-        function render() { //can have a separate function to update scene
-            gameControls.update(gameControls_factor);
-            stats.update();
-
-            drawMainShip();
-            drawHUD();
-            updateScene();
-
-            renderer.render(gameScene, gameCamera); //actual game scene
-            //renderer.render(overlayScene, overlayCamera); //draw hud, crosshair, ring, etc...
-        }
 
         function animate() {
-            requestAnimationFrame(animate);
-            render();
+            if(self.isRunning) {
+                requestAnimationFrame(animate);
+            } else {
+                return;
+            }
+           try {
+                render();
+           } catch(err) {
+                return;
+           }
         }
+
+
+        function render() { //can have a separate function to update scene
+            self.gameplay_controls.update(self.gameplay_controls_factor);
+            self.stats.update();
+
+            if(self.getSceneStatus()) {
+                updateMainShip();
+                updateHUD();
+                updateScene();
+            }
+
+            self.renderer.clear();
+            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
+        }
+
+
+
+
 
         function initMathStructures() {
             tempVec = new THREE.Vector3();
@@ -476,18 +553,17 @@ function GraphicsEngine() {
             tempVecUp = new THREE.Vector3(0, 1, 0); //don't overwrite
             tempQuat = new THREE.Quaternion();
             tempMat = new THREE.Matrix4();
-
         }
 
 
         var sceneObject, diff,
             maxRoll, negRoll,
             maxXOffset, maxYOffset, negX, negY;
-        function drawMainShip() {
+        function updateMainShip() {
             sceneObject = sceneElements.mainShip;
-            sceneObject.position.copy(gameCamera.position);
+            sceneObject.position.copy(self.gameplay_camera.position);
             //tilt left or right depending on roll
-            if(gameControls.moveState.rollRight == 1) {
+            if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
                     diff = sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent;
                     sceneObject.drawParameters.tiltRotationCurrent += 0.05 * diff;
@@ -496,7 +572,7 @@ function GraphicsEngine() {
                     }
                 }
             }
-            if(gameControls.moveState.rollLeft == 1) {
+            if(self.gameplay_controls.moveState.rollLeft == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent > -sceneObject.drawParameters.tiltRotationMax) {
                     diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent;
                     sceneObject.drawParameters.tiltRotationCurrent -= 0.05 * diff;
@@ -505,7 +581,7 @@ function GraphicsEngine() {
                     }
                 }
             }
-            if(gameControls.moveState.rollRight == 0) {
+            if(self.gameplay_controls.moveState.rollRight == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                     diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent;
                     sceneObject.drawParameters.tiltRotationCurrent -= (0.0075 / (diff+1));
@@ -514,7 +590,7 @@ function GraphicsEngine() {
                     }
                 }
             }
-            if(gameControls.moveState.rollLeft == 0) {
+            if(self.gameplay_controls.moveState.rollLeft == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
                     diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent;
                     sceneObject.drawParameters.tiltRotationCurrent += (0.0075 / (diff+1));
@@ -525,7 +601,7 @@ function GraphicsEngine() {
             }
 
             //tilt left or right depending on turn
-            sceneObject.quaternion.copy(gameCamera.quaternion);
+            sceneObject.quaternion.copy(self.gameplay_camera.quaternion);
 
             //set ship direction
             //tempVec.set(0, 0, -1);
@@ -536,67 +612,39 @@ function GraphicsEngine() {
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
             //rotate ship based on turn (delaying turns to smooth animation)
-            maxRoll = -gameControls.rotationVector.y * 0.45;
-            if(maxRoll < 0) {
-                negRoll = true;
-            } else {
-                negRoll = false;
-            }
+            maxRoll = -self.gameplay_controls.rotationVector.y * 0.45;
             diff = Math.abs(maxRoll - sceneObject.currentRoll);
-            if(diff > 0) {
-                if(negRoll) {
-                    if(sceneObject.currentRoll < -0.1) {
-                        sceneObject.currentRoll -= 0.035 * diff;
-                    } else {
-                        sceneObject.currentRoll -= 0.05;
-                    }
-                    if(sceneObject.currentRoll < maxRoll) sceneObject.currentRoll = maxRoll;
-                } else {
-                    if(sceneObject.currentRoll > 0.1) {
-                        sceneObject.currentRoll += 0.035 * diff;
-                    } else {
-                        sceneObject.currentRoll += 0.05;
-                    }
-                    if(sceneObject.currentRoll > maxRoll) sceneObject.currentRoll = maxRoll;
-                }
+            if(maxRoll < sceneObject.currentRoll) {
+                sceneObject.currentRoll -= 0.045 * diff;
+                if(sceneObject.currentRoll < maxRoll) sceneObject.currentRoll = maxRoll;
+            } else {
+                sceneObject.currentRoll += 0.045 * diff;
+                if(sceneObject.currentRoll > maxRoll) sceneObject.currentRoll = maxRoll;
             }
+
             tempQuat.setFromAxisAngle(tempVecForward, sceneObject.currentRoll);
             sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
             //translate ship according to turn
-            maxXOffset = gameControls.rotationVector.y * 10;
-            if(maxXOffset < 0) {
-                negX = true;
-            } else {
-                negX = false;
-            }
+            maxXOffset = self.gameplay_controls.rotationVector.y * 10;
             diff = Math.abs(maxXOffset - sceneObject.currentXOffset);
-            if(diff > 0) {
-                if(negX) {
-                    sceneObject.currentXOffset -= 0.1 * diff;
-                    if(sceneObject.currentXOffset < maxXOffset) sceneObject.currentXOffset = maxXOffset;
-                } else {
-                    sceneObject.currentXOffset += 0.1 * diff;
-                    if(sceneObject.currentXOffset > maxXOffset) sceneObject.currentXOffset = maxXOffset;
-                }
+            if(maxXOffset < sceneObject.currentXOffset) {
+                sceneObject.currentXOffset -= 0.05 * diff;
+                if(sceneObject.currentXOffset < maxXOffset) sceneObject.currentXOffset = maxXOffset;
+            } else {
+                sceneObject.currentXOffset += 0.05 * diff;
+                if(sceneObject.currentXOffset > maxXOffset) sceneObject.currentXOffset = maxXOffset;
             }
             sceneObject.translateX(sceneObject.currentXOffset);
 
-            maxYOffset = -gameControls.rotationVector.x * 5 - 20;
-            if(maxYOffset < 0 ) {
-                negY = true;
-            } else {
-                negY = false;
-            }
+            maxYOffset = -self.gameplay_controls.rotationVector.x * 5 - 20;
             diff = Math.abs(maxYOffset - sceneObject.currentYOffset);
-            if(diff > 0) {
-                if(negY) {
-                    sceneObject.currentYOffset -= 0.05 * diff;
-                    if(sceneObject.currentYOffset < maxYOffset) sceneObject.currentYOffset = maxYOffset;
-                } else {
-                    sceneObject.currentYOffset += 0.05 * diff;
-                    if(sceneObject.currentYOffset > maxYOffset) sceneObject.currentYOffset = maxYOffset;
-                }
+            if(maxYOffset < sceneObject.currentYOffset) {
+                sceneObject.currentYOffset -= 0.025 * diff;
+                if(sceneObject.currentYOffset < maxYOffset) sceneObject.currentYOffset = maxYOffset;
+            } else {
+                sceneObject.currentYOffset += 0.025 * diff;
+                if(sceneObject.currentYOffset > maxYOffset) sceneObject.currentYOffset = maxYOffset;
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
@@ -604,17 +652,19 @@ function GraphicsEngine() {
         }
 
         var HUDObject, i;
-        function drawHUD() { //includes crosshair, ring around mainship to show other ships,
+        function updateHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
             for(i = 0; i < HUDElements.length; i++) {
                 HUDObject = HUDElements[i];
                 switch(HUDElements[i].objectType) {
                     case CROSSHAIR: {
-                        HUDObject.position.copy(gameCamera.position);
-                        HUDObject.quaternion.copy(gameCamera.quaternion);
-                        HUDObject.translateX(-gameControls.rotationVector.y*0.05);
-                        HUDObject.translateY(gameControls.rotationVector.x*0.05);
-                        HUDObject.translateZ(-1);
+                        HUDObject.position.copy(self.gameplay_camera.position);
+                        HUDObject.quaternion.copy(self.gameplay_camera.quaternion);
+                        HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
+//                         HUDObject.position.x = -gameControls.rotationVector.y * 0.1;
+                        HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
+//                         HUDObject.position.y = gameControls.rotationVector.x * 0.1;
+                        HUDObject.translateZ(-71);
                         break;
                     }
                     case RING: {
@@ -640,14 +690,14 @@ function GraphicsEngine() {
          *  Function to update the objects in the scene (~= game engine for now)
          */
         function updateScene() {
-            for(i = 0; i < gameScene.objects.length; i++) {
-                sceneObject = gameScene.objects[i];
+            for(i = 0; i < self.gameplay_scene.objects.length; i++) {
+                sceneObject = self.gameplay_scene.objects[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
                         // tempVecForward.set(0, 0, -1);
                         // tempVecUp.set(0, 1, 0);
                         switch(sceneObject.drawParameters.shipID) {
-                            case 0: {
+                            case 1: {
 
                                 //TODO: NEED TO CONVERT THIS INTO aiTurn() function
 
@@ -680,7 +730,7 @@ function GraphicsEngine() {
                                 sceneObject.translateZ(-5);
                                 break;
                             }
-                            case 1: {
+                            case 2: {
 
                                 //calculate object's current look direction
                                 sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
@@ -734,6 +784,5 @@ function GraphicsEngine() {
 
         }
 ////////////////////////////////////////////////////////////////////////////////////////
-
 
     }
