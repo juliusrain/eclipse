@@ -1,9 +1,10 @@
 function sizeGame(){
     if(window.innerWidth > 600 && window.innerHeight > 500){
         sizeElements();
-        resizePlayWindow();
+        engine.resizePlayWindow();
     }
 }
+
 function sizeElements(){
     var ww = window.innerWidth,
         wh = window.innerHeight,

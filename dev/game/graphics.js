@@ -64,9 +64,10 @@ function init() {
 	cubeGeometry = new THREE.CubeGeometry(10, 10, 10);
 
 	//earth
-	earthMaterial = new THREE.MeshLambertMaterial({
-		map: THREE.ImageUtils.loadTexture("textures/planets/earth_atmos_2048.jpg")
-	});
+	// earthMaterial = new THREE.MeshLambertMaterial({
+		// map: THREE.ImageUtils.loadTexture("textures/planets/earth_atmos_2048.jpg")
+	// });
+    earthMaterial = new THREE.MeshNormalMaterial();
 	earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
 	earthMesh.position.z = -1000;
 	earthMesh.rotation.z = 0.41;
@@ -74,9 +75,10 @@ function init() {
 	scene.add(earthMesh);	
 	
 	//moon
-	moonMaterial = new THREE.MeshLambertMaterial({
-		map: THREE.ImageUtils.loadTexture("textures/planets/moon_1024.jpg")
-	});
+	// moonMaterial = new THREE.MeshLambertMaterial({
+		// map: THREE.ImageUtils.loadTexture("textures/planets/moon_1024.jpg")
+	// });
+    moonMaterial = new THREE.MeshNormalMaterial();
 	moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
 	moonMesh.scale.set(0.25, 0.25, 0.25);
 	moonMesh.position.copy(earthMesh.position);
@@ -111,9 +113,9 @@ function init() {
 	scene.add(laserMesh);
 	
 	//skybox
-	skyboxTex = ["textures/cube/skybox/px.jpg", "textures/cube/skybox/nx.jpg", 
-				 "textures/cube/skybox/py.jpg", "textures/cube/skybox/ny.jpg",
-				 "textures/cube/skybox/pz.jpg", "textures/cube/skybox/nz.jpg"];
+	skyboxTex = ["textures/skybox/px.jpg", "textures/skybox/nx.jpg", 
+				 "textures/skybox/py.jpg", "textures/skybox/ny.jpg",
+				 "textures/skybox/pz.jpg", "textures/skybox/nz.jpg"];
 	cubeTex = THREE.ImageUtils.loadTextureCube(skyboxTex);
 
 	var shader = THREE.ShaderUtils.lib["cube"];
