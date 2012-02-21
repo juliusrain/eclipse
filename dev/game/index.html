@@ -6,10 +6,23 @@ chrome<html>
 </head>
 <body>
     <div id="head"></div>
+	<div id="loader">
+		<div id="loadertop">
+			Loading...
+		</div>
+		<div id="loaderimage"><img src="../ajax-loader.gif" alt="" /></div>
+	</div>
     <div id="container">
         <div id="main"></div>
-        <div id="top">top</div>
+        <div id="top">
+			<div id="food" class="resourcenumber"></div>
+			<div id="fuel" class="resourcenumber"></div>
+			<div id="metals" class="resourcenumber"></div>
+		</div>
         <div id="left">
+			<div id="shipvitals">
+				<div id="shiphealth"></div>
+			</div>
             <div id="minibox"></div>
         </div>
         <!--<div id="middle"><div id="maindiv"></div></div>-->
@@ -22,12 +35,14 @@ chrome<html>
     <!--<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>-->
     <script type="text/javascript" src="jquery/jquery-1.7.1.min.js"></script>
 
+	<!--
     <script type="text/javascript" src="build/Three.js"></script>
     <script type="text/javascript" src="js/Detector.js"></script>
     <script type="text/javascript" src="js/Stats.js"></script>
-
+-->
     <script type="text/javascript" src="frame.js"></script>
     <script type="text/javascript" src="UI.js"></script>
+	<!--
     <script type="text/javascript" src="GraphicsEngine.js"></script>
     <script type="text/javascript" src="Minimap.js"></script>
     <script type="text/javascript" src="GameConstants.js"></script>
@@ -35,6 +50,10 @@ chrome<html>
     <script type="text/javascript" src="testobjects.js"></script>
 
     <script type="text/javascript" src="game.js"></script>
-    <script>console.log('done loading');</script>
+	-->
+    <script>
+		console.log('done loading');
+		$('#loader').hide();
+	</script>
 </body>
 </html>

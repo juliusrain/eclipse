@@ -1,7 +1,9 @@
 function sizeGame(){
     if(window.innerWidth > 600 && window.innerHeight > 500){
         sizeElements();
-        graphicsEngine.resizePlayWindow();
+		if(typeof graphicsEngine == "object" && typeof graphicsEngine.resizePlayWindow == "function"){
+        	graphicsEngine.resizePlayWindow();
+		}
     }
 }
 
@@ -52,5 +54,3 @@ function sizeElements(){
     $('#minibox').height(parseInt($('#minibox').width()));
     $('#minibox').css('top', parseInt($('#left').css('top'))+$('#left').height()-$('#minibox').height()*1.25);
 };
-window.onload = sizeGame;
-window.onresize = sizeGame;
