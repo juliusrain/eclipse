@@ -30,7 +30,7 @@ body {
 }
 #left {
     width:200px;
-    background-color:rgba(0,0,0,0);
+    background-color:rgba(0,0,0,0.0);
     position:absolute;
     left:10px;
     top:39px;
@@ -53,10 +53,7 @@ body {
     padding:0px;
     margin:0px;
 }
-#maindiv {
-    width:100%;
-    height:100%;
-}
+
 #right {
     width:200px;
     height:400px;
@@ -74,10 +71,10 @@ body {
 }
 #bottom {
     clear:both;
-    //padding:5px 0px;
+    padding:5px 0px;
     padding:0px;
     width:990px;
-    background-color:orange;
+    background-color:rgba(0.0, 0.0, 0.0, 0.0);
     position:absolute;
     left:10px;
     top:439px;
@@ -89,12 +86,23 @@ body {
     padding:5%;
 }
 #minibox {
-    background-color:blue;
-    width:90%;
+    background-color:rgba(0.0, 0.0, 0.0, 0.0);
+    width:200px;
+    height:200px;
     padding:0px;
     margin:0px;
     position:absolute;
+    //left:10px;
+    opacity:0.5;
+}
+#minimap {
+    background-color:rgba(0.0, 0.0, 0.0, 0.0);
+    position:absolute;
+    width:200px;
+    height:200px;
     left:10px;
+    bottom:10px;
+    overflow:hidden;
 }
 #jumpmapbox {
     position:absolute;

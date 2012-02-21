@@ -36,6 +36,12 @@ function sizeElements(){
         'top':centerTop,
         'left':5*ww/6,
     });
+    $("#minimap").css({
+        'width':ww/8,
+        'height':ww/8,
+        'left':10,
+        'bottom':10,
+    });
     //$('#main')
     /*$("#middle").css({
         'width':4*ww/6,

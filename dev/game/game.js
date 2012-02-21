@@ -14,3 +14,4 @@ var sceneElements = {   mainShip: null,
 var graphicsEngine = new GraphicsEngine();
 graphicsEngine.loadGameplayObjects(gameObjects);
 graphicsEngine.startEngine();
+

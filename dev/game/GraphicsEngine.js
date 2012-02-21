@@ -3,8 +3,6 @@
 //contains HUD elements, updated by graphics engine (crosshairs, etc...)
 var HUDElements = [];
 
-var USEINDEXHTML = true;
-
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
@@ -12,32 +10,16 @@ function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
-    this.gameplayObjects = []; //array of gameplay objects
-    this.mapObjects = []; //array of objects for map overlay (jumping)
-
-
-    if(USEINDEXHTML) { //remove stuff for final version
-        //canvas dimensions
-        this.canvas_width = window.innerWidth;
-        this.canvas_height = window.innerHeight;
-        //this.canvas_width = parseInt($('#main').css('width'));
-        //this.canvas_height = parseInt($('#main').css('height'));
-        //container
-        this.container = document.getElementById('main');
-    } else {
-        //canvas dimensions
-        this.canvas_width = window.innerWidth;
-        this.canvas_height = window.innerHeight;
-        //container
-//         this.container = document.getElementById('gamediv'); //how to get size of existing div without jquery?
-        this.container = document.createElement('gdiv');
-        document.body.appendChild(this.container);
-
-        window.addEventListener('resize', resizewindow, false);
-    }
 
     this.scene_loaded = false;
     this.isRunning = false;
+
+    this.container = document.getElementById('main');
+    //container
+    this.canvas_width = parseInt($('#main').css('width'));
+    this.canvas_height = parseInt($('#main').css('height'));
+
+
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
@@ -48,14 +30,6 @@ function GraphicsEngine() {
 
     //this.gameplay_controls.dragToLook = true;
 
-
-    //HUD elements (might not need this)
-//     var halfWidth = this.canvas_width / 2,
-//         halfHeight = this.canvas_height / 2;
-//     this.HUD_scene = new THREE.Scene();
-//     this.HUD_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e5);
-//     this.HUD_scene.add(this.HUD_camera);
-
     //threejs scene elements for map overlay (jump map)
     this.map_scene = new THREE.Scene();
     this.map_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
@@ -65,6 +39,13 @@ function GraphicsEngine() {
     this.renderer.setSize(this.canvas_width, this.canvas_height);
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
+
+
+    //create minimap
+    this.minimap = new Minimap();
+    this.minimap.objectType = MINIMAP;
+    HUDElements.push(this.minimap);
+
 
     /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
@@ -79,28 +60,8 @@ function GraphicsEngine() {
 
 //TEMPORARY event listenrs
     var self = this;
-//         HUD_camera = this.HUD_camera;
-    function resizewindow() {
-        self.canvas_width = window.innerWidth;
-        self.canvas_height = window.innerHeight;
-        self.renderer.setSize(self.canvas_width, self.canvas_height);
-
-        self.gameplay_camera.aspect = (self.canvas_width/self.canvas_height);
-        self.gameplay_camera.updateProjectionMatrix();
-
-//         var halfWidth = this.canvas_width / 2,
-//             halfHeight = this.canvas_height / 2;
-//         HUD_camera.aspect = (this.canvas_width/this.canvas_height);
-//         HUD_camera.left = -halfWidth;
-//         HUD_camera.right = halfWidth;
-//         HUD_camera.top = halfHeight;
-//         HUD_camera.bottom = -halfHeight;
-//         HUD_camera.updateProjectionMatrix();
-    }
-
-    var removed = false,
-        self = this;
-    document.addEventListener('mousedown', onMouseDown, false);
+    var removed = false;
+    //document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
             //self.removeSceneObject(sceneElements.AIShips[0]);
@@ -123,7 +84,7 @@ function GraphicsEngine() {
                 var tempMaterial = new THREE.MeshNormalMaterial({
                 });
 
-                var sphereGeometry = new THREE.SphereGeometry(1,10,10);
+                var sphereGeometry = new THREE.SphereGeometry(10,10,10);
                 var tempSphere1 = new THREE.Mesh(sphereGeometry, tempMaterial);
                     tempSphere2 = new THREE.Mesh(sphereGeometry, tempMaterial);
                 tempSphere1.name = "sphere1";
@@ -138,21 +99,13 @@ function GraphicsEngine() {
 
     //resizing function for index.html
     GraphicsEngine.prototype.resizePlayWindow = function() {
-        /*if(USEINDEXHTML) {
-            this.canvas_width = parseInt($('#middle').css('width'));
-            this.canvas_height = parseInt($('#middle').css('height'));
-            this.renderer.setSize(this.canvas_width, this.canvas_height);
-            this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
-            this.gameplay_camera.updateProjectionMatrix();
-        } else { //doesn't work*/
-            this.canvas_width = window.innerWidth;
-            this.canvas_height = window.innerHeight;
-            this.renderer.setSize(this.canvas_width, this.canvas_height);
-            this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
-            this.gameplay_camera.updateProjectionMatrix();
+        this.canvas_width = parseInt($('#main').css('width'));
+        this.canvas_height = parseInt($('#main').css('height'));
+        this.renderer.setSize(this.canvas_width, this.canvas_height);
+        this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
+        this.gameplay_camera.updateProjectionMatrix();
 
-
-        //}
+        this.minimap.resizeMinimap();
     }
 
 
@@ -170,9 +123,6 @@ function GraphicsEngine() {
 
 ////////////////////////////
 
-
-
-        this.gameplayObjects = objects;
         this.scene_loaded = true;
 
         //for loading models
@@ -180,8 +130,8 @@ function GraphicsEngine() {
 
         var gameObject;
         var i;
-        for(i = 0; i < this.gameplayObjects.length; i++) {
-            gameObject = this.gameplayObjects[i];
+        for(i = 0; i < objects.length; i++) {
+            gameObject = objects[i];
             switch(gameObject.type) {
                 case SKYBOX: { //if skybox
                     loadSkybox(gameObject, this.gameplay_scene);
@@ -204,6 +154,8 @@ function GraphicsEngine() {
                 }
             }
         }
+
+        this.minimap.loadMinimap();
 
         function loadCrosshair(gameObject, scene) {
             var quad = new THREE.PlaneGeometry(2, 2),
@@ -297,6 +249,7 @@ function GraphicsEngine() {
                     modelMesh.currentRoll = 0;
                     modelMesh.currentXOffset = 0;
                     modelMesh.currentYOffset = 0;
+
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh;
                     break;
@@ -481,6 +434,12 @@ function GraphicsEngine() {
 //=============================================================
 //================== Rendering functions ======================
 
+
+    GraphicsEngine.prototype.toggleCursor = function() {
+        this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
+        console.log("blah");
+    }
+
     /*
      *  Check whether a scene is currently loaded.
      */
@@ -491,12 +450,10 @@ function GraphicsEngine() {
         return this.isRunning;
     }
 
-
     GraphicsEngine.prototype.stopEngine = function() {
         this.isRunning = false;
         console.log("stopping");
     }
-
 
     /*
      *  Start rendering
@@ -531,7 +488,7 @@ function GraphicsEngine() {
            try {
                 render();
            } catch(err) {
-                console.log(err);
+                console.warn("CAUGHT: " + err);
                 return;
            }
         }
@@ -685,7 +642,7 @@ function GraphicsEngine() {
                     }
                     case MINIMAP: {
                         //TODO
-
+                        HUDObject.updateMinimap();
                         break;
                     }
                 }
@@ -739,7 +696,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-5);
+                                sceneObject.translateZ(-8);
                                 break;
                             }
                             case 2: {
@@ -781,7 +738,7 @@ function GraphicsEngine() {
 
                 var t = Date.now() * 0.0008;
                 tempSphere1.position.x = 500*Math.cos(t)
-                tempSphere1.position.y = 300*Math.sin(t)
+                tempSphere1.position.y = -1000*Math.sin(t)
                 tempSphere1.position.z = 800*Math.sin(t) - 400;
 
                 tempSphere2.position.x = 400*Math.sin(t);
