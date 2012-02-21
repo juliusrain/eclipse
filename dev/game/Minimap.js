@@ -17,6 +17,7 @@
 function Minimap(game_camera) {
 
     this.minimap_objects = [];
+    this.minimap_grid = new THREE.Object3D();
 
     this.container = document.getElementById('minimap');
 
@@ -56,6 +57,10 @@ function Minimap(game_camera) {
 /////////////////////////////
 
 
+    this.tempVec = new THREE.Vector3();
+    this.tempVecForward = new THREE.Vector3(0, 0, -1);
+    this.tempQuat = new THREE.Quaternion();
+
 }
 
     Minimap.prototype.resizeMinimap = function() {
@@ -74,7 +79,7 @@ function Minimap(game_camera) {
     }
 
 
-
+    var cube;
     Minimap.prototype.loadMinimap = function() {
         //addLights(this.minimap_texture_scene);
 
@@ -83,7 +88,6 @@ function Minimap(game_camera) {
         var self = this;
 
         drawCircles(this.minimap_texture_scene);
-        drawShipIndicators(this.minimap_texture_scene);
         //draw on to quad
 
 
@@ -104,8 +108,7 @@ function Minimap(game_camera) {
         }
 
         function drawCircles(scene) {
-            var mergedCircles = new THREE.Object3D(),
-                line_geometryH = new THREE.Geometry(),
+            var line_geometryH = new THREE.Geometry(),
                 line_geometryVyz = new THREE.Geometry(),
                 line_geometryVxy = new THREE.Geometry(),
                 line_material = new THREE.LineBasicMaterial({
@@ -138,36 +141,43 @@ function Minimap(game_camera) {
             var circleVyz = new THREE.Line(line_geometryVyz, line_material);
             var circleVxy = new THREE.Line(line_geometryVxy, line_material);
 
-            mergedCircles.add(circleH);
-            mergedCircles.add(circleHtop);
-            mergedCircles.add(circleHbottom);
-            mergedCircles.add(circleVyz);
-            mergedCircles.add(circleVxy);
-            mergedCircles.useQuaternion = true;
+            var planeGeometry = new THREE.PlaneGeometry(10,10);
+           cube= new THREE.Mesh(planeGeometry, new THREE.MeshNormalMaterial());
+            cube.scale.set(0.05, 0.05, 0.05);
+            scene.add(cube);
 
-            self.minimap_objects.push(mergedCircles);
+            self.minimap_grid.add(circleH);
+            //self.minimap_grid.add(circleHtop);
 
-            scene.add(mergedCircles);
+            self.minimap_grid.add(circleHbottom);
+            self.minimap_grid.add(circleVyz);
+            self.minimap_grid.add(circleVxy);
+            self.minimap_grid.useQuaternion = true;
+            self.minimap_grid.name = "sphere grid";
+
+            scene.add(self.minimap_grid);
 
         }
 
-        function drawShipIndicators(scene) {
-
-            console.log(sceneElements.AIShips.length);
-            var vec,
-                sprite;
-            for(var i = 0; i < sceneElements.AIShips.length; i++) {
-                console.log("vvdsv");
-                sprite = new THREE.Srptie({
-                    map: THREE.ImageUtils.loadTexture("textures/sprite0.png"),
-                    useScreenCoordinates: false
-                });
-                scene.add(sprite);
-            }
-        }
     }
 
-    Minimap.prototype.addMinimapObject = function() {
+    //takes constant represent what type of object to add
+    Minimap.prototype.addMinimapObject = function(objectType) {
+        var sprite;
+        switch(objectType) {
+            case AI_SHIP: {
+                sprite = new THREE.Sprite({
+                    map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
+                    useScreenCoordinates: false,
+                    scaleByViewport: true,
+                });
+                sprite.objectType = AI_SHIP;
+                sprite.name = "ship indicator";
+                break;
+            }
+        }
+        this.minimap_texture_scene.add(sprite);
+        this.minimap_objects.push(sprite);
 
     }
 
@@ -183,8 +193,13 @@ function Minimap(game_camera) {
 
 //         this.stats.update();
 
-        this.minimap_objects[0].quaternion.copy(this.game_camera.quaternion).inverse();
+        this.minimap_grid.quaternion.copy(this.game_camera.quaternion);//.inverse();
+        this.tempQuat.setFromEuler(Math.PI, 0, 0);
+        //this.minimap_grad.quaternion
 
+
+        var self = this;
+        update();
 
         this.renderer.clear();
         //render to texture
@@ -193,9 +208,27 @@ function Minimap(game_camera) {
         //render quad scene with texture applied
         this.renderer.render(this.minimap_scene, this.minimap_camera);
 
-        var self = this;
-        function update() {
 
+        function update() {
+            var mainShipX = sceneElements.mainShip.position.x,
+                mainShipY = sceneElements.mainShip.position.y,
+                mainShipZ = sceneElements.mainShip.position.z,
+                minimap_object;
+            var aiShip;
+            for(var i = 0; i < self.minimap_objects.length; i++) {
+                minimap_object = self.minimap_objects[i];
+                aiShip = sceneElements.AIShips[i];
+                switch(minimap_object.objectType) {
+                    case AI_SHIP: {
+                        self.tempVec.set(aiShip.position.x - mainShipX, aiShip.position.y - mainShipY, aiShip.position.z - mainShipZ);
+                        self.tempVec.multiplyScalar(0.001);
+                        self.tempQuat.copy(self.minimap_grid.quaternion);
+                        self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
+                        minimap_object.position.copy(self.tempVec);
+                    }
+                }
+
+            }
 
         }
     }
