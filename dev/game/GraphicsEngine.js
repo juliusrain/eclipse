@@ -23,7 +23,7 @@ function GraphicsEngine() {
 
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
-    this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
+    this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
@@ -127,10 +127,9 @@ function GraphicsEngine() {
 
         //for loading models
         var loader = new THREE.JSONLoader();
-
+        var self = this;
         var gameObject;
-        var i;
-        for(i = 0; i < objects.length; i++) {
+        for(var i = 0; i < objects.length; i++) {
             gameObject = objects[i];
             switch(gameObject.type) {
                 case SKYBOX: { //if skybox
@@ -252,6 +251,7 @@ function GraphicsEngine() {
 
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh;
+
                     break;
                 }
                 case AI_SHIP: {
@@ -259,9 +259,11 @@ function GraphicsEngine() {
                     modelMesh.drawParameters = gameObject.drawParameters;
                     loadLasers(modelMesh, scene);
                     sceneElements.AIShips.push(modelMesh);
+                    self.minimap.addMinimapObject(AI_SHIP)
                     break;
                 }
             }
+
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
         }
@@ -485,12 +487,12 @@ function GraphicsEngine() {
             } else {
                 return;
             }
-           try {
+           //try {
                 render();
-           } catch(err) {
-                console.warn("CAUGHT: " + err);
-                return;
-           }
+           //} catch(err) {
+           //     console.warn("CAUGHT: " + err);
+           //     return;
+           //}
         }
 
 
@@ -639,7 +641,6 @@ function GraphicsEngine() {
                         break;
                     }
                     case MINIMAP: {
-                        //TODO
                         HUDObject.updateMinimap();
                         break;
                     }
@@ -694,7 +695,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-8);
+                                sceneObject.translateZ(-4);
                                 break;
                             }
                             case 2: {
