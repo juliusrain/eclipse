@@ -531,6 +531,7 @@ function GraphicsEngine() {
            try {
                 render();
            } catch(err) {
+                console.log(err);
                 return;
            }
         }
@@ -542,7 +543,10 @@ function GraphicsEngine() {
 
             if(self.getSceneStatus()) {
                 updateMainShip();
-                updateHUD();
+                updateHUD(); //includes minimap
+
+                //ai.updateScene(); //decides direction
+                //gameEngine.updateScene(); //increment laser and ship position
                 updateScene();
             }
 

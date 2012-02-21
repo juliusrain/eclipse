@@ -26,6 +26,8 @@ var playerShip = {  type: PLAYER_SHIP,
                                 range: 500,
                                 speed: 10,
                                 amount: 50,
+                                maxCharge: 100,
+                                currentCharge: 0,
 
                             },
                             missiles: {

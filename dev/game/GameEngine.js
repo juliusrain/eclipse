@@ -9,7 +9,7 @@ function GameEngine() {
 	   // call database, create new game(?)
 	   // call database, retrieve types info, generate solar systems/planets
     // create graphicsEngine
-	this.load(/*first planet*/);
+	this.load(this.solarSystem, this.planet);
 }
 
 //Jump function
@@ -19,7 +19,7 @@ GameEngine.prototype.jump = function (ssid, pid){
     graphicsEngine.stopEngine();
 	this.save();
     graphicsEngine.deleteScene();
-	this.load();
+	this.load(ssid, pid);
     // etc
 };
 
@@ -31,12 +31,14 @@ GameEngine.prototype.save = function () {
 
 // GameEngine load function
 // called when jumping into another system
-GameEngine.prototype.load = function (){
+GameEngine.prototype.load = function (ssid, pid){
 	// wipe everything
 	//     *********clear
 	//     place loader screen
 	// determine winning or losing state
 	//     blah blah blah
+    this.solarSystem = ssid;
+    this.planet = pid;
 	// get information from network
 	var received = network.retrievePlanet(this.gameID, this.solarSystem, this.planet);
     graphicsEngine.loadGamePlayObjects(received);

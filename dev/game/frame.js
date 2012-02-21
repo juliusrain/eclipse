@@ -43,8 +43,8 @@ function sizeElements(){
         'top':centerTop,
         'left':ww/6,
     });*/
-    $('#minibox').height(parseInt($('#minibox').width())/1.5);
-    $('#minibox').css('top', parseInt($('#left').css('top'))+$('#left').height()-$('#minibox').height()*2);
+    $('#minibox').height(parseInt($('#minibox').width()));
+    $('#minibox').css('top', parseInt($('#left').css('top'))+$('#left').height()-$('#minibox').height()*1.25);
 };
 window.onload = sizeGame;
 window.onresize = sizeGame;
