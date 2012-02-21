@@ -42,7 +42,7 @@ function GraphicsEngine() {
 
 
     //create minimap
-    this.minimap = new Minimap();
+    this.minimap = new Minimap(this.gameplay_camera);
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
@@ -141,7 +141,7 @@ function GraphicsEngine() {
                 case PLAYER_SHIP: {
                     loadShip(gameObject, this.gameplay_scene);
                     loadCrosshair(gameObject, this.gameplay_scene);
-                    loadRing(gameObject, this.gameplay_scene);
+                    //loadRing(gameObject, this.gameplay_scene);
                     //set camera turning and movement speed based on main ship's parameters
                     this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                     this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;

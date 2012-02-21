@@ -14,7 +14,7 @@
  *
  */
 
-function Minimap() {
+function Minimap(game_camera) {
 
     this.minimap_objects = [];
 
@@ -32,7 +32,7 @@ function Minimap() {
     this.minimap_scene.add(this.minimap_camera);
 
     this.minimap_texture_scene = new THREE.Scene(); //scene for texture
-    this.minimap_texture_camera = new THREE.PerspectiveCamera(60, this.map_width/this.map_height, 0.1, 1e5);
+    this.minimap_texture_camera = new THREE.PerspectiveCamera(20, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_texture_scene.add(this.minimap_texture_camera);
 
     this.minimap_texture = new THREE.WebGLRenderTarget(
@@ -40,6 +40,9 @@ function Minimap() {
         {minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat}
     );
 
+    var CIRCLEH = 0;
+
+    this.game_camera = game_camera;
 
     this.renderer = new THREE.WebGLRenderer({antialias: true});
     this.renderer.autoClear = false;
@@ -86,6 +89,8 @@ function Minimap() {
 //
 //         this.minimap_texture_scene.add(sphere);
 
+        this.minimap_texture_camera.position.z = 10;
+
         var self = this;
 
         drawCircles(this.minimap_texture_scene);
@@ -110,29 +115,49 @@ function Minimap() {
         }
 
         function drawCircles(scene) {
-            var line_geometry = new THREE.Geometry(),
+            var mergedCircles = new THREE.Object3D(),
+                line_geometryH = new THREE.Geometry(),
+                line_geometryVyz = new THREE.Geometry(),
+                line_geometryVxy = new THREE.Geometry(),
                 line_material = new THREE.LineBasicMaterial({
                     color: 0xffffff,
                     opacity: 0.75,
                     transparent: true
                 }),
                 pos;
+
             for(var i = 0; i <= 360; i++) {
                 pos = new THREE.Vector3(Math.cos(2*Math.PI*i/360), 0, Math.sin(2*Math.PI*i/360));
-                line_geometry.vertices.push(new THREE.Vertex(pos));
+                line_geometryH.vertices.push(new THREE.Vertex(pos));
+
+                pos = new THREE.Vector3(0, Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360));
+                if(pos.y < Math.sin(Math.PI/4)) {
+                    line_geometryVyz.vertices.push(new THREE.Vertex(pos));
+                }
+
+                pos = new THREE.Vector3(Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360), 0);
+                line_geometryVxy.vertices.push(new THREE.Vertex(pos));
             }
-            var circleH = new THREE.Line(line_geometry, line_material),
-                circleV = new THREE.Line(line_geometry, line_material);
 
-            //circleH.useQuaternion = true;
-            //circleV.useQuaternion = true;
-            self.minimap_objects.push(circleH);
-            self.minimap_objects.push(circleV);
 
-            circleV.rotation.z = Math.PI/2;
 
-            scene.add(circleH);
-            scene.add(circleV);
+            var circleH = new THREE.Line(line_geometryH, line_material);
+            var circleVyz = new THREE.Line(line_geometryVyz, line_material);
+            var circleVxy = new THREE.Line(line_geometryVxy, line_material);
+
+//             THREE.GeometryUtils.merge(mergedGeometry, circleH);
+//             THREE.GeometryUtils.merge(mergedGeometry, circleV);
+
+            mergedCircles.add(circleH);
+            mergedCircles.add(circleVyz);
+            mergedCircles.add(circleVxy);
+            mergedCircles.useQuaternion = true;
+
+            self.minimap_objects.push(mergedCircles);
+
+//             scene.add(circleH);
+//             scene.add(circleV);
+            scene.add(mergedCircles);
 
         }
     }
@@ -153,10 +178,8 @@ function Minimap() {
 
 //         this.stats.update();
 
-        for(var i = 0; i < this.minimap_objects.length; i++) {
+        this.minimap_objects[0].quaternion.copy(this.game_camera.quaternion).inverse();
 
-            this.minimap_objects[i].rotation.z += 0.05;
-        }
 
         this.renderer.clear();
         //render to texture
@@ -165,7 +188,9 @@ function Minimap() {
         //render quad scene with texture applied
         this.renderer.render(this.minimap_scene, this.minimap_camera);
 
+        var self = this;
         function update() {
+
 
         }
     }
