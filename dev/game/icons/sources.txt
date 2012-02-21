@@ -1,0 +1,7 @@
+apple-icon.png	Aha-Soft	http://www.iconarchive.com/show/food-icons-by-aha-soft.html
+Gold-Bullion-icon.png	antialiasfactory	http://www.iconarchive.com/show/jewelry-icons-by-antialiasfactory/Gold-Bullion-icon.html
+laboratory-icon.png	Iconshock	http://www.iconarchive.com/show/real-vista-education-icons-by-iconshock/laboratory-icon.html
+gear-icon.png	Rob Sanders	http://www.iconarchive.com/show/gear-icons-by-rob-sanders/gear-icon.html
+spur-gear-icon.png	Rob Sanders	http://www.iconarchive.com/show/gear-icons-by-rob-sanders/spur-gear-icon.html
+nuclear-icon.png	BanzaiTokyo	http://www.iconarchive.com/show/medico-icons-by-banzaitokyo/nuclear-icon.html
+ajax-loader.gif		http://ajaxload.info/

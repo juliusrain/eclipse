@@ -7,6 +7,8 @@ body {
 	font-family:"arial bold",sans-serif;
     -moz-user-select: none;
     -webkit-user-select: none;
+	background-color:#222;
+	color:white;
 }
 #main {
     position:absolute;
@@ -18,7 +20,6 @@ body {
     margin:0px;
 }
 #top {
-    background-color:orange;
     padding:5px 0px;
     width:990px;
     height:40px;
