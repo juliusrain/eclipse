@@ -15,7 +15,7 @@ function GameEngine() {
 	   // call database, create new game(?)
 	   // call database, retrieve types info, generate solar systems/planets
     // create graphicsEngine
-	this.load(this.solarSystem, this.planet);
+	//this.load(this.solarSystem, this.planet);
 }
 
 //Jump function
@@ -54,9 +54,9 @@ GameEngine.prototype.load = function (ssid, pid) {
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
-	$('#food').html(this.resources.food);
-	$('#fuel').html(this.resources.fuel);
-	$('#metals').html(this.resources.metals);
+	$('#food span').html(this.resources.food);
+	$('#fuel span').html(this.resources.fuel);
+	$('#metals span').html(this.resources.metals);
 };
 
 GameEngine.prototype.updateResources = function () {

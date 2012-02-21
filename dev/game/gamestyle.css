@@ -9,6 +9,7 @@ body {
     -webkit-user-select: none;
     background-color:#222;
     color:white;
+	overflow:hidden;
 }
 #main {
     position:absolute;
@@ -19,6 +20,8 @@ body {
     padding:0px;
     margin:0px;
 }
+
+/* TOP section */
 #top {
     background-color:orange;
     padding:5px 0px;
@@ -33,10 +36,16 @@ body {
     background-color:#222;
 }
 .resourcenumber {
-    margin:0px 20px;
+    margin:0px 40px;
     float:left;
     font-size:25px;
     margin-top:5px;
+}
+.resourcenumber span {
+	margin-left:10px;
+}
+#food {
+	margin-left:100px;
 }
 #left {
     width:200px;
@@ -51,6 +60,8 @@ body {
 #lefttop {
     height:225px;
 }
+
+/* MIDDLE section */
 #middle {
     width:601px;
     background-color:#FFF;
@@ -64,6 +75,7 @@ body {
     margin:0px;
 }
 
+/* RIGHT section */
 #right {
     width:200px;
     height:400px;
@@ -79,21 +91,48 @@ body {
     height:375px;
     overflow:auto;
 }
+#chatcontainer {
+	background-color:orange;
+	//opacity:0.5;
+	width:90%;
+	padding-left:5%;
+	font-family:"arial",sans-serif;
+	position:absolute;
+	bottom:40px;
+	height:50%;
+}
+#chatmessages {
+	height:90%;
+	overflow-y:auto;
+	background-color:brown;
+}
+.chatmessage {
+	margin:10px 0px;
+	font-size:small;
+	background-color:pink;
+}
+.chatmessage span {
+	font-size:x-small;
+	font-style:italic;
+}
+.chatmessage div {
+	font-size:medium;
+}
+.#chatcompose {
+	width:100%;
+}
+
+/* BOTTOM section */
 #bottom {
     clear:both;
     padding:5px 0px;
     padding:0px;
     width:990px;
-    background-color:rgba(0.0, 0.0, 0.0, 0.0);
+    background-color:rgba(0.0, 50.0, 0.0, 0.0);
     position:absolute;
     left:10px;
     top:439px;
     overflow:hidden;
-}
-#test {
-    background-color:brown;
-    width:90%;
-    padding:5%;
 }
 #minibox {
     background-color:rgba(0.0, 0.0, 0.0, 0.5);
@@ -104,7 +143,7 @@ body {
     position:absolute;
 }
 #minimap {
-    background-color:rgba(0, 0, 200, 0.25);
+    background-color:rgba(0, 0, 0, 0);
     position:absolute;
     width:200px;
     height:200px;
@@ -112,6 +151,8 @@ body {
     bottom:10px;
     overflow:hidden;
 }
+
+/* OUTSIDE section */
 #loader {
     position:absolute;
     top:0px;
