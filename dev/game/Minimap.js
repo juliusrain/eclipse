@@ -32,15 +32,13 @@ function Minimap(game_camera) {
     this.minimap_scene.add(this.minimap_camera);
 
     this.minimap_texture_scene = new THREE.Scene(); //scene for texture
-    this.minimap_texture_camera = new THREE.PerspectiveCamera(20, this.map_width/this.map_height, 0.1, 1e5);
+    this.minimap_texture_camera = new THREE.PerspectiveCamera(15, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_texture_scene.add(this.minimap_texture_camera);
 
     this.minimap_texture = new THREE.WebGLRenderTarget(
         this.map_width, this.map_height,
         {minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat}
     );
-
-    var CIRCLEH = 0;
 
     this.game_camera = game_camera;
 
@@ -64,7 +62,7 @@ function Minimap(game_camera) {
         this.map_width = this.container.clientWidth;
         this.map_height = this.container.clientHeight;
         this.renderer.setSize(this.map_width, this.map_height);
-//         this.minimap_camera.aspect = this.map_width/this.map_height;
+
         this.minimap_camera.left = this.map_width / -2;
         this.minimap_camera.right = this.map_width / 2;
         this.minimap_camera.top = this.map_height / 2;
@@ -80,25 +78,16 @@ function Minimap(game_camera) {
     Minimap.prototype.loadMinimap = function() {
         //addLights(this.minimap_texture_scene);
 
-        //draw on to texture
-//         var sphere_geometry = new THREE.SphereGeometry(20, 20, 20),
-//             sphere_material = new THREE.MeshNormalMaterial(),
-//             sphere = new THREE.Mesh(sphere_geometry, sphere_material);
-//
-//         sphere.position.z = -100;
-//
-//         this.minimap_texture_scene.add(sphere);
-
         this.minimap_texture_camera.position.z = 10;
 
         var self = this;
 
         drawCircles(this.minimap_texture_scene);
-
+        drawShipIndicators(this.minimap_texture_scene);
         //draw on to quad
 
 
-//        draw onto texture
+        //draw onto texture
         var plane_geometry = new THREE.PlaneGeometry(this.map_width, this.map_height);
         var sceneMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: this.minimap_texture});
         var quad = new THREE.Mesh(plane_geometry, sceneMaterial);
@@ -121,8 +110,7 @@ function Minimap(game_camera) {
                 line_geometryVxy = new THREE.Geometry(),
                 line_material = new THREE.LineBasicMaterial({
                     color: 0xffffff,
-                    opacity: 0.75,
-                    transparent: true
+                    opacity: 0.5,
                 }),
                 pos;
 
@@ -131,34 +119,51 @@ function Minimap(game_camera) {
                 line_geometryH.vertices.push(new THREE.Vertex(pos));
 
                 pos = new THREE.Vector3(0, Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360));
-                if(pos.y < Math.sin(Math.PI/4)) {
-                    line_geometryVyz.vertices.push(new THREE.Vertex(pos));
-                }
+                line_geometryVyz.vertices.push(new THREE.Vertex(pos));
 
                 pos = new THREE.Vector3(Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360), 0);
                 line_geometryVxy.vertices.push(new THREE.Vertex(pos));
+
             }
 
-
-
             var circleH = new THREE.Line(line_geometryH, line_material);
+            var circleHtop = new THREE.Line(line_geometryH, line_material);
+            circleHtop.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
+            circleHtop.position.y -= Math.sin(Math.PI/4);
+
+            var circleHbottom = new THREE.Line(line_geometryH, line_material);
+            circleHbottom.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
+            circleHbottom.position.y += Math.sin(Math.PI/4);
+
             var circleVyz = new THREE.Line(line_geometryVyz, line_material);
             var circleVxy = new THREE.Line(line_geometryVxy, line_material);
 
-//             THREE.GeometryUtils.merge(mergedGeometry, circleH);
-//             THREE.GeometryUtils.merge(mergedGeometry, circleV);
-
             mergedCircles.add(circleH);
+            mergedCircles.add(circleHtop);
+            mergedCircles.add(circleHbottom);
             mergedCircles.add(circleVyz);
             mergedCircles.add(circleVxy);
             mergedCircles.useQuaternion = true;
 
             self.minimap_objects.push(mergedCircles);
 
-//             scene.add(circleH);
-//             scene.add(circleV);
             scene.add(mergedCircles);
 
+        }
+
+        function drawShipIndicators(scene) {
+
+            console.log(sceneElements.AIShips.length);
+            var vec,
+                sprite;
+            for(var i = 0; i < sceneElements.AIShips.length; i++) {
+                console.log("vvdsv");
+                sprite = new THREE.Srptie({
+                    map: THREE.ImageUtils.loadTexture("textures/sprite0.png"),
+                    useScreenCoordinates: false
+                });
+                scene.add(sprite);
+            }
         }
     }
 

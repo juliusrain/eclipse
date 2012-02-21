@@ -39,8 +39,8 @@ function sizeElements(){
         'left':5*ww/6,
     });
     $("#minimap").css({
-        'width':ww/8,
-        'height':ww/8,
+        'width':ww/7,
+        'height':ww/7,
         'left':10,
         'bottom':10,
     });

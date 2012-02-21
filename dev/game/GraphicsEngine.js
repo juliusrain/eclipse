@@ -552,8 +552,7 @@ function GraphicsEngine() {
             }
             if(self.gameplay_controls.moveState.rollRight == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
-                    diff =  sceneObject.drawParameters.tiltRotationMax - sceneObject.drawParameters.tiltRotationCurrent;
-                    sceneObject.drawParameters.tiltRotationCurrent -= (0.0075 / (diff+1));
+                    sceneObject.drawParameters.tiltRotationCurrent -= 0.05 * sceneObject.drawParameters.tiltRotationCurrent
                     if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }
@@ -561,8 +560,7 @@ function GraphicsEngine() {
             }
             if(self.gameplay_controls.moveState.rollLeft == 0) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < 0) {
-                    diff = sceneObject.drawParameters.tiltRotationMax + sceneObject.drawParameters.tiltRotationCurrent;
-                    sceneObject.drawParameters.tiltRotationCurrent += (0.0075 / (diff+1));
+                    sceneObject.drawParameters.tiltRotationCurrent -= 0.05 * sceneObject.drawParameters.tiltRotationCurrent
                     if(sceneObject.drawParameters.tiltRotationCurrent > 0) {
                         sceneObject.drawParameters.tiltRotationCurrent = 0;
                     }

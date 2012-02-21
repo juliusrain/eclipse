@@ -60,7 +60,7 @@ GameEngine.prototype.updateResourcesBar = function () {
 };
 
 GameEngine.prototype.updateResources = function () {
-	
+
 };
 
 // GameEngine update function
