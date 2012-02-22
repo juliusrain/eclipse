@@ -9,7 +9,7 @@ body {
     -webkit-user-select: none;
     background-color:#222;
     color:white;
-	overflow:hidden;
+    overflow:hidden;
 }
 #main {
     position:absolute;
@@ -38,16 +38,16 @@ body {
     margin:0px 40px;
     float:left;
     font-size:25px;
-    margin-top:5px;
 }
 .resourcenumber img {
-	height:32px;
+    height:32px;
+    vertical-align:text-bottom;
 }
 .resourcenumber span {
-	margin-left:10px;
+    margin-left:10px;
 }
 #food {
-	margin-left:100px;
+    margin-left:100px;
 }
 #left {
     width:200px;
@@ -62,50 +62,50 @@ body {
     height:225px;
 }
 #shipvitals {
-	margin-top:20px;
+    margin-top:20px;
 }
 .vital {
-	margin-top:10px;
+    margin-top:10px;
 }
 .baroutside {
-	border:2.5px solid green;
-	height:20px;
-	width:90%;
-	margin:0px auto;
+    border:2.5px solid green;
+    height:20px;
+    width:90%;
+    margin:0px auto;
 }
 .barinside {
-	height:100%;
-	width:95%;
-	background-color:green;
+    height:100%;
+    width:95%;
+    background-color:green;
 }
 .barcaption {
-	font-size:x-small;
-	font-style:italic;
-	margin-top:5px;
-	margin-left:10px;
-	padding-right:13px
+    font-size:x-small;
+    font-style:italic;
+    margin-top:5px;
+    margin-left:10px;
+    padding-right:13px
 }
 .barcaption .value {
-	float:right;
+    float:right;
 }
 #healthbaroutside {
-	border-width:3px;
-	height:25px;
+    border-width:3px;
+    height:25px;
 }
 #healthbarcaption {
-	font-size:small;
+    font-size:small;
 }
 #jumpbaroutside {
-	border-color:blue;
+    border-color:blue;
 }
 #jumpbar {
-	background-color:blue;
+    background-color:blue;
 }
 #laserbaroutside {
-	border-color:red;
+    border-color:red;
 }
 #laserbar {
-	background-color:red;
+    background-color:red;
 }
 
 
@@ -140,67 +140,67 @@ body {
     overflow:auto;
 }
 #chatcontainer {
-	background-color:orange;
-	//opacity:0.5;
-	background-color:rgba(0,0,100,0.5);
-	width:99%;
-	padding-left:5px;
-	font-family:"arial",sans-serif;
-	position:absolute;
-	bottom:40px;
-	height:30%;
+    background-color:orange;
+    //opacity:0.5;
+    background-color:rgba(0,0,100,0.5);
+    width:99%;
+    padding-left:5px;
+    font-family:"arial",sans-serif;
+    position:absolute;
+    bottom:40px;
+    height:30%;
 }
 #chatmessages {
-	height:90%;
-	overflow-y:auto;
+    height:90%;
+    overflow-y:auto;
 }
 .chatmessage {
-	margin:10px 0px;
-	font-size:small;
+    margin:10px 0px;
+    font-size:small;
 }
 .chatmessage span {
-	font-size:x-small;
-	font-style:italic;
+    font-size:x-small;
+    font-style:italic;
 }
 .chatmessage div {
-	font-size:medium;
+    font-size:medium;
 }
 #chatwrite {
-	width:100%;
-	margin-top:5px;
+    width:100%;
+    margin-top:5px;
 }
 #chatcompose {
-	width:80%;
+    width:80%;
 }
 
 /* BOTTOM section */
 #bottom {
-	//background-color:orange;
-	background-color:rgba(0,0,100,0.5);
+    //background-color:orange;
+    background-color:rgba(0,0,100,0.5);
     clear:both;
     padding:0px;
     width:990px;
     background-color:rgba(0.0, 50.0, 0.0, 0.0);
     position:absolute;
     left:10px;
-	bottom:0px;
+    bottom:0px;
     overflow:hidden;
-	height:40px;
+    height:40px;
 }
 .control {
-	margin:0px 10px;
-	float:left;
-	border:thin solid white;
-	border-radius:5px;
-	padding:10px;
+    margin:0px 10px;
+    float:left;
+    border:thin solid white;
+    border-radius:5px;
+    padding:10px;
 }
 .control span {
-	border:thin solid cyan;
-	border-radius:3px;
-	color:cyan;
-	font-size:small;
-	margin-right:5px;
-	padding:3px;
+    border:thin solid cyan;
+    border-radius:3px;
+    color:cyan;
+    font-size:small;
+    margin-right:5px;
+    padding:3px;
 }
 /*
 #minibox {

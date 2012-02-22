@@ -1,7 +1,10 @@
 
-//window resize events
+// window resize events
 $(window).load(sizeGame);
 $(window).resize(sizeGame);
+
+// click events
+$('#jumpmapcontrol').click(toggleJumpMap);
 
 // keyboard events
 $(window).keypress(function (e){
