@@ -23,9 +23,10 @@
 	"colorDiffuse" : [0.48304377321964154, 0.4826613498130641, 0.39356833090734966],
 	"colorSpecular" : [0.699999988079071, 0.699999988079071, 0.699999988079071],
 	"mapDiffuse" : "MetalAircraft0061_1_S.jpg",
-	"mapDiffuseRepeat" : [220, 220],
+	"mapDiffuseRepeat" : [280, 280],
+	"mapDiffuseWrap" : ["mirror", "mirror"],
 	"shading" : "Lambert",
-	"specularCoef" : 65,
+	"specularCoef" : 80,
 	"transparency" : 1.0,
 	"vertexColors" : false
 	},

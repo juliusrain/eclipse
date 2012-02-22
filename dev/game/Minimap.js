@@ -178,7 +178,7 @@ function Minimap(game_controls, game_camera) {
 //                 sprite.name = "ship indicator";
 //                 break;
                 sprite = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
-                sprite.scale.set(0.1, 0.1, 0.1);
+                sprite.scale.set(0.03, 0.03, 0.03);
                 sprite.objectType = AI_SHIP;
                 sprite.useQuaternion = true;
                 break;
