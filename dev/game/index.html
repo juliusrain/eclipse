@@ -1,4 +1,4 @@
-chrome<html>
+<html>
 <head>
     <meta charset="UTF-8">
     <title>GAME</title>
@@ -6,27 +6,45 @@ chrome<html>
 </head>
 <body>
     <div id="head"></div>
-	<div id="loader">
-		<div id="loadertop">
-			Loading...
-		</div>
-		<div id="loaderimage"><img src="icons/ajax-loader.gif" alt="" /></div>
-	</div>
+    <div id="loader">
+        <div id="loadertop">
+            Loading...
+        </div>
+        <div id="loaderimage"><img src="icons/ajax-loader.gif" alt="" /></div>
+    </div>
     <div id="container">
         <div id="main"></div>
         <div id="top">
-			<div id="food" class="resourcenumber"></div>
-			<div id="fuel" class="resourcenumber"></div>
-			<div id="metals" class="resourcenumber"></div>
-		</div>
+            <div id="food" class="resourcenumber" title="food"><img src="icons/apple-icon.png" /><span> </span></div>
+            <div id="fuel" class="resourcenumber" title="fuel"><img src="icons/nuclear-icon.png" /><span> </span></div>
+            <div id="metals" class="resourcenumber" title="metals"><img src="icons/Gold-Bullion-icon.png" /><span> </span></div>
+        </div>
         <div id="left">
-			<div id="shipvitals">
-				<div id="shiphealth"></div>
-			</div>
+            <div id="shipvitals">
+                <div id="shiphealth"></div>
+            </div>
             <div id="minibox"></div>
         </div>
         <!--<div id="middle"><div id="maindiv"></div></div>-->
-        <div id="right"></div>
+        <div id="right">
+			<div id="chatcontainer">
+				<div id="chatmessages">
+					<div class="chatmessage">cwong81 <span>4:58pm</span><div>message 1</div></div>
+					<div class="chatmessage">bwong117 <span>5:03pm</span><div>message 2</div></div>
+					<div class="chatmessage">cwong81 <span>5:08pm</span><div>message 3</div></div>
+					<div class="chatmessage">cwong81 <span>5:18pm</span><div>message 4</div></div>
+					<div class="chatmessage">bwong117 <span>5:23pm</span><div>message 5</div></div>
+					<div class="chatmessage">cwong81 <span>5:28pm</span><div>message 6</div></div>
+					<div class="chatmessage">bwong117 <span>5:33pm</span><div>message 7</div></div>
+					<div class="chatmessage">cwong81 <span>5:38pm</span><div>message 8</div></div>
+					<div class="chatmessage">bwong117 <span>now</span><div>it's a new message, one to rule them all!!! all other messages will bow to this one, and everyone will be in trouble!</div></div>
+					<div class="chatmessage">cwong81 <span>now</span><div>this is an even better message than yours, rendering your whole argument invalid. Please refer to your manual for more information.</div></div>
+				</div>
+				<div id="chatwrite">
+					<textarea id ="chatcompose" rows="2"></textarea>
+				</div>
+			</div>
+		</div>
         <div id="bottom"></div>
         <div id="minimap"></div>
     </div>
@@ -50,12 +68,12 @@ chrome<html>
     <script type="text/javascript" src="testobjects.js"></script>
     <script type="text/javascript" src="testsectormap.js"></script>
 
+    <script type="text/javascript" src="GameEngine.js"></script>
     <script type="text/javascript" src="game.js"></script>
 
     <script>
-
-		console.log('done loading');
-		$('#loader').hide();
-	</script>
+        console.log('done loading');
+        $('#loader').hide();
+    </script>
 </body>
 </html>
