@@ -3,9 +3,12 @@ var gameObjects = []
 var skybox = {  type: SKYBOX,
                 parameters: {
                     name: "skybox",
-                    textures: [ "textures/skybox/starfield.png", "textures/skybox/starfield.png",
+                    /*textures: [ "textures/skybox/starfield.png", "textures/skybox/starfield.png",
                                 "textures/skybox/starfield.png", "textures/skybox/starfield.png",
-                                "textures/skybox/starfield.png", "textures/skybox/starfield.png"]
+                                "textures/skybox/starfield.png", "textures/skybox/starfield.png"]*/
+                    textures: [ "skybox/starfield.png", "skybox/starfield.png",
+                                "skybox/starfield.png", "skybox/starfield.png",
+                                "skybox/starfield.png", "skybox/starfield.png"]
                 }
             };
 gameObjects.push(skybox);
@@ -19,7 +22,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         },
                         armor: {},
                         health: 100,
-						maxhealth: 100,
+                        maxhealth: 100,
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?
