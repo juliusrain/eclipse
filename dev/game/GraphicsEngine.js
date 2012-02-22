@@ -293,7 +293,8 @@ function GraphicsEngine() {
             var laserContainer = new THREE.Object3D(),
                 callback = function(geometry) {loadJSONLasers(geometry, parentShip, laserContainer)};
 
-            loader.load(parentShip.drawParameters.laserModel, callback);
+            //loader.load(parentShip.drawParameters.laserModel, callback);
+            loader.load("models/lasers/laser.js", callback);
 
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
@@ -321,7 +322,6 @@ function GraphicsEngine() {
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
                 laserMesh.parentShip = parentShip.drawParameters.shipID;
 
-                laserMesh.position.x = (100*Math.random());
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
@@ -395,57 +395,7 @@ function GraphicsEngine() {
         this.gameplay_scene.add(sceneObject);
     }
 
-    //TODO: NEED TO FIX THIS UP
-    GraphicsEngine.prototype.addExplosion = function(x, y, z) { //plus other vars
-        //will need multiple systems for the different textures
-        var container = new THREE.Object3D();
-        container.name = "ps";
 
-        var geometry1 = new THREE.Geometry();
-        var particleMaterial1, particleSystem1;
-        var particlePosition;
-        var i;
-        for(i = 0; i < 100; i++) {
-            particlePosition = new THREE.Vector3(0, 0, 0);
-            geometry1.vertices.push(new THREE.Vertex(particlePosition));
-            geometry1.vertices[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-            geometry1.vertices[i].speed = Math.random() * 10;
-        }
-
-        particleMaterial1 = new THREE.ParticleBasicMaterial({
-            color: 0xff0000,
-            size: 100,
-
-        });
-
-        particleSystem1 = new THREE.ParticleSystem(geometry1, particleMaterial1);
-        particleSystem1.position.set(x, y, z);
-        particleSystem1.name = "particle system1";
-
-        container.add(particleSystem1);
-
-
-        var geometry2 = new THREE.Geometry();
-        var particleMaterial2, particleSystem2;
-        for(i = 0; i < 50; i++) {
-            particlePosition = new THREE.Vector3(0, 0, 0);
-            geometry2.vertices.push(new THREE.Vertex(particlePosition));
-        }
-        particleMaterial2 = new THREE.ParticleBasicMaterial({
-            color: 0x0000ff,
-            size: 50
-        });
-
-        particleSystem2 = new THREE.ParticleSystem(geometry2, particleMaterial2);
-        particleSystem2.position.set(x+60, y, z);
-        particleSystem2.name = "particle system2";
-
-
-        container.add(particleSystem2);
-
-        sceneElements.explosions.push(container);
-        this.gameplay_scene.add(container);
-    }
 
 //=================================================================
 
@@ -557,6 +507,7 @@ function GraphicsEngine() {
         function updateMainShip() {
             sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(self.gameplay_camera.position);
+            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
             //tilt left or right depending on roll
             if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
