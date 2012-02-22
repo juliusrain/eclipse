@@ -249,6 +249,7 @@ function Minimap(game_controls, game_camera) {
                         self.tempQuat.copy(self.game_camera.quaternion);
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.copy(self.tempVec);
+                        
 
                     }
                 }
