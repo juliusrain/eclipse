@@ -1,9 +1,9 @@
 function sizeGame(){
     if(window.innerWidth > 600 && window.innerHeight > 500){
         sizeElements();
-		if(typeof graphicsEngine == "object" && typeof graphicsEngine.resizePlayWindow == "function"){
-        	graphicsEngine.resizePlayWindow();
-		}
+        if(typeof graphicsEngine == "object" && typeof graphicsEngine.resizePlayWindow == "function"){
+            graphicsEngine.resizePlayWindow();
+        }
     }
 }
 
@@ -21,7 +21,7 @@ function sizeElements(){
     centerTop = parseInt($("#top").height());
     $("#bottom").css({
         'width':ww,
-        'top':wh-(parseInt($("#bottom").css("height"))),
+        //'top':wh-(parseInt($("#bottom").css("height"))),
         'left':0,
     });
     centerBottom = wh-(parseInt($("#bottom").css("height")));
@@ -38,12 +38,12 @@ function sizeElements(){
         'top':centerTop,
         'left':5*ww/6,
     });
-	$('#bottom').css('bottom', 0);
+    //$('#bottom').css('bottom', 0);
     $("#minimap").css({
         'width':ww/7,
         'height':ww/7,
-        'left':10,
-        'bottom':10,
+        //'left':10,
+        //'bottom':10,
     });
     //$('#main')
     /*$("#middle").css({

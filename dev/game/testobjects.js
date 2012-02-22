@@ -19,6 +19,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         },
                         armor: {},
                         health: 100,
+						maxhealth: 100,
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?

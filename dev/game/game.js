@@ -16,7 +16,7 @@ var jumpMap = new JumpMap();
 jumpMap.loadJumpMap();
 jumpMap.animate();
 
-var graphicsEngine = new GraphicsEngine();
-graphicsEngine.loadGameplayObjects(gameObjects);
+var graphicsEngine, gameEngine;
+gameEngine = new GameEngine();
 graphicsEngine.startEngine();
-var gameEngine = new GameEngine();
+

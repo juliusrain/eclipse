@@ -21,31 +21,51 @@
         </div>
         <div id="left">
             <div id="shipvitals">
-                <div id="shiphealth"></div>
+                <div id="shiphealth" class="vital">
+                    <div id="healthbaroutside" class="baroutside">
+                        <div id="healthbar" class="barinside">&nbsp;</div>
+                    </div>
+                    <div id="healthbarcaption" class="barcaption">health<div id="healthvalue" class="value">95%</div></div>
+                </div>
+                <div id="jumpcharge" class="vital">
+                    <div id="jumpbaroutside" class="baroutside">
+                        <div id="jumpbar" class="barinside">&nbsp;</div>
+                    </div>
+                    <div id="jumpbarcaption" class="barcaption">jump charge<div id="jumpvalue" class="value">95%</div></div>
+                </div>
+                <div id="lasercharge" class="vital">
+                    <div id="laserbaroutside" class="baroutside">
+                        <div id="laserbar" class="barinside">&nbsp;</div>
+                    </div>
+                    <div id="laserbarcaption" class="barcaption">laser charge<div id="laservalue" class="value">95%</div></div>
+                </div>
             </div>
-            <div id="minibox"></div>
+            <!--<div id="minibox"></div>-->
         </div>
         <!--<div id="middle"><div id="maindiv"></div></div>-->
         <div id="right">
-			<div id="chatcontainer">
-				<div id="chatmessages">
-					<div class="chatmessage">cwong81 <span>4:58pm</span><div>message 1</div></div>
-					<div class="chatmessage">bwong117 <span>5:03pm</span><div>message 2</div></div>
-					<div class="chatmessage">cwong81 <span>5:08pm</span><div>message 3</div></div>
-					<div class="chatmessage">cwong81 <span>5:18pm</span><div>message 4</div></div>
-					<div class="chatmessage">bwong117 <span>5:23pm</span><div>message 5</div></div>
-					<div class="chatmessage">cwong81 <span>5:28pm</span><div>message 6</div></div>
-					<div class="chatmessage">bwong117 <span>5:33pm</span><div>message 7</div></div>
-					<div class="chatmessage">cwong81 <span>5:38pm</span><div>message 8</div></div>
-					<div class="chatmessage">bwong117 <span>now</span><div>it's a new message, one to rule them all!!! all other messages will bow to this one, and everyone will be in trouble!</div></div>
-					<div class="chatmessage">cwong81 <span>now</span><div>this is an even better message than yours, rendering your whole argument invalid. Please refer to your manual for more information.</div></div>
-				</div>
-				<div id="chatwrite">
-					<textarea id ="chatcompose" rows="2"></textarea>
-				</div>
-			</div>
-		</div>
-        <div id="bottom"></div>
+            <div id="chatcontainer">
+                <div id="chatmessages">
+                    <div class="chatmessage">cwong81 <span>4:58pm</span><div>message 1</div></div>
+                    <div class="chatmessage">bwong117 <span>5:03pm</span><div>message 2</div></div>
+                    <div class="chatmessage">cwong81 <span>5:08pm</span><div>message 3</div></div>
+                    <div class="chatmessage">cwong81 <span>5:18pm</span><div>message 4</div></div>
+                    <div class="chatmessage">bwong117 <span>5:23pm</span><div>message 5</div></div>
+                    <div class="chatmessage">cwong81 <span>5:28pm</span><div>message 6</div></div>
+                    <div class="chatmessage">bwong117 <span>5:33pm</span><div>message 7</div></div>
+                    <div class="chatmessage">cwong81 <span>5:38pm</span><div>message 8</div></div>
+                    <div class="chatmessage">bwong117 <span>now</span><div>it's a new message, one to rule them all!!! all other messages will bow to this one, and everyone will be in trouble!</div></div>
+                    <div class="chatmessage">cwong81 <span>now</span><div>this is an even better message than yours, rendering your whole argument invalid. Please refer to your manual for more information.</div></div>
+                </div>
+                <div id="chatwrite">
+                    <input type="text" id="chatcompose" />
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <div id="jumpmapcontrol" class="control"><span>J</span>Jump Map</div>
+            <div class="control"></div>
+        </div>
         <div id="minimap"></div>
     </div>
     <div id="jumpmapbox"></div>
@@ -72,8 +92,11 @@
     <script type="text/javascript" src="game.js"></script>
 
     <script>
-        console.log('done loading');
-        $('#loader').hide();
+        $(function (){
+            console.log('done loading');
+            $('#loader').hide();
+            //setTimeout(graphicsEngine.stopEngine, 15000);
+        });
     </script>
 </body>
 </html>
