@@ -52,6 +52,8 @@ CREATE TABLE preset_objects (
   initial_stats text
 );
 
+INSERT INTO preset_objects (type, model, texture, initial_stats) VALUES
+();
 
 
 CREATE TABLE preset_planetary_systems (
@@ -66,7 +68,7 @@ CREATE TABLE preset_planetary_systems (
 
 INSERT INTO preset_planetary_systems (type, top, bottom, front, back, leftside, rightside) VALUES
 (0, 'sky/py.jpg', 'sky/ny.jpg', 'sky/nz.jpg', 'sky/pz.jpg', 'sky/nx.jpg', 'sky/px.jpg'),
-(1, 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png'),
+(1, 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png');
 
 
 CREATE TABLE single_games (
