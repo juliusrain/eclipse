@@ -11,6 +11,11 @@ var sceneElements = {   mainShip: null,
                         env_objects: [],
                         explosions: []
                     };
+
+var jumpMap = new JumpMap();
+jumpMap.loadJumpMap();
+jumpMap.animate();
+
 var graphicsEngine = new GraphicsEngine();
 graphicsEngine.loadGameplayObjects(gameObjects);
 graphicsEngine.startEngine();

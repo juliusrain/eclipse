@@ -14,7 +14,8 @@
  *
  */
 
-function Minimap(game_camera) {
+
+function Minimap(game_controls) {
 
     this.minimap_objects = [];
     this.minimap_grid = new THREE.Object3D();
@@ -41,7 +42,7 @@ function Minimap(game_camera) {
         {minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat}
     );
 
-    this.game_camera = game_camera;
+    this.game_controls = game_controls;
 
     this.renderer = new THREE.WebGLRenderer({antialias: true});
     this.renderer.autoClear = false;
@@ -79,7 +80,6 @@ function Minimap(game_camera) {
     }
 
 
-    var cube;
     Minimap.prototype.loadMinimap = function() {
         //addLights(this.minimap_texture_scene);
 
@@ -129,6 +129,15 @@ function Minimap(game_camera) {
 
             }
 
+            var geometry = new THREE.PlaneGeometry(10, 10);
+            var material = new THREE.MeshBasicMaterial({
+                map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
+            });
+            var planeH = new THREE.Mesh(geometry, material);
+            planeH.scale.set(0.25, 0.25, 0.25);
+            planeH.doubleSided = true;
+            scene.add(planeH);
+
             var circleH = new THREE.Line(line_geometryH, line_material);
             var circleHtop = new THREE.Line(line_geometryH, line_material);
             circleHtop.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
@@ -141,13 +150,10 @@ function Minimap(game_camera) {
             var circleVyz = new THREE.Line(line_geometryVyz, line_material);
             var circleVxy = new THREE.Line(line_geometryVxy, line_material);
 
-            var planeGeometry = new THREE.PlaneGeometry(10,10);
-           cube= new THREE.Mesh(planeGeometry, new THREE.MeshNormalMaterial());
-            cube.scale.set(0.05, 0.05, 0.05);
-            scene.add(cube);
-
             self.minimap_grid.add(circleH);
-            //self.minimap_grid.add(circleHtop);
+            self.minimap_grid.add(circleHtop);
+
+            self.minimap_grid.add(planeH);
 
             self.minimap_grid.add(circleHbottom);
             self.minimap_grid.add(circleVyz);
@@ -157,11 +163,13 @@ function Minimap(game_camera) {
 
             scene.add(self.minimap_grid);
 
+
+
         }
 
     }
 
-    //takes constant represent what type of object to add
+    //takes constant representing what type of object to add
     Minimap.prototype.addMinimapObject = function(objectType) {
         var sprite;
         switch(objectType) {
@@ -193,10 +201,23 @@ function Minimap(game_camera) {
 
 //         this.stats.update();
 
-        this.minimap_grid.quaternion.copy(this.game_camera.quaternion);//.inverse();
-        this.tempQuat.setFromEuler(Math.PI, 0, 0);
-        //this.minimap_grad.quaternion
+        this.tempVec.set(1, 0, 0);
+        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
+        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.x*0.015);
+        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
 
+        this.tempVec.set(0, 1, 0);
+        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
+        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.setFromAxisAngle(this.tempVec, -this.game_controls.rotationVector.y*0.015);
+        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
+
+        this.tempVec.set(0, 0, 1);
+        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
+        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.z*0.015);
+        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
 
         var self = this;
         update();
@@ -220,11 +241,11 @@ function Minimap(game_camera) {
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(aiShip.position.x - mainShipX, aiShip.position.y - mainShipY, aiShip.position.z - mainShipZ);
-                        self.tempVec.multiplyScalar(0.001);
+                        self.tempVec.set(aiShip.position.x - mainShipX, aiShip.position.y - mainShipY, aiShip.position.z - mainShipZ).normalize();
                         self.tempQuat.copy(self.minimap_grid.quaternion);
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.copy(self.tempVec);
+
                     }
                 }
 

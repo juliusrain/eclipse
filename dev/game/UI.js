@@ -23,11 +23,10 @@ $(window).keypress(function (e){
 function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
-        //graphicsEngine lock mouse
-    }
-    else{
+        graphicsEngine.toggleCursor();
+    } else{
         $('#jumpmapbox').show();
-
+        graphicsEngine.toggleCursor();
     }
 }
 
