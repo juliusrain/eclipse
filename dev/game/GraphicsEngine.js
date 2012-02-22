@@ -505,7 +505,7 @@ function GraphicsEngine() {
                 updateHUD(); //includes minimap
 
                 //ai.updateScene(); //decides direction
-                //gameEngine.updateScene(); //increment laser and ship position
+                gameEngine.update(); //increment laser and ship position
                 updateScene();
             }
 

@@ -23,7 +23,7 @@ body {
 
 /* TOP section */
 #top {
-    background-color:orange;
+    background-color:rgba(0,0,100,0.5);
     padding:5px 0px;
     width:990px;
     height:40px;
@@ -33,7 +33,6 @@ body {
     overflow:hidden;
     padding:0px;
     margin:0px;
-    background-color:#222;
 }
 .resourcenumber {
     margin:0px 40px;
@@ -176,7 +175,8 @@ body {
 
 /* BOTTOM section */
 #bottom {
-	background-color:orange;
+	//background-color:orange;
+	background-color:rgba(0,0,100,0.5);
     clear:both;
     padding:0px;
     width:990px;
@@ -190,6 +190,17 @@ body {
 .control {
 	margin:0px 10px;
 	float:left;
+	border:thin solid white;
+	border-radius:5px;
+	padding:10px;
+}
+.control span {
+	border:thin solid cyan;
+	border-radius:3px;
+	color:cyan;
+	font-size:small;
+	margin-right:5px;
+	padding:3px;
 }
 /*
 #minibox {
