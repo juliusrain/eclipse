@@ -14,5 +14,6 @@ var sceneElements = {   mainShip: null,
 
 var graphicsEngine, gameEngine, network;
 gameEngine = new GameEngine();
+gameEngine.first();
 //graphicsEngine.startEngine();
 

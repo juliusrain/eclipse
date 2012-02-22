@@ -190,7 +190,8 @@ body {
     float:left;
     border:thin solid white;
     border-radius:5px;
-    padding:10px;
+	margin-top:3px;
+    padding:7px;
 	cursor:pointer;
 }
 .control span {
@@ -250,5 +251,5 @@ body {
     left:auto;
     z-index:1000;
     background-color:rgba(0,0,0,0.5);
-    //display:none;
+    display:none;
 }

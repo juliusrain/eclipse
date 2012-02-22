@@ -20,10 +20,15 @@ function GameEngine() {
        // call database, create new game(?)
        // call database, retrieve types info, generate solar systems/planets
     // create graphicsEngine
-    graphicsEngine = new GraphicsEngine();
-    this.load(this.solarSystem, this.planet);
+    //graphicsEngine = new GraphicsEngine();
+    //this.load(this.solarSystem, this.planet);
     //graphicsEngine.loadGameplayObjects(gameObjects);
 }
+
+GameEngine.prototype.first = function () {
+    graphicsEngine = new GraphicsEngine();
+    this.load(this.solarSystem, this.planet);
+};
 
 //Jump function
 GameEngine.prototype.jump = function (ssid, pid){
@@ -58,7 +63,7 @@ GameEngine.prototype.load = function (ssid, pid) {
     this.planet = pid;
 
     // trigger GraphicsEngine
-    //graphicsEngine.startEngine();
+    graphicsEngine.startEngine();
     // remove loader screen
 	$('#loader').hide();
 };

@@ -455,7 +455,7 @@ function GraphicsEngine() {
         else{
             this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
         }
-        console.log("blah");
+        console.log("mouse lock");
     }
 
     /*
