@@ -12,7 +12,7 @@ var sceneElements = {   mainShip: null,
                         explosions: []
                     };
 
-var graphicsEngine, gameEngine;
+var graphicsEngine, gameEngine, network;
 gameEngine = new GameEngine();
-graphicsEngine.startEngine();
+//graphicsEngine.startEngine();
 

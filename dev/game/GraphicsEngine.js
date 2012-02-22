@@ -441,8 +441,13 @@ function GraphicsEngine() {
 //================== Rendering functions ======================
 
 
-    GraphicsEngine.prototype.toggleCursor = function() {
-        this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
+    GraphicsEngine.prototype.toggleCursor = function(param) {
+        if(typeof param == "boolean"){
+            this.gameplay_controls.dragToLook = param;
+        }
+        else{
+            this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
+        }
         console.log("blah");
     }
 
@@ -509,7 +514,9 @@ function GraphicsEngine() {
                 updateHUD(); //includes minimap
 
                 //ai.updateScene(); //decides direction
-                gameEngine.update(); //increment laser and ship position
+                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+                    gameEngine.update(); //increment laser and ship position
+                }
                 updateScene();
             }
             self.jumpmap.updateJumpmap();

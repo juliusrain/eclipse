@@ -1,8 +1,8 @@
 // Game Engine
 function GameEngine() {
-    this.gameID;// = <?php echo $number; ?>;//get from game maker?
-    this.solarSystem;
-    this.planet;
+    this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
+    this.solarSystem = 0;
+    this.planet = 0;
     //this.resources = {};//load from game constants!
     // TEMPORARY ***************************************
     this.resources = {
@@ -12,13 +12,17 @@ function GameEngine() {
     };
     this.stage = 0;
     this.logicwait = 0;
+
+	// start network client
+	network = new Network();
+
     // new game portion - NO NEED FOR THIS!
        // call database, create new game(?)
        // call database, retrieve types info, generate solar systems/planets
     // create graphicsEngine
     graphicsEngine = new GraphicsEngine();
-    //this.load(this.solarSystem, this.planet);
-    graphicsEngine.loadGameplayObjects(gameObjects);
+    this.load(this.solarSystem, this.planet);
+    //graphicsEngine.loadGameplayObjects(gameObjects);
 }
 
 //Jump function
@@ -46,14 +50,17 @@ GameEngine.prototype.load = function (ssid, pid) {
     $('#loader').show();
     // determine winning or losing state
     //     blah blah blah
+
     // get information from network
     var received = network.retrievePlanet(this.gameID, ssid, pid);
-    graphicsEngine.loadGamePlayObjects(received);
+    graphicsEngine.loadGameplayObjects(received);
     this.solarSystem = ssid;
     this.planet = pid;
+
     // trigger GraphicsEngine
-    graphicsEngine.startEngine();
+    //graphicsEngine.startEngine();
     // remove loader screen
+	$('#loader').hide();
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
