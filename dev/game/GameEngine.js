@@ -74,20 +74,84 @@ GameEngine.prototype.updateResourcesBar = function () {
     $('#metals span').html(this.resources.metals);
 };
 
-GameEngine.prototype.updateResources = function () {
+GameEngine.prototype.sufficientResources = function (cost) {
+	for(c in cost){
+		if(this.resources[c] < cost[c]){
+			return false;
+		}
+	}
+	return true;
+};
 
+GameEngine.prototype.expendResources = function (cost) {
+	for(c in cost){
+		this.resources[c] -= cost[c];
+		if(this.resources[c] < 0){
+			this.resources[c] = 0;
+		}
+	}
+};
+
+GameEngine.prototype.updateResources = function () {
+	var ship = sceneElements.mainShip.gameParameters;
+	// regeneration
+	if(ship.health < ship.maxHealth){
+		// ship needs repairs
+		if(this.sufficientResources(ship.repairCost)){
+			// ship can afford repairs
+			this.expendResources(ship.repairCost);
+			ship.health += ship.repairRate;
+			if(ship.health > ship.maxHealth){
+				ship.health = ship.maxHealth;
+			}
+		}
+	}
+	// recharge lasers
+	var lasers = ship.weapons.lasers;
+	if(lasers.currentCharge < lasers.maxCharge){
+		// lasers need recharging
+		if(this.resources.fuel >= lasers.rechargeCost){
+			//if the player can afford to charge the banks
+			// then refill
+			this.resources.fuel -= lasers.rechargeCost;
+			lasers.currentCharge += lasers.rechargeRate;
+			if(lasers.currentCharge > lasers.maxCharge){
+				lasers.currentCharge = lasers.maxCharge;
+			}
+		}
+	}
+	// recharge engines
+	var engine = ship.engine;
+	if(engine.currentCharge < 100){
+		// recharge engines
+		if(this.resources.fuel >= engine.rechargeCost){
+			// player can afford to charge
+			this.resources.fuel -= engine.rechargeCost;
+			engine.currentCharge += engine.rechargeRate;
+			if(engine.currentCharge > 100){
+				engine.currentCharge = 100;
+			}
+		}
+	}
 };
 
 GameEngine.prototype.updateVitals = function () {
 
 };
 
-GameEngine.prototype.updateVitalSlot = function (which, numer, denom) {
+GameEngine.prototype.updateVitalSlot = function (which, numer, denom, percent) {
     $('#'+which+'bar').css('width', (100*numer/denom)+'%');
-    $('#'+which+'value').html(numer+' / '+denom);
+	if(percent === true){
+    	$('#'+which+'value').html(Math.round(100 * numer / denom) + '%');
+	}
+	else{
+    	$('#'+which+'value').html(numer+' / '+denom);
+	}
 };
 GameEngine.prototype.updateVitalsInfo = function () {
-    this.updateVitalSlot('health', sceneElements.mainShip.gameParameters.health, sceneElements.mainShip.gameParameters.maxhealth);
+    this.updateVitalSlot('health', sceneElements.mainShip.gameParameters.health, sceneElements.mainShip.gameParameters.maxHealth);
+    this.updateVitalSlot('jump', sceneElements.mainShip.gameParameters.engine.currentCharge, 100, true);
+    this.updateVitalSlot('laser', sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge, sceneElements.mainShip.gameParameters.weapons.lasers.maxCharge);
 };
 
 // GameEngine update function
