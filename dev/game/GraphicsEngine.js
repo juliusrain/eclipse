@@ -42,7 +42,7 @@ function GraphicsEngine() {
 
 
     //create minimap
-    this.minimap = new Minimap(this.gameplay_camera);
+    this.minimap = new Minimap(this.gameplay_controls);
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
@@ -578,7 +578,7 @@ function GraphicsEngine() {
 
             //rotate ship based on roll
             tempQuat.setFromAxisAngle(tempVecForward, sceneObject.drawParameters.tiltRotationCurrent);
-            sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+            sceneObject.quaternion.multiplySelf(tempQuat);
 
             //rotate ship based on turn (delaying turns to smooth animation)
             maxRoll = -self.gameplay_controls.rotationVector.y * 0.45;
@@ -592,7 +592,7 @@ function GraphicsEngine() {
             }
 
             tempQuat.setFromAxisAngle(tempVecForward, sceneObject.currentRoll);
-            sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+            sceneObject.quaternion.multiplySelf(tempQuat);
 
             //translate ship according to turn
             maxXOffset = self.gameplay_controls.rotationVector.y * 10;
@@ -684,7 +684,7 @@ function GraphicsEngine() {
                                 tempQuat.multiplyVector3(tempVecDir, tempVec);
                                 tempVec.normalize();
 
-                                //set a rotation based on x offset of forward dir and new look dir (local coords)
+                                //set a rotation based on x offset of forward dir and new look dir (in local coords)
                                 tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x); //get max angle based on huy's direction vector
 
                                 //look at new dir (world coords)
@@ -692,7 +692,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.setFromRotationMatrix(tempMat);
 
                                 //apply turn rotation
-                                sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+                                sceneObject.quaternion.multiplySelf(tempQuat);
 
                                 //go forward
                                 sceneObject.translateZ(-4);
@@ -723,7 +723,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.setFromRotationMatrix(tempMat);
 
                                 //apply turn rotation
-                                sceneObject.quaternion.multiply(sceneObject.quaternion, tempQuat);
+                                sceneObject.quaternion.multiplySelf(tempQuat);
 
                                 //go forward
                                 sceneObject.translateZ(-3);

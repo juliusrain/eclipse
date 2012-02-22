@@ -1,5 +1,5 @@
-var sectormap = [
-                    {   name:'solar system',
+var sectorMap = [
+                    {   name:'solar system1',
                         x:300,
                         y:23,
                         planets:[
@@ -13,7 +13,8 @@ var sectormap = [
                                 x: 60,
                                 y: 65,
                                 radius: 20,
-                                type: , //tie type directly with texture
+                                type: GAS_GIANT, //tie type directly with texture
+                            }
 
 
                         ]
