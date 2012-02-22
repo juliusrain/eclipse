@@ -46,6 +46,9 @@ function GraphicsEngine() {
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
+    this.jumpmap = new Jumpmap();
+    
+
 
     /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
@@ -155,6 +158,7 @@ function GraphicsEngine() {
         }
 
         this.minimap.loadMinimap();
+        this.jumpmap.loadJumpmap();
 
         function loadCrosshair(gameObject, scene) {
             var quad = new THREE.PlaneGeometry(2, 2),
@@ -508,7 +512,7 @@ function GraphicsEngine() {
                 gameEngine.update(); //increment laser and ship position
                 updateScene();
             }
-
+            self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
         }
@@ -646,7 +650,7 @@ function GraphicsEngine() {
                     }
                 }
             }
-
+            
 
         }
 

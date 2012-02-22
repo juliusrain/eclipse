@@ -1,6 +1,6 @@
 
 
-function JumpMap() {
+function Jumpmap() {
 
     this.container = document.getElementById('jumpmapbox');
 
@@ -21,7 +21,7 @@ function JumpMap() {
 
 }
 
-    JumpMap.prototype.loadJumpMap = function() {
+    Jumpmap.prototype.loadJumpmap = function() {
 
         var sphereGeometry = new THREE.SphereGeometry(20, 20, 20);
         var sphere = new THREE.Mesh(sphereGeometry, new THREE.MeshNormalMaterial());
@@ -35,14 +35,15 @@ function JumpMap() {
         }
     }
 
-    JumpMap.prototype.animate = function() {
-        var self = this;
-        animate();
-        function animate() {
-            requestAnimationFrame(animate);
-            self.renderer.clear();
-            self.renderer.render(self.jumpmap_scene, self.jumpmap_camera);
-        }
+    Jumpmap.prototype.updateJumpmap = function() {
 
+
+        this.renderer.clear();
+
+        this.renderer.render(this.jumpmap_scene, this.jumpmap_camera);
+        
+        function update() {
+            
+        }
 
     }
