@@ -24,6 +24,12 @@ $(window).keypress(function (e){
     }
 });
 
+$('#chatcompose').keydown(function (e){
+    
+    $('#chatcompose').val($('#chatcompose').val() + String.fromCharCode(e.keyCode));
+    return false;
+});
+
 function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();

@@ -160,6 +160,13 @@ function GraphicsEngine() {
         this.minimap.loadMinimap();
         this.jumpmap.loadJumpmap();
 
+        var dirlight = new THREE.DirectionalLight(0xffffff);
+        this.gameplay_scene.add(dirlight);
+
+        var amblight = new THREE.AmbientLight(0xffffff);
+        this.gameplay_scene.add(amblight);
+        
+
         function loadCrosshair(gameObject, scene) {
             var quad = new THREE.PlaneGeometry(2, 2),
                 material = new THREE.MeshBasicMaterial({
@@ -238,7 +245,7 @@ function GraphicsEngine() {
          */
         function loadJSON(geometry, gameObject, scene) {
 
-            var modelMesh = new THREE.Mesh(geometry, tempMaterial);//(geometry, new THREE.MeshFaceMaterial());
+            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());//(geometry, new THREE.MeshFaceMaterial());
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;

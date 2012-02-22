@@ -82,13 +82,13 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/player_ship002.js",
+                    geometry: "temp/player_ship002.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 0, y: 0, z: -1000} //starting position in scene when not main ship
+                    position: {x: 0, y: 0, z: -100} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip);
@@ -120,6 +120,7 @@ var AIShip2 = { type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 2,
+                    //geometry: "models/ships/prototype1big.js",
                     geometry: "models/ships/prototype1big.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",

@@ -169,15 +169,24 @@ function Minimap(game_controls, game_camera) {
         var sprite;
         switch(objectType) {
             case AI_SHIP: {
-                sprite = new THREE.Sprite({
-                    map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
-                    useScreenCoordinates: false,
-                    scaleByViewport: true,
-                });
+//                 sprite = new THREE.Sprite({
+//                     map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
+//                     useScreenCoordinates: false,
+//                     scaleByViewport: true,
+//                 });
+//                 sprite.objectType = AI_SHIP;
+//                 sprite.name = "ship indicator";
+//                 break;
+                sprite = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
+                sprite.scale.set(0.03, 0.03, 0.03);
                 sprite.objectType = AI_SHIP;
-                sprite.name = "ship indicator";
+                sprite.useQuaternion = true;
                 break;
-            }
+
+
+
+             }
+
         }
         this.minimap_texture_scene.add(sprite);
         this.minimap_objects.push(sprite);
@@ -236,8 +245,8 @@ function Minimap(game_controls, game_camera) {
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).negate().normalize();
-                        self.tempQuat.copy(self.minimap_grid.quaternion).inverse();
+                        self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).normalize();
+                        self.tempQuat.copy(self.game_camera.quaternion);
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.copy(self.tempVec);
 
