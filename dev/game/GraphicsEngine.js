@@ -161,7 +161,12 @@ function GraphicsEngine() {
         this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
+        dirlight.position.set(0,30,0).normalize();
         this.gameplay_scene.add(dirlight);
+
+        var dirlight2 = new THREE.DirectionalLight(0xffffff);
+        dirlight2.position.set(0, -30, 0).normalize();
+        this.gameplay_scene.add(dirlight2);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
@@ -244,8 +249,8 @@ function GraphicsEngine() {
          *  (used only for gameObjects)
          */
         function loadJSON(geometry, gameObject, scene) {
-
-            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());//(geometry, new THREE.MeshFaceMaterial());
+            var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
+            var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
@@ -316,6 +321,7 @@ function GraphicsEngine() {
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
                 laserMesh.parentShip = parentShip.drawParameters.shipID;
 
+                laserMesh.position.x = (100*Math.random());
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
