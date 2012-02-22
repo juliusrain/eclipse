@@ -15,7 +15,7 @@
  */
 
 
-function Minimap(game_controls) {
+function Minimap(game_controls, game_camera) {
 
     this.minimap_objects = [];
     this.minimap_grid = new THREE.Object3D();
@@ -43,6 +43,7 @@ function Minimap(game_controls) {
     );
 
     this.game_controls = game_controls;
+    this.game_camera = game_camera;
 
     this.renderer = new THREE.WebGLRenderer({antialias: true});
     this.renderer.autoClear = false;
@@ -132,11 +133,12 @@ function Minimap(game_controls) {
             var geometry = new THREE.PlaneGeometry(10, 10);
             var material = new THREE.MeshBasicMaterial({
                 map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
+                transparent: true
             });
             var planeH = new THREE.Mesh(geometry, material);
             planeH.scale.set(0.25, 0.25, 0.25);
             planeH.doubleSided = true;
-            scene.add(planeH);
+            //scene.add(planeH);
 
             var circleH = new THREE.Line(line_geometryH, line_material);
             var circleHtop = new THREE.Line(line_geometryH, line_material);
@@ -241,8 +243,8 @@ function Minimap(game_controls) {
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(aiShip.position.x - mainShipX, aiShip.position.y - mainShipY, aiShip.position.z - mainShipZ).normalize();
-                        self.tempQuat.copy(self.minimap_grid.quaternion);
+                        self.tempVec.set(mainShipX - aiShip.position.x, aiShip.position.y - mainShipY, mainShipZ - aiShip.position.z).normalize();
+                        self.tempQuat.copy(self.game_camera.quaternion);
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.copy(self.tempVec);
 

@@ -42,7 +42,7 @@ function GraphicsEngine() {
 
 
     //create minimap
-    this.minimap = new Minimap(this.gameplay_controls);
+    this.minimap = new Minimap(this.gameplay_controls, this.gameplay_camera);
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
@@ -695,7 +695,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiplySelf(tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-4);
+                                //sceneObject.translateZ(-2);
                                 break;
                             }
                             case 2: {
@@ -726,7 +726,7 @@ function GraphicsEngine() {
                                 sceneObject.quaternion.multiplySelf(tempQuat);
 
                                 //go forward
-                                sceneObject.translateZ(-3);
+                                //sceneObject.translateZ(-2);
                                 break;
                             }
                         }
