@@ -186,6 +186,7 @@ body {
     bottom:0px;
     overflow:hidden;
     height:40px;
+	z-index:1002;
 }
 .control {
     margin:0px 10px;
@@ -193,6 +194,7 @@ body {
     border:thin solid white;
     border-radius:5px;
     padding:10px;
+	cursor:pointer;
 }
 .control span {
     border:thin solid cyan;
