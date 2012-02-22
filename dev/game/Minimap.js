@@ -116,6 +116,10 @@ function Minimap(game_controls, game_camera) {
                     color: 0xffffff,
                     opacity: 0.5,
                 }),
+                line_materialH = new THREE.LineBasicMaterial({
+                    color: 0x00ff00,
+                    opacity: 0.5,
+                }),
                 pos;
 
             for(var i = 0; i <= 360; i++) {
@@ -130,17 +134,8 @@ function Minimap(game_controls, game_camera) {
 
             }
 
-            var geometry = new THREE.PlaneGeometry(10, 10);
-            var material = new THREE.MeshBasicMaterial({
-                map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
-                transparent: true
-            });
-            var planeH = new THREE.Mesh(geometry, material);
-            planeH.scale.set(0.25, 0.25, 0.25);
-            planeH.doubleSided = true;
-            //scene.add(planeH);
 
-            var circleH = new THREE.Line(line_geometryH, line_material);
+            var circleH = new THREE.Line(line_geometryH, line_materialH);
             var circleHtop = new THREE.Line(line_geometryH, line_material);
             circleHtop.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
             circleHtop.position.y -= Math.sin(Math.PI/4);
@@ -154,8 +149,6 @@ function Minimap(game_controls, game_camera) {
 
             self.minimap_grid.add(circleH);
             self.minimap_grid.add(circleHtop);
-
-            self.minimap_grid.add(planeH);
 
             self.minimap_grid.add(circleHbottom);
             self.minimap_grid.add(circleVyz);
@@ -243,8 +236,8 @@ function Minimap(game_controls, game_camera) {
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(mainShipX - aiShip.position.x, aiShip.position.y - mainShipY, mainShipZ - aiShip.position.z).normalize();
-                        self.tempQuat.copy(self.game_camera.quaternion);
+                        self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).negate().normalize();
+                        self.tempQuat.copy(self.minimap_grid.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.copy(self.tempVec);
 
