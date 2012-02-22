@@ -15,6 +15,7 @@ function GameEngine() {
 	   // call database, create new game(?)
 	   // call database, retrieve types info, generate solar systems/planets
     // create graphicsEngine
+	//graphicsEngine = new GraphicsEngine();
 	//this.load(this.solarSystem, this.planet);
 }
 
