@@ -8,7 +8,7 @@ $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 
 // keyboard events
-$(window).keypress(function (e){
+$(window).keydown(function (e){
     //console.log(e);
     switch(e.keyCode){
         // j = toggle jump map
@@ -21,6 +21,11 @@ $(window).keypress(function (e){
             toggleCursor();
             break;
         }
+		// space = fire weapon
+		case 32: {
+			gameEngine.fireWeapon();
+			break;
+		}
     }
 });
 

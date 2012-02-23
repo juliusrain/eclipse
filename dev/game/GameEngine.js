@@ -11,6 +11,7 @@ function GameEngine() {
         metals:1000,
     };
     this.stage = 0;
+	this.timeouts = {lasers:0};
     this.logicwait = 0;
 
 	// start network client
@@ -108,7 +109,7 @@ GameEngine.prototype.updateResources = function () {
 	}
 	// recharge lasers
 	var lasers = ship.weapons.lasers;
-	if(lasers.currentCharge < lasers.maxCharge){
+	if(lasers.currentCharge < lasers.maxCharge && this.timeouts.lasers === 0){
 		// lasers need recharging
 		if(this.resources.fuel >= lasers.rechargeCost){
 			//if the player can afford to charge the banks
@@ -168,6 +169,11 @@ GameEngine.prototype.update = function () {
         // update vital stats
         this.updateVitalsInfo();
 
+		// decrement waits
+		if(this.timeouts.lasers > 0){
+			this.timeouts.lasers--;
+		}
+
         // reset counter
         this.logicwait = 4;
     }
@@ -176,4 +182,13 @@ GameEngine.prototype.update = function () {
     }
 };
 
-
+// Fire Weapon
+// called upon user command
+// checks if the selected weapon can be fired, then triggers weapons fire
+GameEngine.prototype.fireWeapon = function () {
+	if(sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost){
+		console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE "+sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
+		sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
+		this.timeouts.lasers = 5;
+	}
+};

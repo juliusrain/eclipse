@@ -41,7 +41,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                 currentCharge: 0,
 								rechargeRate: 3450,
 								rechargeCost: 1,
-								fireCost: 500,
+								fireCost: 5000,
                             },
                             missiles: {
 
