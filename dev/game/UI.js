@@ -8,7 +8,7 @@ $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 
 // keyboard events
-$(window).keydown(function (e){
+$(window).keypress(function (e){
     //console.log(e);
     switch(e.keyCode){
         // j = toggle jump map
