@@ -160,7 +160,7 @@ body {
             // hide the others
             for(var s in sector){
                 if(s === t){
-                    $('#ss'+s).animate({top:'50%',left:'50%'},500,'linear',ssl);
+                    $('#ss'+s).animate({top:'45%',left:'45%'},500,'linear',ssl);
                 }
                 else{
                     $('#ss'+s).animate({opacity:0},500,'linear');
@@ -218,15 +218,25 @@ body {
                 else{
                     $('#ss'+s).animate({opacity:1}, 500);
                 }
+                $('#ss'+s).unbind();
             }
         }
         // planet click
         function pc() {
             var ssid = $(this).attr('ss'),
                 pid = $(this).attr('p');
-            console.log('ssid '+ssid+', pid '+pid);
-            alert('jump to '+sector[ssid].planets[pid].name+'!');
+			ps(ssid, pid);
         }
+		// planet select
+		function ps(ssid, pid) {
+            console.log('ssid '+ssid+', pid '+pid);
+			if(ssid == curss && pid == curp){
+				alert('you\'re already there!');
+			}
+			else{
+            	alert('jump to '+sector[ssid].planets[pid].name+'!');
+			}
+		}
     </script>
 </body>
 </html>
