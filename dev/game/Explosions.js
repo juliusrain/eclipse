@@ -7,9 +7,13 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
     this.container.name = "ps";
 
     this.pCounter = 0;
+    this.currentDuration = 0;
+    this.maxDuration = duration;
 
-    var pCount = 20;
-    
+    this.scene = scene;
+
+    var pCount = 50;
+
     this.uniforms = {
         texture: {type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("temp/spark1.png")},
         color: {type: "c", value: new THREE.Color(0xffffff)},
@@ -43,10 +47,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         particle_position.multiplyScalar(5);
         particle_geometry.vertices.push(new THREE.Vertex(particle_position));
     }
-//                 var laserPMaterial = new THREE.ParticleBasicMaterial({
-//                     color: 0xff0000,
-//                     size: 8
-//                 });
+
     particle_system = new THREE.ParticleSystem(particle_geometry, particle_shader);
 
     for(var i = 0; i < particle_system.geometry.vertices.length; i++) {
@@ -59,10 +60,10 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
 
     this.container.add(particle_system);
     sceneElements.explosions.push(this);
-    scene.add(particle_system);
+    this.scene.add(particle_system);
 }
 
-Explosion.prototype.updateExplosion = function() {
+Explosion.prototype.updateExplosion = function(index) {
     var time = Date.now() * 0.005;
 
     for(var i = 0; i < this.attributes.size.value.length; i++) {
@@ -82,6 +83,5 @@ Explosion.prototype.updateExplosion = function() {
     this.attributes.angle.needsUpdate = true;
     //attributes.direction.needsUpdate = true;
     this.attributes.time.needsUpdate = true;
-    console.log("vbfdbfdbfbf");
-    
+
 }

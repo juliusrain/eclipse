@@ -301,9 +301,9 @@
 
 
                 //skybox
-                skyboxTex = ["textures/skybox/px.jpg", "textures/skybox/nx.jpg",
-                             "textures/skybox/py.jpg", "textures/skybox/ny.jpg",
-                             "textures/skybox/pz.jpg", "textures/skybox/nz.jpg"];
+                skyboxTex = ["textures/sky/px.jpg", "textures/sky/nx.jpg",
+                             "textures/sky/py.jpg", "textures/sky/ny.jpg",
+                             "textures/sky/pz.jpg", "textures/sky/nz.jpg"];
                 cubeTex = THREE.ImageUtils.loadTextureCube(skyboxTex);
 
                 var shader = THREE.ShaderUtils.lib["cube"];
@@ -734,22 +734,21 @@
 
                 //overlay
                 arrowDir.x = earthMesh.position.x - shipMesh.position.x;
-                arrowDir.y = 0;
+                arrowDir.y = earthMesh.position.y - shipMesh.position.y;
                 arrowDir.z = earthMesh.position.z - shipMesh.position.z;
                 arrowDir.normalize();
                 arrowMesh.position.copy(shipMesh.position);
                 arrowMesh.translateX(arrowDir.x*3);
-                //arrowMesh.translateY(arrowDir.y*2);
+                arrowMesh.translateY(arrowDir.y*3);
                 arrowMesh.translateZ(arrowDir.z*3);
 
                 arrowDir2.x = moonMesh.position.x - shipMesh.position.x;
-                //arrowDir2.y = moonMesh.position.y - cubeMesh.position.y;
-                arrowDir2.y = 0;
+                arrowDir2.y = moonMesh.position.y - shipMesh.position.y;
                 arrowDir2.z = moonMesh.position.z - shipMesh.position.z;
                 arrowDir2.normalize();
                 arrowMesh2.position.copy(shipMesh.position);
                 arrowMesh2.translateX(arrowDir2.x*3);
-                //arrowMesh2.translateY(arrowDir2.y*2);
+                arrowMesh2.translateY(arrowDir2.y*3);
                 arrowMesh2.translateZ(arrowDir2.z*3);
 
                 overlay4.position.copy(shipMesh.position);

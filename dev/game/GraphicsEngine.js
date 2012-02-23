@@ -24,6 +24,7 @@ function GraphicsEngine() {
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
     this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
+    this.gameplay_camera.direction = new THREE.Vector3(0, 0, -1);
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
@@ -47,7 +48,7 @@ function GraphicsEngine() {
     HUDElements.push(this.minimap);
 
     this.jumpmap = new Jumpmap();
-    
+
 
 
     /////////////////////////////////
@@ -70,8 +71,7 @@ function GraphicsEngine() {
             //self.removeSceneObject(sceneElements.AIShips[0]);
             //self.addExplosion(-10, 0, 0);
             //self.gameplay_controls.dragToLook = false;
-            expl = new Explosion(10, 10, 0, self.gameplay_scene);
-            console.log("adding expplosion");
+            var expl = new Explosion(10, 10, 0, self.gameplay_scene, 200);
         } else {
             //self.addSceneObject(sceneElements.AIShips[0]);
             //self.gameplay_controls.dragToLook = true;
@@ -348,7 +348,7 @@ function GraphicsEngine() {
            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
            scene.add(modelMesh);
         }
-        
+
         /*
          *  Creates lasers for a given ship (sceneObject).
          *      parentShip: sceneObject that represents parent ship that lasers belong to
@@ -515,7 +515,7 @@ function GraphicsEngine() {
         function updateMainShip() {
             sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(self.gameplay_camera.position);
-            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, self.gameplay_camera.up);
             //tilt left or right depending on roll
             if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
@@ -629,7 +629,7 @@ function GraphicsEngine() {
                     }
                 }
             }
-            
+
 
         }
 
@@ -729,7 +729,7 @@ function GraphicsEngine() {
 
             }
             for(var i = 0; i < sceneElements.explosions.length; i++) {
-                sceneElements.explosions[i].updateExplosion();
+                sceneElements.explosions[i].updateExplosion(i);
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////

@@ -97,7 +97,7 @@ var AIShip = {  type: AI_SHIP,
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 0, y: 0, z: -100} //starting position in scene when not main ship
+                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip);
