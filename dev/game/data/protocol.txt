@@ -1,0 +1,14 @@
+// Protocol for game data transfer
+
+// these are to be sent to all players
+CHAT - chat message
+
+// these are sent to other players at the same planet
+POS - position update
+NEW - appearance of new object (player)
+
+// these are commands to interact with the database
+RETR - retrieve objects data
+SAVE - save object data (append and update data)
+OVER - overwrite data (whatever's passed becomes the data)
+

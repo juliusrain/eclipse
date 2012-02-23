@@ -159,6 +159,8 @@ body {
 .chatmessage span {
     font-size:x-small;
     font-style:italic;
+	float:right;
+	margin-right:5px;
 }
 .chatmessage div {
     font-size:medium;
