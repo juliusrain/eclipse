@@ -5,6 +5,7 @@ $(window).resize(sizeGame);
 
 // click events
 $('#jumpmapcontrol').click(toggleJumpMap);
+$('#mouselockcontrol').click(toggleCursor);
 
 // keyboard events
 $(window).keypress(function (e){
@@ -15,11 +16,16 @@ $(window).keypress(function (e){
             toggleJumpMap();
             break;
         }
-        //l = bind/unbind cursor
+        // l = bind/unbind cursor
         case 108: {
             toggleCursor();
             break;
         }
+		// space = fire weapon
+		case 32: {
+			gameEngine.fireWeapon();
+			break;
+		}
     }
 });
 
@@ -32,10 +38,10 @@ $('#chatcompose').keydown(function (e){
 function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
-        graphicsEngine.toggleCursor();
+        graphicsEngine.toggleCursor(false);
     } else{
         $('#jumpmapbox').show();
-        graphicsEngine.toggleCursor();
+        graphicsEngine.toggleCursor(true);
     }
 }
 

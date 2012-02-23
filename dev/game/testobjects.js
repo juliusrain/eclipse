@@ -3,9 +3,12 @@ var gameObjects = []
 var skybox = {  type: SKYBOX,
                 parameters: {
                     name: "skybox",
-                    textures: [ "textures/skybox/starfield.png", "textures/skybox/starfield.png",
+                    /*textures: [ "textures/skybox/starfield.png", "textures/skybox/starfield.png",
                                 "textures/skybox/starfield.png", "textures/skybox/starfield.png",
-                                "textures/skybox/starfield.png", "textures/skybox/starfield.png"]
+                                "textures/skybox/starfield.png", "textures/skybox/starfield.png"]*/
+                    textures: [ "skybox/starfield.png", "skybox/starfield.png",
+                                "skybox/starfield.png", "skybox/starfield.png",
+                                "skybox/starfield.png", "skybox/starfield.png"]
                 }
             };
 gameObjects.push(skybox);
@@ -15,11 +18,18 @@ var playerShip = {  type: PLAYER_SHIP,
                         name: "mainShip", //model number?
                         engine: {   level: 0,
                                     speed: 1,
-                                    turnFactor: 1.5 //also used by graphics engine
+                                    turnFactor: 1.5, //also used by graphics engine
+									longJumpCost: 50,
+									medJumpCost: 20,
+									rechargeRate: 1,
+									rechargeCost: 1,
+									currentCharge: 0,
                         },
                         armor: {},
                         health: 100,
-						maxhealth: 100,
+                        maxHealth: 10000,
+						repairRate: 100,
+						repairCost: {food:1, fuel: 1, metals:15},
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?
@@ -27,9 +37,11 @@ var playerShip = {  type: PLAYER_SHIP,
                                 range: 500,
                                 speed: 10,
                                 amount: 50,
-                                maxCharge: 100,
+                                maxCharge: 153400,
                                 currentCharge: 0,
-
+								rechargeRate: 3450,
+								rechargeCost: 1,
+								fireCost: 5000,
                             },
                             missiles: {
 
@@ -127,4 +139,4 @@ var AIShip2 = { type: AI_SHIP,
                     position: {x: 0, y: 0, z: 1000} //starting position in scene when not main ship
                 }
             };
-gameObjects.push(AIShip2);
+//gameObjects.push(AIShip2);

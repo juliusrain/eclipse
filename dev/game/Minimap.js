@@ -61,6 +61,8 @@ function Minimap(game_controls, game_camera) {
 
     this.tempVec = new THREE.Vector3();
     this.tempVecForward = new THREE.Vector3(0, 0, -1);
+    this.tempVecUp = new THREE.Vector3(0, 1, 0);
+    this.tempMat = new THREE.Matrix4();
     this.tempQuat = new THREE.Quaternion();
 
 }
@@ -178,7 +180,7 @@ function Minimap(game_controls, game_camera) {
 //                 sprite.name = "ship indicator";
 //                 break;
                 sprite = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
-                sprite.scale.set(0.03, 0.03, 0.03);
+                sprite.scale.set(0.05, 0.05, 0.05);
                 sprite.objectType = AI_SHIP;
                 sprite.useQuaternion = true;
                 break;
@@ -235,7 +237,8 @@ function Minimap(game_controls, game_camera) {
 
 
         function update() {
-            var mainShipX = sceneElements.mainShip.position.x,
+            var mainShip = sceneElements.mainShip,
+                mainShipX = sceneElements.mainShip.position.x,
                 mainShipY = sceneElements.mainShip.position.y,
                 mainShipZ = sceneElements.mainShip.position.z,
                 minimap_object;
@@ -245,10 +248,18 @@ function Minimap(game_controls, game_camera) {
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).normalize();
-                        self.tempQuat.copy(self.game_camera.quaternion);
-                        self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-                        minimap_object.position.copy(self.tempVec);
+                        //minimap_object.position.set(0, 0, 0);
+                        //minimap_object.quaternion.set(0, 0, 0, 1);
+                        //self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z);
+                        self.tempMat.lookAt(mainShip.position, aiShip.position, mainShip.up.normalize());
+                        minimap_object.quaternion.setFromRotationMatrix(self.tempMat);
+                        //minimap_object.quaternion.multiplySelf(self.tempQuat);
+                        
+//                         self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).normalize();
+//                         self.tempQuat.copy(self.game_camera.quaternion);
+//                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
+//                         minimap_object.position.copy(self.tempVec);
+                        
 
                     }
                 }

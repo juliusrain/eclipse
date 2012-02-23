@@ -64,15 +64,17 @@ function GraphicsEngine() {
 //TEMPORARY event listenrs
     var self = this;
     var removed = false;
-    //document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
             //self.removeSceneObject(sceneElements.AIShips[0]);
             //self.addExplosion(-10, 0, 0);
-            self.gameplay_controls.dragToLook = false;
+            //self.gameplay_controls.dragToLook = false;
+            expl = new Explosion(10, 10, 0, self.gameplay_scene);
+            console.log("adding expplosion");
         } else {
             //self.addSceneObject(sceneElements.AIShips[0]);
-            self.gameplay_controls.dragToLook = true;
+            //self.gameplay_controls.dragToLook = true;
         }
         removed = !removed;
     }
@@ -133,28 +135,7 @@ function GraphicsEngine() {
         var self = this;
         var gameObject;
         for(var i = 0; i < objects.length; i++) {
-            gameObject = objects[i];
-            switch(gameObject.type) {
-                case SKYBOX: { //if skybox
-                    loadSkybox(gameObject, this.gameplay_scene);
-                    break;
-                }
-
-                case PLAYER_SHIP: {
-                    loadShip(gameObject, this.gameplay_scene);
-                    loadCrosshair(gameObject, this.gameplay_scene);
-                    //loadRing(gameObject, this.gameplay_scene);
-                    //set camera turning and movement speed based on main ship's parameters
-                    this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
-                    this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
-                    break;
-                }
-
-                case AI_SHIP: {
-                    loadShip(gameObject, this.gameplay_scene);
-                    break;
-                }
-            }
+            self.addGameObject(objects[i]);
         }
 
         this.minimap.loadMinimap();
@@ -168,9 +149,97 @@ function GraphicsEngine() {
 	dirlight2.position.set(0, 30, 0).normalize();
 	this.gameplay_scene.add(dirlight2);
 
+        var dirlight2 = new THREE.DirectionalLight(0xffffff);
+        dirlight2.position.set(0, -30, 0).normalize();
+        this.gameplay_scene.add(dirlight2);
+
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
-        
+
+    }
+
+    /*
+     *  Delete everything in the scene.
+     *  TODO deallocate textures, remove from scenelements/hudelements arrays
+     */
+    GraphicsEngine.prototype.deleteScene = function() {
+
+        var sceneChildren = this.gameplay_scene.children,
+            sceneChild,
+            i = 0;
+
+        //delete elements from gameplay_scene
+        while(i < sceneChildren.length) {
+            sceneChild = sceneChildren[i];
+            if(sceneChild instanceof THREE.Camera) {
+                i++;
+                continue;
+            }
+            this.gameplay_scene.remove(sceneChild);
+            this.renderer.deallocateObject(sceneChild);
+        }
+
+        sceneElements.mainShip = null;
+        for(i = sceneElements.AIShips.length; i > 0; i--) {
+            delete sceneElements.AIShips[i];
+            sceneElements.AIShips.length--;
+        }
+        for(i = sceneElements.env_objects.length; i > 0; i--) {
+            delete sceneElements.env_objects[i];
+            sceneElements.env_objects.length--;
+        }
+        for(i = sceneElements.explosions.length; i > 0; i--) {
+            delete sceneElements.explosions[i];
+            sceneElements.explosions.length--;
+        }
+        for(i = sceneElements.lasers.length; i > 0; i--) {
+            delete sceneElements.lasers[i];
+            sceneElements.lasers.length--;
+        }
+        for(i = sceneElements.missiles.length; i > 0; i--) {
+            delete sceneElements.missiles[i];
+            sceneElements.missiles.length--;
+        }
+
+
+        this.scene_loaded = false;
+    }
+
+//=================================================================
+//================= Scene manipulation functions ==================
+//adding/removing stuff after it's been created
+
+    //TODO deallocate from memory
+    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
+        this.gameplay_scene.remove(sceneObject);
+    }
+
+
+    //TODO change to take gameObject
+    GraphicsEngine.prototype.addGameObject = function(gameObject) {
+        var loader = new THREE.JSONLoader();
+        var self = this;
+        switch(gameObject.type) {
+            case SKYBOX: { //if skybox
+                loadSkybox(gameObject, this.gameplay_scene);
+                break;
+            }
+
+            case PLAYER_SHIP: {
+                loadShip(gameObject, this.gameplay_scene);
+                loadCrosshair(gameObject, this.gameplay_scene);
+                //loadRing(gameObject, this.gameplay_scene);
+                //set camera turning and movement speed based on main ship's parameters
+                this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
+                this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
+                break;
+            }
+
+            case AI_SHIP: {
+                loadShip(gameObject, this.gameplay_scene);
+                break;
+            }
+        }
 
         function loadCrosshair(gameObject, scene) {
             var quad = new THREE.PlaneGeometry(2, 2),
@@ -249,8 +318,8 @@ function GraphicsEngine() {
          *  (used only for gameObjects)
          */
         function loadJSON(geometry, gameObject, scene) {
-
-            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());//(geometry, new THREE.MeshFaceMaterial());
+            var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
+            var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
@@ -280,10 +349,10 @@ function GraphicsEngine() {
                 }
             }
 
-            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
-            scene.add(modelMesh);
+           modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+           scene.add(modelMesh);
         }
-
+        
         /*
          *  Creates lasers for a given ship (sceneObject).
          *      parentShip: sceneObject that represents parent ship that lasers belong to
@@ -293,7 +362,8 @@ function GraphicsEngine() {
             var laserContainer = new THREE.Object3D(),
                 callback = function(geometry) {loadJSONLasers(geometry, parentShip, laserContainer)};
 
-            loader.load(parentShip.drawParameters.laserModel, callback);
+            //loader.load(parentShip.drawParameters.laserModel, callback);
+            loader.load("models/lasers/laser.js", callback);
 
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
@@ -332,119 +402,12 @@ function GraphicsEngine() {
         }
     }
 
-    /*
-     *  Delete everything in the scene.
-     *  TODO deallocate textures, remove from scenelements/hudelements arrays
-     */
-    GraphicsEngine.prototype.deleteScene = function() {
-
-        var sceneChildren = this.gameplay_scene.children,
-            sceneChild,
-            i = 0;
-
-        //delete elements from gameplay_scene
-        while(i < sceneChildren.length) {
-            sceneChild = sceneChildren[i];
-            if(sceneChild instanceof THREE.Camera) {
-                i++;
-                continue;
-            }
-            this.gameplay_scene.remove(sceneChild);
-            this.renderer.deallocateObject(sceneChild);
-        }
-
-        sceneElements.mainShip = null;
-        for(i = sceneElements.AIShips.length; i > 0; i--) {
-            delete sceneElements.AIShips[i];
-            sceneElements.AIShips.length--;
-        }
-        for(i = sceneElements.env_objects.length; i > 0; i--) {
-            delete sceneElements.env_objects[i];
-            sceneElements.env_objects.length--;
-        }
-        for(i = sceneElements.explosions.length; i > 0; i--) {
-            delete sceneElements.explosions[i];
-            sceneElements.explosions.length--;
-        }
-        for(i = sceneElements.lasers.length; i > 0; i--) {
-            delete sceneElements.lasers[i];
-            sceneElements.lasers.length--;
-        }
-        for(i = sceneElements.missiles.length; i > 0; i--) {
-            delete sceneElements.missiles[i];
-            sceneElements.missiles.length--;
-        }
-
-
-        this.scene_loaded = false;
-    }
-
-//=================================================================
-//================= Scene manipulation functions ==================
-//adding/removing stuff after it's been created
-
-    //TODO deallocate from memory
-    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
-        this.gameplay_scene.remove(sceneObject);
+    GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
+        var duration = 100,
+            e = new Explosion(x, y, z, scene, duration);
     }
 
 
-    //TODO change to take gameObject
-    GraphicsEngine.prototype.addSceneObject = function(sceneObject) {
-        this.gameplay_scene.add(sceneObject);
-    }
-
-    //TODO: NEED TO FIX THIS UP
-    GraphicsEngine.prototype.addExplosion = function(x, y, z) { //plus other vars
-        //will need multiple systems for the different textures
-        var container = new THREE.Object3D();
-        container.name = "ps";
-
-        var geometry1 = new THREE.Geometry();
-        var particleMaterial1, particleSystem1;
-        var particlePosition;
-        var i;
-        for(i = 0; i < 100; i++) {
-            particlePosition = new THREE.Vector3(0, 0, 0);
-            geometry1.vertices.push(new THREE.Vertex(particlePosition));
-            geometry1.vertices[i].direction = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-            geometry1.vertices[i].speed = Math.random() * 10;
-        }
-
-        particleMaterial1 = new THREE.ParticleBasicMaterial({
-            color: 0xff0000,
-            size: 100,
-
-        });
-
-        particleSystem1 = new THREE.ParticleSystem(geometry1, particleMaterial1);
-        particleSystem1.position.set(x, y, z);
-        particleSystem1.name = "particle system1";
-
-        container.add(particleSystem1);
-
-
-        var geometry2 = new THREE.Geometry();
-        var particleMaterial2, particleSystem2;
-        for(i = 0; i < 50; i++) {
-            particlePosition = new THREE.Vector3(0, 0, 0);
-            geometry2.vertices.push(new THREE.Vertex(particlePosition));
-        }
-        particleMaterial2 = new THREE.ParticleBasicMaterial({
-            color: 0x0000ff,
-            size: 50
-        });
-
-        particleSystem2 = new THREE.ParticleSystem(geometry2, particleMaterial2);
-        particleSystem2.position.set(x+60, y, z);
-        particleSystem2.name = "particle system2";
-
-
-        container.add(particleSystem2);
-
-        sceneElements.explosions.push(container);
-        this.gameplay_scene.add(container);
-    }
 
 //=================================================================
 
@@ -453,9 +416,14 @@ function GraphicsEngine() {
 //================== Rendering functions ======================
 
 
-    GraphicsEngine.prototype.toggleCursor = function() {
-        this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
-        console.log("blah");
+    GraphicsEngine.prototype.toggleCursor = function(param) {
+        if(typeof param == "boolean"){
+            this.gameplay_controls.dragToLook = param;
+        }
+        else{
+            this.gameplay_controls.dragToLook = !this.gameplay_controls.dragToLook;
+        }
+        console.log("mouse lock");
     }
 
     /*
@@ -521,7 +489,9 @@ function GraphicsEngine() {
                 updateHUD(); //includes minimap
 
                 //ai.updateScene(); //decides direction
-                gameEngine.update(); //increment laser and ship position
+                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+                    gameEngine.update(); //increment laser and ship position
+                }
                 updateScene();
             }
             self.jumpmap.updateJumpmap();
@@ -549,6 +519,7 @@ function GraphicsEngine() {
         function updateMainShip() {
             sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(self.gameplay_camera.position);
+            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
             //tilt left or right depending on roll
             if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
@@ -761,11 +732,9 @@ function GraphicsEngine() {
                 tempSphere2.position.z = 600*Math.cos(t);
 
             }
-
-            for(i = 0; i < sceneElements.explosions.length; i++) {
-                sceneElements.explosions[i].position.x = 50*(i+1)*Math.cos(Date.now() * 0.005);
+            for(var i = 0; i < sceneElements.explosions.length; i++) {
+                sceneElements.explosions[i].updateExplosion();
             }
-
         }
 ////////////////////////////////////////////////////////////////////////////////////////
 

@@ -64,7 +64,8 @@
         </div>
         <div id="bottom">
             <div id="jumpmapcontrol" class="control"><span>J</span>Jump Map</div>
-            <div class="control"></div>
+            <div id="mouselockcontrol" class="control"><span>L</span>Lock/Unlock Mouse</div>
+            <div id="autorepaircontrol" class="control"><span>T</span>Auto-Repair</div>
         </div>
         <div id="minimap"></div>
     </div>
@@ -79,7 +80,8 @@
 
     <script type="text/javascript" src="frame.js"></script>
     <script type="text/javascript" src="UI.js"></script>
-
+    
+    <script type="text/javascript" src="Explosions.js"></script>
     <script type="text/javascript" src="GraphicsEngine.js"></script>
     <script type="text/javascript" src="Minimap.js"></script>
     <script type="text/javascript" src="Jumpmap.js"></script>
@@ -87,9 +89,63 @@
 
     <script type="text/javascript" src="testobjects.js"></script>
     <script type="text/javascript" src="testsectormap.js"></script>
+    <script type="text/javascript" src="Network.js"></script>
 
     <script type="text/javascript" src="GameEngine.js"></script>
     <script type="text/javascript" src="game.js"></script>
+
+    <script id="vertexShader_explosion_large" type="x-shader/x-vertex">
+        attribute float angle;
+        attribute float size;
+        attribute vec3 customColor;
+        attribute vec3 direction;
+        attribute float time;
+
+        varying vec3 vColor;
+        varying float vAngle;
+        varying float vTime;
+
+        void main() {
+            float newsize;
+            vec3 nDirection = direction;
+            vAngle = angle;
+            vColor = customColor;
+            vTime = time;
+            nDirection = normalize(direction);
+            mat3 trmat = mat3(  0.0, 0.0, 10.0*nDirection.x*time,
+                                0.0, 0.0, 10.0*nDirection.y*time,
+                            0.0, 0.0, 10.0*nDirection.z*time);
+            vec3 newposition = position * trmat;
+            vec4 mvPosition = modelViewMatrix * vec4(newposition, 1.0);
+            newsize = size;
+            //newsize = 1000.0 / newsize;
+            gl_PointSize = newsize * (50.0 / length(mvPosition.xyz));
+            gl_Position = projectionMatrix * mvPosition;
+        }
+    </script>
+
+
+    <script id="fragmentShader_explosion_large" type="x-shader/x-fragment">
+        uniform sampler2D texture;
+        uniform  vec3 color;
+
+        varying vec3 vColor;
+        varying float vAngle;
+        varying float vTime;
+
+        void main() {
+            float cosx, sinx;
+            sinx = sin(vAngle);
+            cosx = cos(vAngle);
+            mat2 rotmat = mat2( cosx, -sinx,
+                                sinx, cosx);
+            vec2 pc = (gl_PointCoord - vec2(0.5, 0.5)) * rotmat;
+            pc += vec2(0.5, 0.5);
+            vec4 c = vec4(color * vColor, 1.0 - vTime);
+            gl_FragColor = c * texture2D(texture, pc);
+        }
+    </script>
+
 
     <script>
         $(function (){
