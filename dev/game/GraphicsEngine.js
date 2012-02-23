@@ -161,7 +161,12 @@ function GraphicsEngine() {
         this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
+	dirlight.position.set(0, -30, 0).normalize();
         this.gameplay_scene.add(dirlight);
+	
+	var dirlight2 = new THREE.DirectionalLight(0xffffff);
+	dirlight2.position.set(0, 30, 0).normalize();
+	this.gameplay_scene.add(dirlight2);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
