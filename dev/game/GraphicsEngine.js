@@ -69,9 +69,9 @@ function GraphicsEngine() {
     function onMouseDown(event) {
         if(!removed) {
             //self.removeSceneObject(sceneElements.AIShips[0]);
-            //self.addExplosion(-10, 0, 0);
+        //self.addExplosion(-10, 0, 0);
             //self.gameplay_controls.dragToLook = false;
-            var expl = new Explosion(10, 10, 0, self.gameplay_scene, 200);
+            var expl = new Explosion(10, 10, 0, self.gameplay_scene, 200.0);
         } else {
             //self.addSceneObject(sceneElements.AIShips[0]);
             //self.gameplay_controls.dragToLook = true;
@@ -729,7 +729,7 @@ function GraphicsEngine() {
 
             }
             for(var i = 0; i < sceneElements.explosions.length; i++) {
-                sceneElements.explosions[i].updateExplosion(i);
+                sceneElements.explosions[i].updateExplosion();
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////

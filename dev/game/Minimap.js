@@ -246,14 +246,12 @@ function Minimap(game_controls, game_camera) {
                     case AI_SHIP: {
 
                         self.game_camera.quaternion.multiplyVector3(self.tempVecForward, self.game_camera.direction);
-                        self.tempVec.sub(aiShip.position, self.game_camera.position).normalize();
 
 
+                        self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
 
+//                         newlookAt(self.game_camera, aiShip.position, self.game_camera.up, self.tempMat);
 
-
-
-                        //self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
                         self.tempMat.lookAt(self.game_camera.position, aiShip.position, self.game_camera.up);
                         self.tempQuat.setFromRotationMatrix(self.tempMat);
                         self.tempQuat.multiplySelf(self.minimap_grid.quaternion);
@@ -262,16 +260,31 @@ function Minimap(game_controls, game_camera) {
                         minimap_object.position.set(0, 0, 0);
                         minimap_object.translateZ(-1);
 
-                        if(blah == 0) {
-                            console.log(self.game_camera.direction.x, self.game_camera.direction.y,self.game_camera.direction.z);
-                            blah = 100;
-
-                        }
-                        blah--;
-
                     }
                 }
 
+            }
+            function newlookAt(eye, center, up, mat) {
+                var x = new THREE.Vector3(),
+                    y = new THREE.Vector3(),
+                    z = new THREE.Vector3();
+
+                z.sub(eye, center).normalize();
+                self.tempQuat.copy(self.game_camera.quaternion).inverse();
+                self.tempQuat.multiplyVector3(z, z);
+                if(z.length() === 0) {
+                    z.z = 1;
+                }
+                x.cross(up, z).normalize();
+                if(x.length() === 0) {
+                    z.x += 0.0001;
+                    x.cross(up, z).normalize();
+                }
+                y.cross(z, x).normalize();
+
+                mat.n11 = x.x; mat.n12 = y.x; mat.n13 = z.x;
+                mat.n21 = x.y; mat.n22 = y.y; mat.n23 = z.y;
+                mat.n31 = x.z; mat.n32 = y.z; mat.n33 = z.z;
             }
 
         }
