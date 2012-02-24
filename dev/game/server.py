@@ -38,6 +38,7 @@ class WSHandler(tornado.web.WebSocketHandler):
         logging.info("got message %r", message)
         parsed = tornado.escape.json_decode(message)
         action = parsed["action"]
+        body = parsed["body"]
         if action == "chat":
             pass
         elif action == "pos"
