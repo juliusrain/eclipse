@@ -47,7 +47,7 @@ function GraphicsEngine() {
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
-    this.jumpmap = new Jumpmap();
+    //this.jumpmap = new Jumpmap();
 
 
 
@@ -133,7 +133,7 @@ function GraphicsEngine() {
         }
 
         this.minimap.loadMinimap();
-        this.jumpmap.loadJumpmap();
+        //this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
         dirlight.position.set(0,30,0).normalize();
@@ -350,9 +350,7 @@ function GraphicsEngine() {
                     break;
                 }
             }
-            function fireLaser() {
-                
-            }
+
             
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
@@ -387,12 +385,11 @@ function GraphicsEngine() {
          */
         function loadJSONLasers(geometry, parentShip, laserContainer) {
             var laserMesh;
-            var i;
-            for(i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
+            for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
                 laserMesh = new THREE.Mesh(geometry, tempMaterial);
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
-                laserMesh.range = parentShip.gameParameters.weapons.lasers.range;
+                laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
                 laserMesh.parentShip = parentShip.drawParameters.shipID;
 
@@ -403,6 +400,19 @@ function GraphicsEngine() {
                 //laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
+            }
+            
+            function fireLaser() {
+                for(var i = 0; i < laserContainer.children.length; i++) {
+                    if(!laserContainer.children[i].fired) {
+                        laserContainer.children[i].fired = true;
+                        laserContainer.children[i+1].fired = true;
+                        laserContainer.children[i].currentDistance += 1;
+                        laserContainer.children[i+1].currentDistance += 1;
+                        laserContainer.children[i].visible = true;
+                        laserContainer.children[i+1].visible = true;
+                    }
+                }
             }
         }
     }
@@ -493,13 +503,14 @@ function GraphicsEngine() {
                 updateMainShip();
                 updateHUD(); //includes minimap
 
-                //ai.updateScene(); //decides direction
-                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
-                    gameEngine.update(); //increment laser and ship position
-                }
+//                ai.updateScene(); //decides direction
+//                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+//                    gameEngine.update(); //increment laser and ship position
+//                }
+                updateLasers();
                 updateScene();
             }
-            self.jumpmap.updateJumpmap();
+            //self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
         }
@@ -612,10 +623,10 @@ function GraphicsEngine() {
             sceneObject.translateZ(-70); //(distance from camera)
         }
 
-        var HUDObject, i;
+        var HUDObject;
         function updateHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
-            for(i = 0; i < HUDElements.length; i++) {
+            for(var i = 0; i < HUDElements.length; i++) {
                 HUDObject = HUDElements[i];
                 switch(HUDElements[i].objectType) {
                     case CROSSHAIR: {
@@ -638,7 +649,12 @@ function GraphicsEngine() {
                     }
                 }
             }
+        }
 
+        function updateLasers() {
+
+            var sceneLasers = sceneElements.lasers;
+            console.log(sceneLasers);
 
         }
 
