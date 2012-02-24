@@ -26,6 +26,10 @@ $(window).keypress(function (e){
 			gameEngine.fireWeapon();
 			break;
 		}
+		//create explosion (for testing)
+        case 112: {
+            graphicsEngine.addExplosionLarge(0, 0, -10);
+        }
     }
 });
 

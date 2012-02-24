@@ -68,13 +68,7 @@ function GraphicsEngine() {
     document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
-            //self.removeSceneObject(sceneElements.AIShips[0]);
-        //self.addExplosion(-10, 0, 0);
-            //self.gameplay_controls.dragToLook = false;
-            var expl = new Explosion(10, 10, 0, self.gameplay_scene, 200.0);
         } else {
-            //self.addSceneObject(sceneElements.AIShips[0]);
-            //self.gameplay_controls.dragToLook = true;
         }
         removed = !removed;
     }
@@ -399,8 +393,8 @@ function GraphicsEngine() {
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 100,
-            e = new Explosion(x, y, z, scene, duration);
+        var duration = 200,
+            e = new Explosion(x, y, z, this.gameplay_scene, duration);
     }
 
 
