@@ -26,10 +26,17 @@ body {
     position:absolute;
     font-size:x-small;
 }
-.youarehere {
+.youarehere .star, .youarehere .planet {
     border:thin solid blue;
 }
-.jumpplanet:hover {
+.jumpplanet .star + div {
+	text-align:right;
+	visibility:hidden;
+}
+.jumpplanet .star:hover+div {
+	visibility:visible;
+}
+.jumpplanet .star:hover {
     border:thin solid yellow;
 }
 .jumpplanet img {
