@@ -4,6 +4,7 @@ URL = "ws://cgi.cs.mcgill.ca:8080/~sli90/ws"
 
 function Network() {
 	//this part will hold the network connection
+	this.ws;
 }
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
@@ -20,5 +21,9 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 }
 
 Network.prototype.connect = function () {
-    ws = new WebSocket
+    this.ws = new WebSocket(URL);
+}
+
+Network.prototype.send = function (message) {
+    this.ws.send(message)
 }
