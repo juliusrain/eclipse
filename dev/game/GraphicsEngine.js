@@ -146,6 +146,18 @@ function GraphicsEngine() {
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
 
+        var cloader = THREE.ColladaLoader();
+        cloader.load("temp/monster.dae",
+                    function(collada) {
+                        var model = collada.scene;
+                        model.position.set(0.0, -1000, -2000);
+                        model.rotation.x = -Math.PI/2;
+                        //model.scale.set();
+                        self.gameplay_scene.add(model);
+                    }
+        );
+
+        
     }
 
     /*
@@ -205,7 +217,7 @@ function GraphicsEngine() {
     }
 
 
-    //TODO change to take gameObject
+    //change to take gameObject
     GraphicsEngine.prototype.addGameObject = function(gameObject) {
         var loader = new THREE.JSONLoader();
         var self = this;
@@ -338,9 +350,12 @@ function GraphicsEngine() {
                     break;
                 }
             }
-
-           modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
-           scene.add(modelMesh);
+            function fireLaser() {
+                
+            }
+            
+            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+            scene.add(modelMesh);
         }
 
         /*
