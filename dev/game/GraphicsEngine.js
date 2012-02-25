@@ -157,7 +157,7 @@ function GraphicsEngine() {
                     }
         );
 
-        
+
     }
 
     /*
@@ -351,7 +351,7 @@ function GraphicsEngine() {
                 }
             }
 
-            
+
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
         }
@@ -401,7 +401,7 @@ function GraphicsEngine() {
 
                 laserContainer.add(laserMesh);
             }
-            
+
             function fireLaser() {
                 for(var i = 0; i < laserContainer.children.length; i++) {
                     if(!laserContainer.children[i].fired) {
@@ -503,10 +503,10 @@ function GraphicsEngine() {
                 updateMainShip();
                 updateHUD(); //includes minimap
 
-//                ai.updateScene(); //decides direction
-//                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
-//                    gameEngine.update(); //increment laser and ship position
-//                }
+//               ai.updateScene(); //decides direction
+//               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+                   gameEngine.update(); //increment laser and ship position
+//               }
                 updateLasers();
                 updateScene();
             }
@@ -654,7 +654,6 @@ function GraphicsEngine() {
         function updateLasers() {
 
             var sceneLasers = sceneElements.lasers;
-            console.log(sceneLasers);
 
         }
 

@@ -152,7 +152,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         particle_position;
 
         //small particles
-    pCount = 100;
+    pCount = 500;
     particle_geometry = new THREE.Geometry();
     for(var i = 0; i < pCount; i++) {
         particle_position = new THREE.Vector3(Math.random()*20-10, Math.random()*20-10, Math.random()*20-10);
@@ -162,7 +162,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
     particle_system = new THREE.ParticleSystem(particle_geometry, particle_shader);
 
     for(var i = 0; i < particle_system.geometry.vertices.length; i++) {
-        this.particle_attributes.size.value[i] = 50;
+        this.particle_attributes.size.value[i] = 25;
         this.particle_attributes.displacement.value[i] = 0.0;
         this.particle_attributes.customColor.value[i] = new THREE.Color(0xffaa00);
         this.particle_attributes.angle.value[i] = 1.0;
@@ -225,8 +225,8 @@ Explosion.prototype.updateExplosion = function(index) {
 
     //update small particle system
     for(var i = 0; i < this.particle_attributes.size.value.length; i++) {
-        this.particle_attributes.angle.value[i] = 3*Math.sin(i+time*0.2);
-        this.particle_attributes.displacement.value[i] += 0.02;
+        this.particle_attributes.angle.value[i] = 3*Math.sin(i + time * 0.2);
+        this.particle_attributes.displacement.value[i] = this.slowdownCounter + 0.1;
     }
 
     this.particle_attributes.angle.needsUpdate = true;
@@ -236,7 +236,7 @@ Explosion.prototype.updateExplosion = function(index) {
 
     //update fire sprite particle system
     for(var i = 0; i < this.fire_sprite_attributes.size.value.length; i++) {
-        this.fire_sprite_attributes.angle.value[i] = 3*Math.cos(i+time*0.01);
+        this.fire_sprite_attributes.angle.value[i] = 3 * Math.cos(i + time * 0.01);
         this.fire_sprite_attributes.displacement.value[i] = this.slowdownCounter;
         this.fire_sprite_attributes.size.value[i] += 0.5;
     }
@@ -248,7 +248,7 @@ Explosion.prototype.updateExplosion = function(index) {
     if(this.slowdownCounter > 0.4475) {
         this.slowdownCounter += 0.001 * this.slowdownCounter;
     } else {
-        this.slowdownCounter += 0.025 * (0.45-this.slowdownCounter);
+        this.slowdownCounter += 0.025 * (0.45 - this.slowdownCounter);
     }
 
 }
