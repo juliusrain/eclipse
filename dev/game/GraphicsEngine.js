@@ -36,7 +36,10 @@ function GraphicsEngine() {
     this.map_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
 
     //main renderer
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({
+        clearColor: 0x000000,
+        clearAlpha: 1
+    });
     this.renderer.setSize(this.canvas_width, this.canvas_height);
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
@@ -248,6 +251,7 @@ function GraphicsEngine() {
                 material = new THREE.MeshBasicMaterial({
                     map: THREE.ImageUtils.loadTexture(gameObject.drawParameters.crosshair),
                     blending: THREE.AdditiveBlending,
+                    depthWrite: false,
                     transparent: true
                 });
             var quadMesh = new THREE.Mesh(quad, material);

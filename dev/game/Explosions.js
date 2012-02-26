@@ -62,10 +62,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
     //will need multiple systems for the different textures of explosion
     this.contents = []; //used to hold this explosion's particle systems
 
-    this.slowdownCounter = 0;
-
     this.scene = scene;
-
 
     //shader attributes/uniforms
     this.particle_uniforms = {
@@ -83,12 +80,12 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         currentDuration: {type: "f", value: []},
     };
 
+/*
     this.fire_sprite_uniforms = {
         texture: {type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("temp/sprite0.png")},
         color: {type: "c", value: new THREE.Color(0xffffff)},
         maxDuration: {type: "f", value: duration},
     };
-
     this.fire_sprite_attributes = {
         size: {type: "f", value: []},
         displacement: {type: "f", value: []},
@@ -104,7 +101,6 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         color: {type: "c", value: new THREE.Color(0xffffff)},
         maxDuration: {type: "f", value: duration},
     };
-
     this.smoke_sprite_attributes = {
         size: {type: "f", value: []},
         displacement: {type: "f", value: []},
@@ -113,6 +109,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         direction: {type: "v3", value: []},
         currentDuration: {type: "f", value: []},
     }
+*/
 
     //shader initialization
     var particle_shader = new THREE.ShaderMaterial({
@@ -125,6 +122,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         transparent: true
     });
 
+/*
     var fire_sprite_shader = new THREE.ShaderMaterial({
         uniforms: this.fire_sprite_uniforms,
         attributes: this.fire_sprite_attributes,
@@ -144,6 +142,7 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         depthWrite: false,
         transparent: true
     });
+*/
 
     //particle system initialization
     var pCount,
@@ -152,55 +151,94 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         particle_position;
 
         //small particles
-    pCount = 500;
+    pCount = 1000;
+    radius = 150;
     particle_geometry = new THREE.Geometry();
     for(var i = 0; i < pCount; i++) {
-        particle_position = new THREE.Vector3(Math.random()*20-10, Math.random()*20-10, Math.random()*20-10);
-        particle_position.multiplyScalar(5);
+        particle_position = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+        particle_position.multiplyScalar(radius);
         particle_geometry.vertices.push(new THREE.Vertex(particle_position));
     }
     particle_system = new THREE.ParticleSystem(particle_geometry, particle_shader);
+    particle_system.position.set(x, y, z);
 
     for(var i = 0; i < particle_system.geometry.vertices.length; i++) {
         this.particle_attributes.size.value[i] = 25;
         this.particle_attributes.displacement.value[i] = 0.0;
         this.particle_attributes.customColor.value[i] = new THREE.Color(0xffaa00);
         this.particle_attributes.angle.value[i] = 1.0;
-        this.particle_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1);
+        this.particle_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
         this.particle_attributes.currentDuration.value[i] = 0.0;
     }
 
     this.contents.push(particle_system);
     this.scene.add(particle_system);
 
+    
+    
+    var sprite;
+    
+    this.fire_sprite_container = new THREE.Object3D();
+    this.fire_sprite_container.radius = 500; //max size
+    this.fire_sprite_container.crt_size = 0;    
+    this.fire_sprite_container.expansion_speed = 0.5;
+    
+    var sCount = 10,
+        size = 10;
+    
+    for(var i = 0; i < sCount; i++) {
+        sprite = new THREE.Sprite({
+            map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
+            useScreenCoordinates: false,
+            scaleByViewport: true,
+            size: size,
+            blending: THREE.AdditiveBlending,
+        });
+        sprite.direction = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+        sprite.crt_size = 0;
+        sprite.position.set(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+        sprite.rotation = Math.random()*Math.PI;
+        
+        this.fire_sprite_container.add(sprite);
+    }
+    
+    this.fire_sprite_container.position.set(x, y, z);
+    
+    this.contents.push(this.fire_sprite_container);
+    this.scene.add(this.fire_sprite_container);
+    
+
+/*
         //fire sprite0
-    pCount = 20;
+    pCount = 50;
+    radius = 50;
     particle_geometry = new THREE.Geometry();
     for(var i = 0; i < pCount; i++) {
-        particle_position = new THREE.Vector3(Math.random()*20-10, Math.random()*20-10, Math.random()*20-10);
-        particle_position.multiplyScalar(4);
+        particle_position = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+        particle_position.multiplyScalar(radius);
         particle_geometry.vertices.push(new THREE.Vertex(particle_position));
     }
-    particle_system = new THREE.ParticleSystem(particle_geometry, fire_sprite_shader);
+    this.particle_system_fire = new THREE.ParticleSystem(particle_geometry, fire_sprite_shader);
 
     for(var i = 0; i < particle_system.geometry.vertices.length; i++) {
-        this.fire_sprite_attributes.size.value[i] = 300;
+        this.fire_sprite_attributes.size.value[i] = 2000;
         this.fire_sprite_attributes.displacement.value[i] = 0.0;
         this.fire_sprite_attributes.customColor.value[i] = new THREE.Color(0xffffff);
         this.fire_sprite_attributes.angle.value[i] = 1.0;
-        this.fire_sprite_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1);
+        this.fire_sprite_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
         this.fire_sprite_attributes.currentDuration.value[i] = 0.0;
     }
 
-    this.contents.push(particle_system);
-    this.scene.add(particle_system);
+    this.contents.push(this.particle_system_fire);
+    this.scene.add(this.particle_system_fire);
 
         //smoke sprites
     pCount = 20;
+    radius = 80;
     particle_geometry = new THREE.Geometry();
     for(var i = 0; i < pCount; i++) {
-        particle_position = new THREE.Vector3(Math.random()*20-10, Math.random()*20-10, Math.random()*20-10);
-        particle_position.multiplyScalar(5);
+        particle_position = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+        particle_position.multiplyScalar(radius);
         particle_geometry.vertices.push(new THREE.Vertex(particle_position));
     }
     particle_system = new THREE.ParticleSystem(particle_geometry, smoke_sprite_shader);
@@ -210,12 +248,15 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         this.smoke_sprite_attributes.displacement.value[i] = 0.0;
         this.smoke_sprite_attributes.customColor.value[i] = new THREE.Color(0xffffff);
         this.smoke_sprite_attributes.angle.value[i] = 1.0;
-        this.smoke_sprite_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1);
+        this.smoke_sprite_attributes.direction.value[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
         this.smoke_sprite_attributes.currentDuration.value[i] = 0.0;
     }
 
     this.contents.push(particle_system);
     this.scene.add(particle_system);
+*/
+
+
 
     sceneElements.explosions.push(this);
 }
@@ -226,14 +267,14 @@ Explosion.prototype.updateExplosion = function(index) {
     //update small particle system
     for(var i = 0; i < this.particle_attributes.size.value.length; i++) {
         this.particle_attributes.angle.value[i] = 3*Math.sin(i + time * 0.2);
-        this.particle_attributes.displacement.value[i] = this.slowdownCounter + 0.1;
+        this.particle_attributes.displacement.value[i] += 0.025 * (1 - this.particle_attributes.displacement.value[i]);
     }
 
     this.particle_attributes.angle.needsUpdate = true;
     this.particle_attributes.displacement.needsUpdate = true;
     this.particle_attributes.currentDuration.needsUpdate = true;
 
-
+/*
     //update fire sprite particle system
     for(var i = 0; i < this.fire_sprite_attributes.size.value.length; i++) {
         this.fire_sprite_attributes.angle.value[i] = 3 * Math.cos(i + time * 0.01);
@@ -244,11 +285,21 @@ Explosion.prototype.updateExplosion = function(index) {
     this.fire_sprite_attributes.displacement.needsUpdate = true;
     this.fire_sprite_attributes.size.needsUpdate = true;
     this.fire_sprite_attributes.currentDuration.needsUpdate = true;
-
-    if(this.slowdownCounter > 0.4475) {
-        this.slowdownCounter += 0.001 * this.slowdownCounter;
-    } else {
-        this.slowdownCounter += 0.025 * (0.45 - this.slowdownCounter);
+*/
+    var fsprites = this.fire_sprite_container;
+    fsprites.crt_size += 0.005 * (fsprites.radius - fsprites.crt_size);
+    for(var i = 0; i < fsprites.children.length; i++) {
+        //grow
+        fsprites.children[i].scale.set(fsprites.crt_size, fsprites.crt_size, 1.0);
+        //disperse
+        fsprites.children[i].position.x += fsprites.children[i].direction.x * fsprites.expansion_speed;
+        fsprites.children[i].position.y += fsprites.children[i].direction.y * fsprites.expansion_speed;
+        fsprites.children[i].position.z += fsprites.children[i].direction.z * fsprites.expansion_speed;
+        fsprites.expansion_speed *= (1.1 - fsprites.expansion_speed);
+        //rotate
+        fsprites.children[i].rotation += time * i;
+        
     }
+
 
 }
