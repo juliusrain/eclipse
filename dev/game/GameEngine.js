@@ -6,12 +6,16 @@ function GameEngine() {
     //this.resources = {};//load from game constants!
     // TEMPORARY ***************************************
     this.resources = {
-        food:1000,
-        fuel:1000,
-        metals:1000,
+        food:10000,
+        fuel:10000,
+        metals:10000,
     };
     this.stage = 0;
-	this.timeouts = {lasers:0};
+	this.autorepair = true;
+	this.timeouts = {
+		lasers:0,
+		food:0,
+	};
     this.logicwait = 0;
 
 	// start network client
@@ -96,7 +100,7 @@ GameEngine.prototype.expendResources = function (cost) {
 GameEngine.prototype.updateResources = function () {
 	var ship = sceneElements.mainShip.gameParameters;
 	// regeneration
-	if(ship.health < ship.maxHealth){
+	if(this.autorepair && ship.health < ship.maxHealth){
 		// ship needs repairs
 		if(this.sufficientResources(ship.repairCost)){
 			// ship can afford repairs
@@ -133,6 +137,14 @@ GameEngine.prototype.updateResources = function () {
 				engine.currentCharge = 100;
 			}
 		}
+	}
+	// eat food!
+	if(this.timeouts.food === 0){
+		this.resources.food--;
+		this.timeouts.food = EATING;
+	}
+	else{
+		this.timeouts.food--;
 	}
 };
 
