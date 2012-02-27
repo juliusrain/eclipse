@@ -664,14 +664,14 @@ function GraphicsEngine() {
         }
 
         function updateExplosions() {
-            var done;
             for(var i = sceneElements.explosions.length - 1; i >= 0 && sceneElements.explosions[i] instanceof Explosion; i--) {
                 sceneElements.explosions[i].updateExplosion();
                 if(sceneElements.explosions[i].done) {
                     delete sceneElements.explosions[i];
+                    sceneElements.explosions.splice(i, 1);
                 }
             }
-            console.log(sceneElements.explosions);
+            //console.log(sceneElements.explosions, sceneElements.explosions.length);
         }
 
         //temporary

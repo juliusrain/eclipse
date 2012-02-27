@@ -174,15 +174,15 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
 
     // ============= sprites =============== //
     var sprite, sCount, sSize;
-    
+
     //fire sprite
     this.fire_sprite_container = new THREE.Object3D();
     this.fire_sprite_container.radius = 550; //max size per sprite
-    this.fire_sprite_container.crt_size = 0;    
+    this.fire_sprite_container.crt_size = 0;
     this.fire_sprite_container.displacement = 0.0;
     this.fire_sprite_container.maxDuration = 800;
     this.fire_sprite_container.currentDuration = 0;
-    
+
     sCount = 10;
     sSize = 10;
     for(var i = 0; i < sCount; i++) {
@@ -197,23 +197,23 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         sprite.crt_size = 0;
         sprite.position.set(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
         sprite.rotation = Math.random()*Math.PI;
-        
+
         this.fire_sprite_container.add(sprite);
     }
-    
+
     this.fire_sprite_container.position.set(x, y, z);
-    
+
     this.contents.push(this.fire_sprite_container);
     this.scene.add(this.fire_sprite_container);
-    
+
     //smoke sprites
     this.smoke_sprite_container = new THREE.Object3D();
     this.smoke_sprite_container.radius = 300; //max size
-    this.smoke_sprite_container.crt_size = 0;    
+    this.smoke_sprite_container.crt_size = 0;
     this.smoke_sprite_container.displacement = 0.0;
     this.smoke_sprite_container.maxDuration = 1000;
     this.smoke_sprite_container.currentDutation = 0;
-    
+
     sCount = 20;
     sSize = 10;
     for(var i = 0; i < sCount; i++) {
@@ -228,12 +228,12 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
         sprite.crt_size = 0;
         sprite.position.set(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
         sprite.rotation = Math.random()*Math.PI;
-        
+
         this.smoke_sprite_container.add(sprite);
     }
-    
+
     this.smoke_sprite_container.position.set(x, y, z);
-    
+
     this.contents.push(this.smoke_sprite_container);
     this.scene.add(this.smoke_sprite_container);
 
@@ -286,14 +286,14 @@ function Explosion(x, y, z, scene, duration) { //plus other vars
 */
 
     this.deleteExplosion = function() {
-    
+
         for(var i = this.contents.length - 1; i >= 0; i--) {
             this.scene.remove(this.contents[i]);
             delete this.contents[i];
             this.contents.length--;
         }
     }
-    
+
 }
 
 Explosion.prototype.updateExplosion = function(index) {
@@ -305,7 +305,7 @@ Explosion.prototype.updateExplosion = function(index) {
         this.particle_attributes.displacement.value[i] += 0.015 * (1 - this.particle_attributes.displacement.value[i]);
         this.particle_attributes.opacity.value[i] -= 0.0025;
     }
-    
+
     this.particle_attributes.angle.needsUpdate = true;
     this.particle_attributes.displacement.needsUpdate = true;
     this.particle_attributes.opacity.needsUpdate = true;
@@ -336,12 +336,12 @@ Explosion.prototype.updateExplosion = function(index) {
         if(fsprites.currentDuration > fsprites.maxDuration && fsprites.children[i].opacity > 0.0) {
             fsprites.children[i].opacity -= 0.005;
         }
-        
+
     }
     fsprites.displacement += 0.085 * (0.065 - fsprites.displacement);
     fsprites.currentDuration += 5;
 
-    
+
     var ssprites = this.smoke_sprite_container;
     ssprites.crt_size += 0.0005 * (ssprites.radius - ssprites.crt_size);
     for(var i = 0; i < ssprites.children.length; i++) {

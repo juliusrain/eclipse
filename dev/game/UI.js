@@ -56,8 +56,7 @@ function toggleJumpMap() {
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
 		$('#jumpmapcontrol').removeClass('on');
-    } // show jump map
-	else{
+    } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
 		$('#jumpmapcontrol').addClass('on');
@@ -69,8 +68,7 @@ function toggleAutoRepair() {
 		// auto repair is now off, turn it on
 		gameEngine.autorepair = true;
 		$('#autorepaircontrol').removeClass('on');
-	}
-	else{
+	} else{
 		// auto repair is now on, turn it off
 		gameEngine.autorepair = false;
 		$('#autorepaircontrol').addClass('on');
@@ -81,12 +79,11 @@ function toggleCursor() {
     graphicsEngine.toggleCursor();
 	if($('#mouselockcontrol').hasClass("on")){
 		$('#mouselockcontrol').removeClass('on');
-	}
-	else{
+	} else{
 		$('#mouselockcontrol').addClass('on');
 	}
 }
 
 function switchToChat() {
-	
+
 }
