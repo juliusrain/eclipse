@@ -185,23 +185,23 @@ function GraphicsEngine() {
         }
 
         sceneElements.mainShip = null;
-        for(i = sceneElements.AIShips.length; i > 0; i--) {
+        for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
             sceneElements.AIShips.length--;
         }
-        for(i = sceneElements.env_objects.length; i > 0; i--) {
+        for(i = sceneElements.env_objects.length - 1; i >= 0; i--) {
             delete sceneElements.env_objects[i];
             sceneElements.env_objects.length--;
         }
-        for(i = sceneElements.explosions.length; i > 0; i--) {
+        for(i = sceneElements.explosions.length - 1; i >= 0; i--) {
             delete sceneElements.explosions[i];
             sceneElements.explosions.length--;
         }
-        for(i = sceneElements.lasers.length; i > 0; i--) {
+        for(i = sceneElements.lasers.length - 1; i >= 0; i--) {
             delete sceneElements.lasers[i];
             sceneElements.lasers.length--;
         }
-        for(i = sceneElements.missiles.length; i > 0; i--) {
+        for(i = sceneElements.missiles.length - 1; i >= 0; i--) {
             delete sceneElements.missiles[i];
             sceneElements.missiles.length--;
         }
@@ -422,8 +422,9 @@ function GraphicsEngine() {
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 200,
+        var duration = 2000,
             e = new Explosion(x, y, z, this.gameplay_scene, duration);
+        sceneElements.explosions.push(e);
     }
 
 
@@ -512,6 +513,7 @@ function GraphicsEngine() {
                    gameEngine.update(); //increment laser and ship position
 //               }
                 updateLasers();
+                updateExplosions();
                 updateScene();
             }
             //self.jumpmap.updateJumpmap();
@@ -661,7 +663,16 @@ function GraphicsEngine() {
 
         }
 
-
+        function updateExplosions() {
+            var done;
+            for(var i = sceneElements.explosions.length - 1; i >= 0 && sceneElements.explosions[i] instanceof Explosion; i--) {
+                sceneElements.explosions[i].updateExplosion();
+                if(sceneElements.explosions[i].done) {
+                    delete sceneElements.explosions[i];
+                }
+            }
+            console.log(sceneElements.explosions);
+        }
 
         //temporary
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -755,9 +766,6 @@ function GraphicsEngine() {
                 tempSphere2.position.y = 500*Math.cos(t) + 150;
                 tempSphere2.position.z = 600*Math.cos(t);
 
-            }
-            for(var i = 0; i < sceneElements.explosions.length; i++) {
-                sceneElements.explosions[i].updateExplosion();
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////
