@@ -41,9 +41,9 @@ function Jumpmap() {
         this.renderer.clear();
 
         this.renderer.render(this.jumpmap_scene, this.jumpmap_camera);
-        
+
         function update() {
-            
+
         }
 
     }

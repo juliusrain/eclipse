@@ -24,6 +24,7 @@ function GraphicsEngine() {
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
     this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
+    this.gameplay_camera.direction = new THREE.Vector3(0, 0, -1);
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
@@ -35,7 +36,10 @@ function GraphicsEngine() {
     this.map_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
 
     //main renderer
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({
+        clearColor: 0x000000,
+        clearAlpha: 1
+    });
     this.renderer.setSize(this.canvas_width, this.canvas_height);
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
@@ -46,8 +50,8 @@ function GraphicsEngine() {
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
-    this.jumpmap = new Jumpmap();
-    
+    //this.jumpmap = new Jumpmap();
+
 
 
     /////////////////////////////////
@@ -67,14 +71,7 @@ function GraphicsEngine() {
     document.addEventListener('mousedown', onMouseDown, false);
     function onMouseDown(event) {
         if(!removed) {
-            //self.removeSceneObject(sceneElements.AIShips[0]);
-            //self.addExplosion(-10, 0, 0);
-            //self.gameplay_controls.dragToLook = false;
-            expl = new Explosion(10, 10, 0, self.gameplay_scene);
-            console.log("adding expplosion");
         } else {
-            //self.addSceneObject(sceneElements.AIShips[0]);
-            //self.gameplay_controls.dragToLook = true;
         }
         removed = !removed;
     }
@@ -139,7 +136,7 @@ function GraphicsEngine() {
         }
 
         this.minimap.loadMinimap();
-        this.jumpmap.loadJumpmap();
+        //this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
 	dirlight.position.set(0, -30, 0).normalize();
@@ -155,6 +152,18 @@ function GraphicsEngine() {
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
+
+        var cloader = THREE.ColladaLoader();
+        cloader.load("temp/monster.dae",
+                    function(collada) {
+                        var model = collada.scene;
+                        model.position.set(0.0, -1000, -2000);
+                        model.rotation.x = -Math.PI/2;
+                        //model.scale.set();
+                        self.gameplay_scene.add(model);
+                    }
+        );
+
 
     }
 
@@ -180,23 +189,23 @@ function GraphicsEngine() {
         }
 
         sceneElements.mainShip = null;
-        for(i = sceneElements.AIShips.length; i > 0; i--) {
+        for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
             sceneElements.AIShips.length--;
         }
-        for(i = sceneElements.env_objects.length; i > 0; i--) {
+        for(i = sceneElements.env_objects.length - 1; i >= 0; i--) {
             delete sceneElements.env_objects[i];
             sceneElements.env_objects.length--;
         }
-        for(i = sceneElements.explosions.length; i > 0; i--) {
+        for(i = sceneElements.explosions.length - 1; i >= 0; i--) {
             delete sceneElements.explosions[i];
             sceneElements.explosions.length--;
         }
-        for(i = sceneElements.lasers.length; i > 0; i--) {
+        for(i = sceneElements.lasers.length - 1; i >= 0; i--) {
             delete sceneElements.lasers[i];
             sceneElements.lasers.length--;
         }
-        for(i = sceneElements.missiles.length; i > 0; i--) {
+        for(i = sceneElements.missiles.length - 1; i >= 0; i--) {
             delete sceneElements.missiles[i];
             sceneElements.missiles.length--;
         }
@@ -215,7 +224,7 @@ function GraphicsEngine() {
     }
 
 
-    //TODO change to take gameObject
+    //change to take gameObject
     GraphicsEngine.prototype.addGameObject = function(gameObject) {
         var loader = new THREE.JSONLoader();
         var self = this;
@@ -246,6 +255,7 @@ function GraphicsEngine() {
                 material = new THREE.MeshBasicMaterial({
                     map: THREE.ImageUtils.loadTexture(gameObject.drawParameters.crosshair),
                     blending: THREE.AdditiveBlending,
+                    depthWrite: false,
                     transparent: true
                 });
             var quadMesh = new THREE.Mesh(quad, material);
@@ -349,10 +359,11 @@ function GraphicsEngine() {
                 }
             }
 
-           modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
-           scene.add(modelMesh);
+
+            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+            scene.add(modelMesh);
         }
-        
+
         /*
          *  Creates lasers for a given ship (sceneObject).
          *      parentShip: sceneObject that represents parent ship that lasers belong to
@@ -382,12 +393,11 @@ function GraphicsEngine() {
          */
         function loadJSONLasers(geometry, parentShip, laserContainer) {
             var laserMesh;
-            var i;
-            for(i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
+            for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
                 laserMesh = new THREE.Mesh(geometry, tempMaterial);
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
-                laserMesh.range = parentShip.gameParameters.weapons.lasers.range;
+                laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
                 laserMesh.parentShip = parentShip.drawParameters.shipID;
 
@@ -399,12 +409,26 @@ function GraphicsEngine() {
 
                 laserContainer.add(laserMesh);
             }
+
+            function fireLaser() {
+                for(var i = 0; i < laserContainer.children.length; i++) {
+                    if(!laserContainer.children[i].fired) {
+                        laserContainer.children[i].fired = true;
+                        laserContainer.children[i+1].fired = true;
+                        laserContainer.children[i].currentDistance += 1;
+                        laserContainer.children[i+1].currentDistance += 1;
+                        laserContainer.children[i].visible = true;
+                        laserContainer.children[i+1].visible = true;
+                    }
+                }
+            }
         }
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 100,
-            e = new Explosion(x, y, z, scene, duration);
+        var duration = 2000,
+            e = new Explosion(x, y, z, this.gameplay_scene, duration);
+        sceneElements.explosions.push(e);
     }
 
 
@@ -488,13 +512,15 @@ function GraphicsEngine() {
                 updateMainShip();
                 updateHUD(); //includes minimap
 
-                //ai.updateScene(); //decides direction
-                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
-                    gameEngine.update(); //increment laser and ship position
-                }
+//               ai.updateScene(); //decides direction
+//               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+                   gameEngine.update(); //increment laser and ship position
+//               }
+                updateLasers();
+                updateExplosions();
                 updateScene();
             }
-            self.jumpmap.updateJumpmap();
+            //self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
         }
@@ -519,7 +545,7 @@ function GraphicsEngine() {
         function updateMainShip() {
             sceneObject = sceneElements.mainShip;
             sceneObject.position.copy(self.gameplay_camera.position);
-            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, self.gameplay_camera.up);
             //tilt left or right depending on roll
             if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
@@ -607,10 +633,10 @@ function GraphicsEngine() {
             sceneObject.translateZ(-70); //(distance from camera)
         }
 
-        var HUDObject, i;
+        var HUDObject;
         function updateHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
-            for(i = 0; i < HUDElements.length; i++) {
+            for(var i = 0; i < HUDElements.length; i++) {
                 HUDObject = HUDElements[i];
                 switch(HUDElements[i].objectType) {
                     case CROSSHAIR: {
@@ -633,11 +659,24 @@ function GraphicsEngine() {
                     }
                 }
             }
-            
+        }
+
+        function updateLasers() {
+
+            var sceneLasers = sceneElements.lasers;
 
         }
 
-
+        function updateExplosions() {
+            for(var i = sceneElements.explosions.length - 1; i >= 0 && sceneElements.explosions[i] instanceof Explosion; i--) {
+                sceneElements.explosions[i].updateExplosion();
+                if(sceneElements.explosions[i].done) {
+                    delete sceneElements.explosions[i];
+                    sceneElements.explosions.splice(i, 1);
+                }
+            }
+            //console.log(sceneElements.explosions, sceneElements.explosions.length);
+        }
 
         //temporary
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -731,9 +770,6 @@ function GraphicsEngine() {
                 tempSphere2.position.y = 500*Math.cos(t) + 150;
                 tempSphere2.position.z = 600*Math.cos(t);
 
-            }
-            for(var i = 0; i < sceneElements.explosions.length; i++) {
-                sceneElements.explosions[i].updateExplosion();
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////

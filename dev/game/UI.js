@@ -26,25 +26,64 @@ $(window).keypress(function (e){
 			gameEngine.fireWeapon();
 			break;
 		}
+		// t = auto repair
+		case 116:{
+			toggleAutoRepair();
+			break;
+		}
+		// c = chat box
+		case 99: {
+			switchToChat();
+			break;
+		}
+		//create explosion (for testing)
+        case 112: {
+            graphicsEngine.addExplosionLarge(20, 0, -100);
+            break;
+        }
     }
 });
 
 $('#chatcompose').keydown(function (e){
-    
+
     $('#chatcompose').val($('#chatcompose').val() + String.fromCharCode(e.keyCode));
     return false;
 });
 
 function toggleJumpMap() {
+	// hide jump map
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
-    } else{
+		$('#jumpmapcontrol').removeClass('on');
+    } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
+		$('#jumpmapcontrol').addClass('on');
     }
+}
+
+function toggleAutoRepair() {
+	if($('#autorepaircontrol').hasClass("on")){
+		// auto repair is now off, turn it on
+		gameEngine.autorepair = true;
+		$('#autorepaircontrol').removeClass('on');
+	} else{
+		// auto repair is now on, turn it off
+		gameEngine.autorepair = false;
+		$('#autorepaircontrol').addClass('on');
+	}
 }
 
 function toggleCursor() {
     graphicsEngine.toggleCursor();
+	if($('#mouselockcontrol').hasClass("on")){
+		$('#mouselockcontrol').removeClass('on');
+	} else{
+		$('#mouselockcontrol').addClass('on');
+	}
+}
+
+function switchToChat() {
+
 }

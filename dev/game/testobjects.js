@@ -37,11 +37,11 @@ var playerShip = {  type: PLAYER_SHIP,
                                 range: 500,
                                 speed: 10,
                                 amount: 50,
-                                maxCharge: 153400,
+                                maxCharge: 15400,
                                 currentCharge: 0,
-								rechargeRate: 3450,
+								rechargeRate: 350,
 								rechargeCost: 1,
-								fireCost: 5000,
+								fireCost: 500,
                             },
                             missiles: {
 
@@ -97,7 +97,7 @@ var AIShip = {  type: AI_SHIP,
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 0, y: 0, z: -30} //starting position in scene when not main ship
+                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip);

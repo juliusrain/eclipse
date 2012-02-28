@@ -12,7 +12,8 @@ var SKYBOX = 0,
     RING = 91,
     MINIMAP = 92;
 
-
+// values
+var EATING = 100;
 
 
 //for planet types

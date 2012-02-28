@@ -204,6 +204,9 @@ body {
     margin-right:5px;
     padding:3px;
 }
+.control.on {
+	background-color:rgba(55,20,20,0.7);
+}
 /*
 #minibox {
     background-color:rgba(0.0, 0.0, 0.0, 0.5);

@@ -217,13 +217,13 @@
                 shipOverlay.useQuaternion = true;
                 shipOverlay.name = "overlay";
                 //shipOverlay.quaternion = camera.quaternion;
-                scene.add(shipOverlay);
+                //scene.add(shipOverlay);
                 overlay2.rotation.z = Math.PI/2;
-                scene.add(overlay2);
+                //scene.add(overlay2);
                 overlay3.rotation.x = Math.PI/2;
-                scene.add(overlay3);
-                scene.add(overlay4);
-                scene.add(overlay5);
+                //scene.add(overlay3);
+                //scene.add(overlay4);
+                //scene.add(overlay5);
 
                 //arrow
                 arrowDir = new THREE.Vector3();
@@ -250,8 +250,9 @@
 
                 laserMeshes = new THREE.Object3D();
 
+                var normalMaterial = new THREE.MeshNormalMaterial();
                 for(var i = 0; i < laserQuantity; i++) {
-                    laserTemp = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                    laserTemp = new THREE.Mesh(cubeGeometry, normalMaterial);
                     laserTemp.scale.set(0.025, 0.025, 0.75);
                     laserTemp.useQuaternion = true;
                     laserTemp.name = "laser" + i;
@@ -288,7 +289,7 @@
                 laserSystem = new THREE.ParticleSystem(laserPGeometry, laserPMaterial);
                 laserSystem.useQuaternion = true;
                 laserSystem.name = "laser particle system";
-                scene.add(laserSystem);
+                //scene.add(laserSystem);
 
 
                 //crosshair
@@ -301,9 +302,9 @@
 
 
                 //skybox
-                skyboxTex = ["textures/skybox/px.jpg", "textures/skybox/nx.jpg",
-                             "textures/skybox/py.jpg", "textures/skybox/ny.jpg",
-                             "textures/skybox/pz.jpg", "textures/skybox/nz.jpg"];
+                skyboxTex = ["textures/sky/px.jpg", "textures/sky/nx.jpg",
+                             "textures/sky/py.jpg", "textures/sky/ny.jpg",
+                             "textures/sky/pz.jpg", "textures/sky/nz.jpg"];
                 cubeTex = THREE.ImageUtils.loadTextureCube(skyboxTex);
 
                 var shader = THREE.ShaderUtils.lib["cube"];
@@ -317,7 +318,7 @@
                 skybox = new THREE.Mesh(new THREE.CubeGeometry(1000000, 1000000, 1000000), skyboxMaterial);
                 skybox.flipSided = true;
                 skybox.name = "skybox";
-                scene.add(skybox);
+               // scene.add(skybox);
 
 
                 //lights
@@ -427,11 +428,11 @@
             }
 
             function fireLaser() {
-                if(!firing) {
-                    clearTimeout();
-                    return;
-                }
-
+//                if(!firing) {
+//                    clearTimeout();
+//                    return;
+//                }
+                //find first unfired laser
                 for(var i = 0; i < laserMeshes.children.length; i+=2) {
                     if(laserMeshes.children[i].fired == false) {
                         laserMeshes.children[i].fired = true;
@@ -440,23 +441,31 @@
                         laserMeshes.children[i+1].currentDistance += 1;
                         laserMeshes.children[i].visible = true;
                         laserMeshes.children[i+1].visible = true;
-                        break;
-                    }
-                }
 
-                for(var i = 0; i < laserCount; i+=2) {
-                    if(!laserSystem.geometry.vertices[i].fired) {
-                        laserSystem.geometry.vertices[i].fired = true;
-                        laserSystem.geometry.vertices[i+1].fired = true;
-
-                        laserSystem.geometry.vertices[i].currentDistance += 1;
-                        laserSystem.geometry.vertices[i].currentdistance += 1;
+                        //laserMeshes.children[i].quaternion.copy(shipMesh.quaternion);
+                        //laserMeshes.children[i+1].quaternion.copy(shipMesh.quaternion);
+                        //laserMeshes.children[i].position.copy(shipMesh.position);
+                        //laserMeshes.children[i+1].position.copy(shipMesh.position);
+                        //laserMeshes.children[i].translateX(-1);
+                        //laserMeshes.children[i+1].translateX(1);
 
                         break;
                     }
                 }
 
-                setTimeout(function() {fireLaser();}, 200);
+//                 for(var i = 0; i < laserCount; i+=2) {
+//                     if(!laserSystem.geometry.vertices[i].fired) {
+//                         laserSystem.geometry.vertices[i].fired = true;
+//                         laserSystem.geometry.vertices[i+1].fired = true;
+//
+//                         laserSystem.geometry.vertices[i].currentDistance += 1;
+//                         laserSystem.geometry.vertices[i+1].currentDistance += 1;
+//
+//                         break;
+//                     }
+//                 }
+
+//                setTimeout(function() {fireLaser();}, 200);
             }
 
             function onKeyPress(event) {
@@ -478,10 +487,10 @@
                             laserDist += 1;
                         }
 */
-                        if(!firing) {
-                            firing = true;
+                        //if(!firing) {
+                        //    firing = true;
                             fireLaser();
-                        }
+                        //}
 
                         break;
                     }
@@ -551,14 +560,14 @@
                     case 90: { //z
                         if(!wireframe) {
                             for(var i = 0; i < scene.objects.length; i++) {
-                                if(scene.objects[i] != skybox) {
+                                //if(scene.objects[i] != skybox) {
                                     try {
                                                                             scene.objects[i].material.wireframe = true;
                                                                         } catch(err) {
 
                                                                         }
                                     console.log(scene.objects[i].name);
-                                }
+                                //}
                             }
                             wireframe = true;
                         } else {
@@ -734,29 +743,28 @@
 
                 //overlay
                 arrowDir.x = earthMesh.position.x - shipMesh.position.x;
-                arrowDir.y = 0;
+                arrowDir.y = earthMesh.position.y - shipMesh.position.y;
                 arrowDir.z = earthMesh.position.z - shipMesh.position.z;
                 arrowDir.normalize();
                 arrowMesh.position.copy(shipMesh.position);
                 arrowMesh.translateX(arrowDir.x*3);
-                //arrowMesh.translateY(arrowDir.y*2);
+                arrowMesh.translateY(arrowDir.y*3);
                 arrowMesh.translateZ(arrowDir.z*3);
 
                 arrowDir2.x = moonMesh.position.x - shipMesh.position.x;
-                //arrowDir2.y = moonMesh.position.y - cubeMesh.position.y;
-                arrowDir2.y = 0;
+                arrowDir2.y = moonMesh.position.y - shipMesh.position.y;
                 arrowDir2.z = moonMesh.position.z - shipMesh.position.z;
                 arrowDir2.normalize();
                 arrowMesh2.position.copy(shipMesh.position);
                 arrowMesh2.translateX(arrowDir2.x*3);
-                //arrowMesh2.translateY(arrowDir2.y*2);
+                arrowMesh2.translateY(arrowDir2.y*3);
                 arrowMesh2.translateZ(arrowDir2.z*3);
 
-                overlay4.position.copy(shipMesh.position);
-                overlay4.position.y += 3*Math.sin(Math.PI/3);
-
-                overlay5.position.copy(shipMesh.position);
-                overlay5.position.y += 3*Math.sin(Math.PI/6);
+//                 overlay4.position.copy(shipMesh.position);
+//                 overlay4.position.y += 3*Math.sin(Math.PI/3);
+//
+//                 overlay5.position.copy(shipMesh.position);
+//                 overlay5.position.y += 3*Math.sin(Math.PI/6);
 
 
                 //laser
@@ -813,6 +821,7 @@
                         laserMeshes.children[i+1].position.y = shipMesh.position.y;
                         laserMeshes.children[i+1].position.z = shipMesh.position.z;
 
+                        //used for collision detection
                         laserMeshes.children[i].direction.copy(shipMesh.direction);
                         laserMeshes.children[i+1].direction.copy(shipMesh.direction);
 
@@ -825,6 +834,7 @@
                         //laserMeshes[i+1].translateZ(-10);
 
                     } else {
+
                         laserMeshes.children[i].translateZ(-laserMeshes.children[i].speed);
                         laserMeshes.children[i+1].translateZ(-laserMeshes.children[i+1].speed);
 

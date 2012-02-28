@@ -61,6 +61,8 @@ function Minimap(game_controls, game_camera) {
 
     this.tempVec = new THREE.Vector3();
     this.tempVecForward = new THREE.Vector3(0, 0, -1);
+    this.tempVecBackward = new THREE.Vector3(0, 0, 1);
+    this.tempVecRight = new THREE.Vector3(1, 0, 0);
     this.tempVecUp = new THREE.Vector3(0, 1, 0);
     this.tempMat = new THREE.Matrix4();
     this.tempQuat = new THREE.Quaternion();
@@ -201,27 +203,25 @@ function Minimap(game_controls, game_camera) {
     }
 
 
-
+    var blah = 100;
     //for each ship in sceneElements array, draw ship based on its position
     Minimap.prototype.updateMinimap = function() {
 
 //         this.stats.update();
 
-        this.tempVec.set(1, 0, 0);
+        //take current quaternion, transform to reference, determine added rotation based on mouse along reference, apply added rotation to current
         this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.multiplyVector3(this.tempVecRight, this.tempVec);
         this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.x*0.015);
         this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
 
-        this.tempVec.set(0, 1, 0);
         this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.multiplyVector3(this.tempVecUp, this.tempVec);
         this.tempQuat.setFromAxisAngle(this.tempVec, -this.game_controls.rotationVector.y*0.015);
         this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
 
-        this.tempVec.set(0, 0, 1);
         this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVec, this.tempVec);
+        this.tempQuat.multiplyVector3(this.tempVecBackward, this.tempVec);
         this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.z*0.015);
         this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
 
@@ -237,33 +237,54 @@ function Minimap(game_controls, game_camera) {
 
 
         function update() {
-            var mainShip = sceneElements.mainShip,
-                mainShipX = sceneElements.mainShip.position.x,
-                mainShipY = sceneElements.mainShip.position.y,
-                mainShipZ = sceneElements.mainShip.position.z,
-                minimap_object;
+            var minimap_object;
             var aiShip;
             for(var i = 0; i < self.minimap_objects.length; i++) {
                 minimap_object = self.minimap_objects[i];
                 aiShip = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        //minimap_object.position.set(0, 0, 0);
-                        //minimap_object.quaternion.set(0, 0, 0, 1);
-                        //self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z);
-                        self.tempMat.lookAt(mainShip.position, aiShip.position, mainShip.up.normalize());
-                        minimap_object.quaternion.setFromRotationMatrix(self.tempMat);
-                        //minimap_object.quaternion.multiplySelf(self.tempQuat);
-                        
-//                         self.tempVec.set(mainShipX - aiShip.position.x, mainShipY - aiShip.position.y, mainShipZ - aiShip.position.z).normalize();
-//                         self.tempQuat.copy(self.game_camera.quaternion);
-//                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-//                         minimap_object.position.copy(self.tempVec);
-                        
+
+                        self.game_camera.quaternion.multiplyVector3(self.tempVecForward, self.game_camera.direction);
+
+
+                        self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
+
+//                         newlookAt(self.game_camera, aiShip.position, self.game_camera.up, self.tempMat);
+
+                        self.tempMat.lookAt(self.game_camera.position, aiShip.position, self.game_camera.up);
+                        self.tempQuat.setFromRotationMatrix(self.tempMat);
+                        self.tempQuat.multiplySelf(self.minimap_grid.quaternion);
+                        minimap_object.quaternion.copy(self.tempQuat);
+
+                        minimap_object.position.set(0, 0, 0);
+                        minimap_object.translateZ(-1);
 
                     }
                 }
 
+            }
+            function newlookAt(eye, center, up, mat) {
+                var x = new THREE.Vector3(),
+                    y = new THREE.Vector3(),
+                    z = new THREE.Vector3();
+
+                z.sub(eye, center).normalize();
+                self.tempQuat.copy(self.game_camera.quaternion).inverse();
+                self.tempQuat.multiplyVector3(z, z);
+                if(z.length() === 0) {
+                    z.z = 1;
+                }
+                x.cross(up, z).normalize();
+                if(x.length() === 0) {
+                    z.x += 0.0001;
+                    x.cross(up, z).normalize();
+                }
+                y.cross(z, x).normalize();
+
+                mat.n11 = x.x; mat.n12 = y.x; mat.n13 = z.x;
+                mat.n21 = x.y; mat.n22 = y.y; mat.n23 = z.y;
+                mat.n31 = x.z; mat.n32 = y.z; mat.n33 = z.z;
             }
 
         }
