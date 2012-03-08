@@ -154,15 +154,15 @@ function GraphicsEngine() {
         this.gameplay_scene.add(amblight);
 
         var cloader = THREE.ColladaLoader();
-        cloader.load("temp/monster.dae",
-                    function(collada) {
-                        var model = collada.scene;
-                        model.position.set(0.0, -1000, -2000);
-                        model.rotation.x = -Math.PI/2;
-                        //model.scale.set();
-                        self.gameplay_scene.add(model);
-                    }
-        );
+//        cloader.load("temp/monster.dae",
+//                    function(collada) {
+//                        var model = collada.scene;
+//                        model.position.set(0.0, -1000, -2000);
+//                        model.rotation.x = -Math.PI/2;
+//                        //model.scale.set();
+//                        self.gameplay_scene.add(model);
+//                    }
+//        );
 
 
     }
@@ -495,12 +495,12 @@ function GraphicsEngine() {
             } else {
                 return;
             }
-           //try {
+//           try {
                 render();
-           //} catch(err) {
-           //     console.warn("CAUGHT: " + err);
-           //     return;
-           //}
+//           } catch(err) {
+//                console.warn("CAUGHT: " + err);
+//                return;
+//           }
         }
 
 
@@ -684,8 +684,10 @@ function GraphicsEngine() {
          *  Function to update the objects in the scene (~= game engine for now)
          */
         function updateScene() {
-            for(i = 0; i < self.gameplay_scene.objects.length; i++) {
-                sceneObject = self.gameplay_scene.objects[i];
+//            for(i = 0; i < self.gameplay_scene.objects.length; i++) {
+            for(i = 0; i < sceneElements.AIShips.length; i++) {
+//                sceneObject = self.gameplay_scene.objects[i];
+                sceneObject = sceneElements.AIShips[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
                         // tempVecForward.set(0, 0, -1);
