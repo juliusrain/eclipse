@@ -139,7 +139,7 @@ function GraphicsEngine() {
         //this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
-        dirlight.position.set(0,30,0).normalize();
+        dirlight.position.set(0, 30, 0).normalize();
         this.gameplay_scene.add(dirlight);
 
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
@@ -324,7 +324,7 @@ function GraphicsEngine() {
          *  (used only for gameObjects)
          */
         function loadJSON(geometry, gameObject, scene) {
-            var material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
+            var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
             var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
@@ -373,8 +373,58 @@ function GraphicsEngine() {
             loader.load("models/lasers/laser.js", callback);
 
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
+            laserContainer.parentShip = parentShip;
+
+            //laser firing function to be called to fire laser;
+            parentShip.fireLaser = function() {
+                for(var i = 0; i < laserContainer.children.length; i++) {
+                    if(!laserContainer.children[i].fired) {
+                        laserContainer.children[i].fired = true;
+                        laserContainer.children[i+1].fired = true;
+                        laserContainer.children[i].currentDistance += 1;
+                        laserContainer.children[i+1].currentDistance += 1;
+                        laserContainer.children[i].visible = true;
+                        laserContainer.children[i+1].visible = true;
+                        break;
+                    }
+                }
+            }
+
+            laserContainer.update = function() {
+                for(var i = 0; i < this.children.length; i+=2) {
+                    if(this.children[i].currentDistance >= this.children[i].maxDistance || this.children[i].hit) {
+                        this.children[i].currentDistance = 0;
+                        this.children[i+1].currentDistance = 0;
+                        this.children[i].fired = false;
+                        this.children[i+1].fired = false;
+                        this.children[i].hit = false;
+                        this.children[i+1].hit = false;
+                        this.children[i].visible = false;
+                        this.children[i+1].visible = false;
+                    }
+                    if(!this.children[i].fired) {
+                        this.children[i].quaternion.copy(this.parentShip.quaternion);
+                        this.children[i+1].quaternion.copy(this.parentShip.quaternion);
+
+                        this.children[i].position.copy(this.parentShip.position);
+                        this.children[i+1].position.copy(this.parentShip.position);
+
+                        this.children[i].translateX(-10);
+                        this.children[i+1].translateX(10);
+
+                    } else {
+                        this.children[i].translateZ(-this.children[i].speed);
+                        this.children[i+1].translateZ(-this.children[i+1].speed);
+
+                        this.children[i].currentDistance += 1;
+                        this.children[i+1].currentDistance += 1;
+                    }
+
+                }
+
+            }
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
-            laserContainer.parentShip = parentShip.drawParameters.shipID;
+            laserContainer.parentShipID = parentShip.drawParameters.shipID;
             sceneElements.lasers.push(laserContainer);
             scene.add(laserContainer);
 
@@ -389,6 +439,7 @@ function GraphicsEngine() {
          */
         function loadJSONLasers(geometry, parentShip, laserContainer) {
             var laserMesh;
+
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
                 laserMesh = new THREE.Mesh(geometry, tempMaterial);
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
@@ -400,23 +451,10 @@ function GraphicsEngine() {
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
-                laserMesh.direction = new THREE.Vector3();
-                //laserMesh.visible = false;
+                //laserMesh.direction = new THREE.Vector3();
+                laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
-            }
-
-            function fireLaser() {
-                for(var i = 0; i < laserContainer.children.length; i++) {
-                    if(!laserContainer.children[i].fired) {
-                        laserContainer.children[i].fired = true;
-                        laserContainer.children[i+1].fired = true;
-                        laserContainer.children[i].currentDistance += 1;
-                        laserContainer.children[i+1].currentDistance += 1;
-                        laserContainer.children[i].visible = true;
-                        laserContainer.children[i+1].visible = true;
-                    }
-                }
             }
         }
     }
@@ -660,6 +698,9 @@ function GraphicsEngine() {
         function updateLasers() {
 
             var sceneLasers = sceneElements.lasers;
+            for(var i = 0; i < sceneLasers.length; i++) {
+                sceneLasers[i].update();
+            }   
 
         }
 

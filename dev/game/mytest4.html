@@ -37,7 +37,7 @@
 
     <body>
 
-        <script type="text/javascript" src="build/Three.js"></script>
+        <script type="text/javascript" src="build/Three.r48.js"></script>
         <script type="text/javascript" src="js/Detector.js"></script>
         <script type="text/javascript" src="js/Stats.js"></script>
 
@@ -442,12 +442,18 @@
                         laserMeshes.children[i].visible = true;
                         laserMeshes.children[i+1].visible = true;
 
-                        //laserMeshes.children[i].quaternion.copy(shipMesh.quaternion);
-                        //laserMeshes.children[i+1].quaternion.copy(shipMesh.quaternion);
-                        //laserMeshes.children[i].position.copy(shipMesh.position);
-                        //laserMeshes.children[i+1].position.copy(shipMesh.position);
-                        //laserMeshes.children[i].translateX(-1);
-                        //laserMeshes.children[i+1].translateX(1);
+                        laserMeshes.children[i].quaternion.copy(shipMesh.quaternion);
+                        laserMeshes.children[i+1].quaternion.copy(shipMesh.quaternion);
+
+                        laserMeshes.children[i].position.x = shipMesh.position.x;
+                        laserMeshes.children[i].position.y = shipMesh.position.y;
+                        laserMeshes.children[i].position.z = shipMesh.position.z;
+                        laserMeshes.children[i+1].position.x = shipMesh.position.x;
+                        laserMeshes.children[i+1].position.y = shipMesh.position.y;
+                        laserMeshes.children[i+1].position.z = shipMesh.position.z;
+
+                        laserMeshes.children[i].translateX(-1);
+                        laserMeshes.children[i+1].translateX(1);
 
                         break;
                     }
@@ -541,7 +547,7 @@
                         ray = new THREE.Ray(camera.position, vec.subSelf(camera.position).normalize());
                         //ray = new THREE.Ray(cubeMesh.position, vec.subSelf(cubeMesh.position).normalize());
 
-                        intersects = ray.intersectScene(scene);
+                        intersects = ray.intersectObjects(scene.children);
 
                         console.log(vec.x, vec.y, vec.z);
                         console.log("---------------------------");
@@ -811,15 +817,15 @@
                     }
                     //if hasn't been fired, keep next to ship
                     if(laserMeshes.children[i].fired == false) {
-                        laserMeshes.children[i].quaternion.copy(shipMesh.quaternion);
-                        laserMeshes.children[i+1].quaternion.copy(shipMesh.quaternion);
-
-                        laserMeshes.children[i].position.x = shipMesh.position.x;
-                        laserMeshes.children[i].position.y = shipMesh.position.y;
-                        laserMeshes.children[i].position.z = shipMesh.position.z;
-                        laserMeshes.children[i+1].position.x = shipMesh.position.x;
-                        laserMeshes.children[i+1].position.y = shipMesh.position.y;
-                        laserMeshes.children[i+1].position.z = shipMesh.position.z;
+//                        laserMeshes.children[i].quaternion.copy(shipMesh.quaternion);
+//                        laserMeshes.children[i+1].quaternion.copy(shipMesh.quaternion);
+//
+//                        laserMeshes.children[i].position.x = shipMesh.position.x;
+//                        laserMeshes.children[i].position.y = shipMesh.position.y;
+//                        laserMeshes.children[i].position.z = shipMesh.position.z;
+//                        laserMeshes.children[i+1].position.x = shipMesh.position.x;
+//                        laserMeshes.children[i+1].position.y = shipMesh.position.y;
+//                        laserMeshes.children[i+1].position.z = shipMesh.position.z;
 
                         //used for collision detection
                         laserMeshes.children[i].direction.copy(shipMesh.direction);
@@ -893,7 +899,7 @@
                 vec = new THREE.Vector3(crosshairWorldCoords.x, crosshairWorldCoords.y, crosshairWorldCoords.z);
 
                 ray = new THREE.Ray(camera.position, vec.subSelf(camera.position).normalize());
-                intersects = ray.intersectScene(scene);
+                intersects = ray.intersectObjects(scene.children);
 
                 if(intersects.length > 0) {
                     for(var i = 0; i < intersects.length; i++) { //checks for intersected objects in order, so can break out after first "real" object
@@ -917,7 +923,7 @@
                 for(var i = 0; i < laserMeshes.children.length; i+=2) {
                     if(laserMeshes.children[i].fired) {
                         ray = new THREE.Ray(laserMeshes.children[i].position, laserMeshes.children[i].direction);
-                        intersects = ray.intersectScene(scene);
+                        intersects = ray.intersectObjects(scene.children);
                         if(intersects.length > 0) {
                             for(var j = 0; j < intersects.length; j++) {
                                 if(intersects[j].object == shipMesh || intersects[j].object == crosshairMesh || intersects[j].object == skybox) {
@@ -943,7 +949,7 @@
                     if(laserSystem.geometry.vertices[i].fired) {
                         vec = new THREE.Vector3(laserSystem.geometry.vertices[i].position.x + laserSystem.position.x, laserSystem.geometry.vertices[i].position.y + laserSystem.position.y, laserSystem.geometry.vertices[i].position.z + laserSystem.position.z);
                         ray = new THREE.Ray(vec, laserSystem.geometry.vertices[i].direction);
-                        intersects = ray.intersectScene(scene);
+                        intersects = ray.intersectObjects(scene.children);
                         if(intersects.length > 0) {
                             for(var j = 0; j < intersects.length; j++) {
                                 if(intersects[j].object == shipMesh || intersects[j].object == crosshairMesh || intersects[j].object == skybox) {
