@@ -21,24 +21,25 @@ $(window).keypress(function (e){
             toggleCursor();
             break;
         }
-		// space = fire weapon
-		case 32: {
-			gameEngine.fireWeapon();
-			break;
-		}
-		// t = auto repair
-		case 116:{
-			toggleAutoRepair();
-			break;
-		}
-		// c = chat box
-		case 99: {
-			switchToChat();
-			break;
-		}
-		//create explosion (for testing)
+        // space = fire weapon
+        case 32: {
+            gameEngine.fireWeapon();
+            break;
+        }
+        // t = auto repair
+        case 116:{
+            toggleAutoRepair();
+            break;
+        }
+        // c = chat box
+        case 99: {
+            switchToChat();
+            break;
+        }
+        //create explosion (for testing) p
         case 112: {
-            graphicsEngine.addExplosionLarge(20, 0, -100);
+//            graphicsEngine.addExplosionLarge(20, 0, -100);
+            sceneElements.AIShips[0].fireLaser();
             break;
         }
     }
@@ -51,37 +52,37 @@ $('#chatcompose').keydown(function (e){
 });
 
 function toggleJumpMap() {
-	// hide jump map
+    // hide jump map
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
-		$('#jumpmapcontrol').removeClass('on');
+        $('#jumpmapcontrol').removeClass('on');
     } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
-		$('#jumpmapcontrol').addClass('on');
+        $('#jumpmapcontrol').addClass('on');
     }
 }
 
 function toggleAutoRepair() {
-	if($('#autorepaircontrol').hasClass("on")){
-		// auto repair is now off, turn it on
-		gameEngine.autorepair = true;
-		$('#autorepaircontrol').removeClass('on');
-	} else{
-		// auto repair is now on, turn it off
-		gameEngine.autorepair = false;
-		$('#autorepaircontrol').addClass('on');
-	}
+    if($('#autorepaircontrol').hasClass("on")){
+        // auto repair is now off, turn it on
+        gameEngine.autorepair = true;
+        $('#autorepaircontrol').removeClass('on');
+    } else{
+        // auto repair is now on, turn it off
+    gameEngine.autorepair = false;
+        $('#autorepaircontrol').addClass('on');
+    }
 }
 
 function toggleCursor() {
     graphicsEngine.toggleCursor();
-	if($('#mouselockcontrol').hasClass("on")){
-		$('#mouselockcontrol').removeClass('on');
-	} else{
-		$('#mouselockcontrol').addClass('on');
-	}
+    if($('#mouselockcontrol').hasClass("on")){
+        $('#mouselockcontrol').removeClass('on');
+    } else{
+        $('#mouselockcontrol').addClass('on');
+    }
 }
 
 function switchToChat() {

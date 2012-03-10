@@ -11,15 +11,15 @@ function GameEngine() {
         metals:10000,
     };
     this.stage = 0;
-	this.autorepair = true;
-	this.timeouts = {
-		lasers:0,
-		food:0,
-	};
+    this.autorepair = true;
+    this.timeouts = {
+        lasers:0,
+        food:0,
+    };
     this.logicwait = 0;
 
-	// start network client
-	network = new Network();
+    // start network client
+    network = new Network();
 
     // new game portion - NO NEED FOR THIS!
        // call database, create new game(?)
@@ -70,7 +70,7 @@ GameEngine.prototype.load = function (ssid, pid) {
     // trigger GraphicsEngine
     graphicsEngine.startEngine();
     // remove loader screen
-	$('#loader').hide();
+    $('#loader').hide();
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
@@ -80,72 +80,72 @@ GameEngine.prototype.updateResourcesBar = function () {
 };
 
 GameEngine.prototype.sufficientResources = function (cost) {
-	for(c in cost){
-		if(this.resources[c] < cost[c]){
-			return false;
-		}
-	}
-	return true;
+    for(c in cost){
+        if(this.resources[c] < cost[c]){
+            return false;
+        }
+    }
+    return true;
 };
 
 GameEngine.prototype.expendResources = function (cost) {
-	for(c in cost){
-		this.resources[c] -= cost[c];
-		if(this.resources[c] < 0){
-			this.resources[c] = 0;
-		}
-	}
+    for(c in cost){
+        this.resources[c] -= cost[c];
+        if(this.resources[c] < 0){
+            this.resources[c] = 0;
+        }
+    }
 };
 
 GameEngine.prototype.updateResources = function () {
-	var ship = sceneElements.mainShip.gameParameters;
-	// regeneration
-	if(this.autorepair && ship.health < ship.maxHealth){
-		// ship needs repairs
-		if(this.sufficientResources(ship.repairCost)){
-			// ship can afford repairs
-			this.expendResources(ship.repairCost);
-			ship.health += ship.repairRate;
-			if(ship.health > ship.maxHealth){
-				ship.health = ship.maxHealth;
-			}
-		}
-	}
-	// recharge lasers
-	var lasers = ship.weapons.lasers;
-	if(lasers.currentCharge < lasers.maxCharge && this.timeouts.lasers === 0){
-		// lasers need recharging
-		if(this.resources.fuel >= lasers.rechargeCost){
-			//if the player can afford to charge the banks
-			// then refill
-			this.resources.fuel -= lasers.rechargeCost;
-			lasers.currentCharge += lasers.rechargeRate;
-			if(lasers.currentCharge > lasers.maxCharge){
-				lasers.currentCharge = lasers.maxCharge;
-			}
-		}
-	}
-	// recharge engines
-	var engine = ship.engine;
-	if(engine.currentCharge < 100){
-		// recharge engines
-		if(this.resources.fuel >= engine.rechargeCost){
-			// player can afford to charge
-			this.resources.fuel -= engine.rechargeCost;
-			engine.currentCharge += engine.rechargeRate;
-			if(engine.currentCharge > 100){
-				engine.currentCharge = 100;
-			}
-		}
-	}
-	// eat food!
-	if(this.timeouts.food === 0){
-		this.resources.food--;
-		this.timeouts.food = EATING;
-	}
-	else{
-		this.timeouts.food--;
-	}
+    var ship = sceneElements.mainShip.gameParameters;
+    // regeneration
+    if(this.autorepair && ship.health < ship.maxHealth){
+        // ship needs repairs
+        if(this.sufficientResources(ship.repairCost)){
+            // ship can afford repairs
+            this.expendResources(ship.repairCost);
+            ship.health += ship.repairRate;
+            if(ship.health > ship.maxHealth){
+                ship.health = ship.maxHealth;
+            }
+        }
+    }
+    // recharge lasers
+    var lasers = ship.weapons.lasers;
+    if(lasers.currentCharge < lasers.maxCharge && this.timeouts.lasers === 0){
+        // lasers need recharging
+        if(this.resources.fuel >= lasers.rechargeCost){
+            //if the player can afford to charge the banks
+            // then refill
+            this.resources.fuel -= lasers.rechargeCost;
+            lasers.currentCharge += lasers.rechargeRate;
+            if(lasers.currentCharge > lasers.maxCharge){
+                lasers.currentCharge = lasers.maxCharge;
+            }
+        }
+    }
+    // recharge engines
+    var engine = ship.engine;
+    if(engine.currentCharge < 100){
+        // recharge engines
+        if(this.resources.fuel >= engine.rechargeCost){
+            // player can afford to charge
+            this.resources.fuel -= engine.rechargeCost;
+            engine.currentCharge += engine.rechargeRate;
+            if(engine.currentCharge > 100){
+                engine.currentCharge = 100;
+            }
+        }
+    }
+    // eat food!
+    if(this.timeouts.food === 0){
+        this.resources.food--;
+        this.timeouts.food = EATING;
+    }
+    else{
+        this.timeouts.food--;
+    }
 };
 
 GameEngine.prototype.updateVitals = function () {
@@ -154,12 +154,12 @@ GameEngine.prototype.updateVitals = function () {
 
 GameEngine.prototype.updateVitalSlot = function (which, numer, denom, percent) {
     $('#'+which+'bar').css('width', (100*numer/denom)+'%');
-	if(percent === true){
-    	$('#'+which+'value').html(Math.round(100 * numer / denom) + '%');
-	}
-	else{
-    	$('#'+which+'value').html(numer+' / '+denom);
-	}
+    if(percent === true){
+        $('#'+which+'value').html(Math.round(100 * numer / denom) + '%');
+    }
+    else{
+        $('#'+which+'value').html(numer+' / '+denom);
+    }
 };
 GameEngine.prototype.updateVitalsInfo = function () {
     this.updateVitalSlot('health', sceneElements.mainShip.gameParameters.health, sceneElements.mainShip.gameParameters.maxHealth);
@@ -181,10 +181,10 @@ GameEngine.prototype.update = function () {
         // update vital stats
         this.updateVitalsInfo();
 
-		// decrement waits
-		if(this.timeouts.lasers > 0){
-			this.timeouts.lasers--;
-		}
+        // decrement waits
+        if(this.timeouts.lasers > 0){
+            this.timeouts.lasers--;
+        }
 
         // reset counter
         this.logicwait = 4;
@@ -198,9 +198,10 @@ GameEngine.prototype.update = function () {
 // called upon user command
 // checks if the selected weapon can be fired, then triggers weapons fire
 GameEngine.prototype.fireWeapon = function () {
-	if(sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost){
-		console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE "+sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
-		sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
-		this.timeouts.lasers = 5;
-	}
+    if(sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost) {
+        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
+        sceneElements.mainShip.fireLaser();
+        sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
+        this.timeouts.lasers = 5;
+    }
 };
