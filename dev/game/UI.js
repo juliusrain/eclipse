@@ -36,9 +36,10 @@ $(window).keypress(function (e){
             switchToChat();
             break;
         }
-        //create explosion (for testing)
+        //create explosion (for testing) p
         case 112: {
-            graphicsEngine.addExplosionLarge(20, 0, -100);
+//            graphicsEngine.addExplosionLarge(20, 0, -100);
+            sceneElements.AIShips[0].fireLaser();
             break;
         }
     }

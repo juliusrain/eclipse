@@ -26,4 +26,5 @@ PLANET_TYPE[GAS_GIANT] = {
         small_texture: "", //texture of small planet
     };
 
-
+// Network URL
+URL = "ws://cgi.cs.mcgill.ca:8080/ws"
