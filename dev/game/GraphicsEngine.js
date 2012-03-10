@@ -32,6 +32,10 @@ function GraphicsEngine() {
     this.gameplay_glow_scene = new THREE.Scene();
     this.gameplay_glow_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
     this.gameplay_glow_scene.add(this.gameplay_glow_camera);
+    //sync regular and glow camera
+    this.gameplay_glow_camera.useQuaternion = true;
+    this.gameplay_glow_camera.position = this.gameplay_camera.position;
+    this.gameplay_glow_camera.quaternion = this.gameplay_camera.quaternion;
 
 
     //threejs scene elements for map overlay (jump map)
@@ -149,7 +153,7 @@ function GraphicsEngine() {
         var dirlight = new THREE.DirectionalLight(0xffffff);
         dirlight.position.set(0, 300, 0).normalize();
         this.gameplay_scene.add(dirlight);
-	
+
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
         dirlight2.position.set(0, -300, 0).normalize();
         this.gameplay_scene.add(dirlight2);
