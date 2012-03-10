@@ -47,7 +47,7 @@ function GraphicsEngine() {
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
 
-
+    
     var effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
 
     effectFXAA.uniforms['resolution'].value.set(1 / this.canvas_width, 1 / this.canvas_height);
@@ -136,7 +136,6 @@ function GraphicsEngine() {
         this.scene_loaded = true;
 
         //for loading models
-        var loader = new THREE.JSONLoader();
         var self = this;
 //        var gameObject;
         for(var i = 0; i < objects.length; i++) {
@@ -229,7 +228,8 @@ function GraphicsEngine() {
 
     //change to take gameObject
     GraphicsEngine.prototype.addGameObject = function(gameObject) {
-        var loader = new THREE.JSONLoader();
+        var jloader = new THREE.JSONLoader();
+        var cloader = new THREE.ColladaLoader();
         var self = this;
 
         switch(gameObject.type) {
@@ -242,6 +242,7 @@ function GraphicsEngine() {
                 loadShip(gameObject, this.gameplay_scene);
                 loadCrosshair(gameObject, this.gameplay_scene);
                 //loadRing(gameObject, this.gameplay_scene);
+
                 //set camera turning and movement speed based on main ship's parameters
                 this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                 this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
@@ -272,6 +273,7 @@ function GraphicsEngine() {
             scene.add(quadMesh);
         }
 
+/*
         function loadRing(gameObject, scene) { //pass gameobject to define radius maybe?
             var ringGeometry = new THREE.Geometry(),
                 vertexPosition;
@@ -294,6 +296,7 @@ function GraphicsEngine() {
             scene.add(ringLine);
             HUDElements.push(ringLine);
         }
+*/
 
         /*
          *  Load skybox. (gameObject)
@@ -314,22 +317,73 @@ function GraphicsEngine() {
             scene.add(skyboxMesh);
         }
 
+
         /*
          *  Load ship. (gameObject)
          *
          */
         function loadShip(gameObject, scene) {
-            var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
-            loader.load(gameObject.drawParameters.geometry, callback);
+            if(gameObject.drawParameters.geometry.indexOf(".dae") != -1) {
+                var callback = function(collada) {loadCollada(collada, gameObject, scene)};
+                cloader.load(gameObject.drawParameters.geometry, callback);
+            } else if(gameObject.drawParameters.geometry.indexOf(".js") != -1) {
+                var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
+                jloader.load(gameObject.drawParameters.geometry, callback);
+            }
         }
 
         /*
-         *  Load model from JSON
+         *  Load model from COLLADA
          *      gameObject: gameObject to be loaded from model
          *      scene: scene to add model to
          *
          *  (used only for gameObjects)
          */
+        function loadCollada (collada, gameObject, scene) {
+            var cmodel = collada.scene;//(geometry, new THREE.MeshFaceMaterial());
+            cmodel.useQuaternion = true;
+            cmodel.direction = new THREE.Vector3(0, 0, -1);
+            cmodel.name = gameObject.gameParameters.name;
+            cmodel.objectType = gameObject.type;
+
+            switch(cmodel.objectType) {
+                case PLAYER_SHIP: {
+                    cmodel.gameParameters = gameObject.gameParameters;
+                    cmodel.drawParameters = gameObject.drawParameters;
+                    //for 3rd person ship positioning
+                    cmodel.currentRoll = 0;
+                    cmodel.currentXOffset = 0;
+                    cmodel.currentYOffset = 0;
+
+                    loadLasers(cmodel, scene);
+                    sceneElements.mainShip = cmodel;
+
+                    break;
+                }
+                case AI_SHIP: {
+                    console.log("load ai ship");
+                    cmodel.gameParameters = gameObject.gameParameters;
+                    cmodel.drawParameters = gameObject.drawParameters;
+                    loadLasers(cmodel, scene);
+                    sceneElements.AIShips.push(cmodel);
+                    self.minimap.addMinimapObject(AI_SHIP)
+                    break;
+                }
+            }
+
+
+            cmodel.position.set(cmodel.drawParameters.position.x, cmodel.drawParameters.position.y, cmodel.drawParameters.position.z);
+            scene.add(cmodel);
+        }
+
+        //JSON
+        /*
+        *  Load model from JSON
+        *      gameObject: gameObject to be loaded from model
+        *      scene: scene to add model to
+        *
+        *  (used only for gameObjects)
+        */
         function loadJSON(geometry, gameObject, scene) {
             var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
             var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
@@ -339,34 +393,34 @@ function GraphicsEngine() {
             modelMesh.objectType = gameObject.type;
 
             switch(modelMesh.objectType) {
-                case PLAYER_SHIP: {
-                    modelMesh.gameParameters = gameObject.gameParameters;
-                    modelMesh.drawParameters = gameObject.drawParameters;
-                    //for 3rd person ship positioning
-                    modelMesh.currentRoll = 0;
-                    modelMesh.currentXOffset = 0;
-                    modelMesh.currentYOffset = 0;
+              case PLAYER_SHIP: {
+                  modelMesh.gameParameters = gameObject.gameParameters;
+                  modelMesh.drawParameters = gameObject.drawParameters;
+                  //for 3rd person ship positioning
+                  modelMesh.currentRoll = 0;
+                  modelMesh.currentXOffset = 0;
+                  modelMesh.currentYOffset = 0;
 
-                    loadLasers(modelMesh, scene);
-                    sceneElements.mainShip = modelMesh;
+                  loadLasers(modelMesh, scene);
+                  sceneElements.mainShip = modelMesh;
 
-                    break;
-                }
-                case AI_SHIP: {
-                    console.log("load ai ship");
-                    modelMesh.gameParameters = gameObject.gameParameters;
-                    modelMesh.drawParameters = gameObject.drawParameters;
-                    loadLasers(modelMesh, scene);
-                    sceneElements.AIShips.push(modelMesh);
-                    self.minimap.addMinimapObject(AI_SHIP)
-                    break;
-                }
+                  break;
+              }
+              case AI_SHIP: {
+                  console.log("load ai ship");
+                  modelMesh.gameParameters = gameObject.gameParameters;
+                  modelMesh.drawParameters = gameObject.drawParameters;
+                  loadLasers(modelMesh, scene);
+                  sceneElements.AIShips.push(modelMesh);
+                  self.minimap.addMinimapObject(AI_SHIP)
+                  break;
+              }
             }
-
 
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
         }
+
 
         /*
          *  Creates lasers for a given ship (sceneObject).
@@ -376,9 +430,7 @@ function GraphicsEngine() {
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
             var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
             //loader.load(parentShip.drawParameters.laserModel, callback);
-            loader.load("models/lasers/laser.js", callback);
-
-
+            jloader.load("models/lasers/laser.js", callback);
         }
 
         /*
@@ -467,6 +519,113 @@ function GraphicsEngine() {
 
             }
         }
+
+
+
+
+
+
+
+//
+//        /*
+//         *  Creates lasers for a given ship (sceneObject).
+//         *      parentShip: sceneObject that represents parent ship that lasers belong to
+//         *      scene: scene to add lasers to
+//         */
+//        function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
+//            var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
+//            //loader.load(parentShip.drawParameters.laserModel, callback);
+//            loader.load("models/lasers/laser.js", callback);
+//
+//
+//        }
+//
+//        /*
+//         *  Creates mesh based on model, fills in parameters based on parentShip's parameters,
+//         *  fills in parameters necessary for drawing and computations, and populates container.
+//         *  (called by loadLasers only)
+//         *      parentShip: sceneObject representing parent ship the lasers belong to
+//         *      laserContainer: Object3D to hold individual lasers
+//         */
+//        function loadJSONLasers(geometry, parentShip, scene) {
+//            var laserContainer = new THREE.Object3D();
+//
+//            //when deleting, make sure to null pointers
+//            parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
+//            laserContainer.parentShip = parentShip;
+//
+//            laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
+//            laserContainer.parentShipID = parentShip.drawParameters.shipID;
+//
+//            for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
+//                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xffffff}));
+//                laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
+//                laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
+//                laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
+//                laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
+//                laserMesh.parentShipID = parentShip.drawParameters.shipID;
+//
+//                laserMesh.useQuaternion = true;
+//                laserMesh.fired = false;
+//                laserMesh.currentDistance = 0;
+//            //                laserMesh.visible = false;
+//
+//                laserContainer.add(laserMesh);
+//            }
+//
+//            sceneElements.lasers.push(laserContainer);
+//            scene.add(laserContainer);
+//
+//            //laser firing function to be called to fire laser;
+//            parentShip.fireLaser = function() {
+//                for(var i = 0; i < laserContainer.children.length; i++) {
+//                    if(!laserContainer.children[i].fired) {
+//                        laserContainer.children[i].fired = true;
+//                        laserContainer.children[i+1].fired = true;
+//                        laserContainer.children[i].currentDistance += 1;
+//                        laserContainer.children[i+1].currentDistance += 1;
+//                        laserContainer.children[i].visible = true;
+//                        laserContainer.children[i+1].visible = true;
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            var self = laserContainer;
+//            laserContainer.update = function() {
+//                for(var i = 0; i < self.children.length; i+=2) {
+//                    if(self.children[i].currentDistance >= self.children[i].maxDistance || self.children[i].hit) {
+//                        self.children[i].currentDistance = 0;
+//                        self.children[i+1].currentDistance = 0;
+//                        self.children[i].fired = false;
+//                        self.children[i+1].fired = false;
+//                        self.children[i].hit = false;
+//                        self.children[i+1].hit = false;
+//                        self.children[i].visible = false;
+//                        self.children[i+1].visible = false;
+//                    }
+//                    if(!self.children[i].fired) {
+//                        self.children[i].quaternion.copy(self.parentShip.quaternion);
+//                        self.children[i+1].quaternion.copy(self.parentShip.quaternion);
+//
+//                        self.children[i].position.copy(self.parentShip.position);
+//                        self.children[i+1].position.copy(self.parentShip.position);
+//
+//                        self.children[i].translateX(-10);
+//                        self.children[i+1].translateX(10);
+//
+//                    } else {
+//                        self.children[i].translateZ(-self.children[i].speed);
+//                        self.children[i+1].translateZ(-self.children[i+1].speed);
+//
+//                        self.children[i].currentDistance += 1;
+//                        self.children[i+1].currentDistance += 1;
+//                    }
+//
+//                }
+//
+//            }
+//        }
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
