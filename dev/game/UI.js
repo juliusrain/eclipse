@@ -78,11 +78,14 @@ function toggleAutoRepair() {
 
 function toggleCursor() {
     graphicsEngine.toggleCursor();
-    if($('#mouselockcontrol').hasClass("on")){
-        $('#mouselockcontrol').removeClass('on');
-    } else{
-        $('#mouselockcontrol').addClass('on');
-    }
+	if($('#mouselockcontrol').hasClass("on")){
+		$('#mouselockcontrol').removeClass('on');
+		$('body').css('cursor', 'none');
+	}
+	else{
+		$('#mouselockcontrol').addClass('on');
+		$('body').css('cursor', 'auto');
+	}
 }
 
 function switchToChat() {

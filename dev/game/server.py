@@ -13,17 +13,18 @@ import tornado.websocket
 from tornado.options import define, options
 
 define("port", default=8080, help="run on the given port", type=int)
-define("root", default="/~sli90/", help="root URL", type=str)
+#define("root", default="/~sli90/", help="root URL", type=str)
+define("root", default="/~bwong117/", help="root URL", type=str)
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (options.root, MainHandler),
+            #(options.root, MainHandler),
             (options.root+"ws", WSHandler)
         ]
         tornado.web.Application.__init__(self, handlers)
         
-class WSHandler(tornado.web.WebSocketHandler):
+class WSHandler(tornado.websocket.WebSocketHandler):
     listeners = set()
     
     def open(self):
@@ -41,17 +42,17 @@ class WSHandler(tornado.web.WebSocketHandler):
         body = parsed["body"]
         if action == "chat":
             pass
-        elif action == "pos"
+        elif action == "pos":
             pass
-        elif action == "new"
+        elif action == "new":
             pass
-        elif action == "retr"
+        elif action == "retr":
             pass
-        elif action == "save"
+        elif action == "save":
             pass
-        elif action == "over"
+        elif action == "over":
             pass
-        else
+        else:
             logging.info("unknown action %r" % action)
             
 def main():
