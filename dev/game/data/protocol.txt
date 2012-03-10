@@ -3,9 +3,17 @@
 // Syntax of message (JSON object)
     {
         'action': 'see below'
-        'body': 'blah'
+        'sender': 'name'
+        'body': object
     }
 
+// Syntax of 'body' (JSON object)
+
+// CHAT
+    {
+        'time': 'H:M'
+        'message': 'text'
+    }
 
 //ACTIONS:
     // these are to be sent to all players
