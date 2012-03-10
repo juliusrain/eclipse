@@ -52,8 +52,8 @@ CREATE TABLE preset_objects (
   initial_stats text
 );
 
-INSERT INTO preset_objects (type, model, texture, initial_stats) VALUES
-();
+--INSERT INTO preset_objects VALUES
+--();
 
 
 CREATE TABLE preset_planetary_systems (
@@ -66,9 +66,8 @@ CREATE TABLE preset_planetary_systems (
   rightside varchar(100)
 );
 
-INSERT INTO preset_planetary_systems (type, top, bottom, front, back, leftside, rightside) VALUES
-(0, 'sky/py.jpg', 'sky/ny.jpg', 'sky/nz.jpg', 'sky/pz.jpg', 'sky/nx.jpg', 'sky/px.jpg'),
-(1, 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png');
+INSERT INTO preset_planetary_systems VALUES (0, 'sky/py.jpg', 'sky/ny.jpg', 'sky/nz.jpg', 'sky/pz.jpg', 'sky/nx.jpg', 'sky/px.jpg');
+INSERT INTO preset_planetary_systems VALUES (1, 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png', 'skybox/starfield.png');
 
 
 CREATE TABLE single_games (
@@ -100,8 +99,7 @@ CREATE TABLE users (
 );
 
 
-INSERT INTO users (uid, type, uname, email, password, status) VALUES
-(1, 1, 'bw', 'bw@cool.com', 'iamcool', 1),
-(2, 1, 'cw', 'cw@success.com', 'iamawesome', 1),
-(3, 1, 'sl', 'sl@music.com', 'iamcool', 1),
-(4, 1, 'qht', 'qht@hockeylove.com', 'iamawesome', 1);
+INSERT INTO users VALUES (1, 1, 'bw', 'bw@cool.com', 'iamcool', 1);
+INSERT INTO users VALUES (2, 1, 'cw', 'cw@success.com', 'iamawesome', 1);
+INSERT INTO users VALUES (3, 1, 'sl', 'sl@music.com', 'iamcool', 1);
+INSERT INTO users VALUES (4, 1, 'qht', 'qht@hockeylove.com', 'iamawesome', 1);

@@ -1,0 +1,10 @@
+DROP TABLE active_objects;
+DROP TABLE games;
+DROP TABLE multi_games;
+DROP TABLE objects;
+DROP TABLE planetary_systems;
+DROP TABLE preset_objects;
+DROP TABLE preset_planetary_systems;
+DROP TABLE single_games;
+DROP TABLE solar_systems;
+DROP TABLE users;
