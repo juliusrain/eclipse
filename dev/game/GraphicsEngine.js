@@ -55,13 +55,13 @@ function GraphicsEngine() {
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
 
-    var renderModel = new THREE.RenderPass(this.gameplay_scene, this.gameplay_camera);
+    var renderModel = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_glow_camera);
     var effectBloom = new THREE.BloomPass(4.3);
     var effectScreen = new THREE.ShaderPass(THREE.ShaderExtras["screen"]);
     var effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
 
     effectFXAA.uniforms['resolution'].value.set(1 / this.canvas_width, 1 / this.canvas_height);
-//    effectScreen.uniforms['opacity'].value = 0.5;
+    effectScreen.uniforms['opacity'].value = 0.5;
 
     effectScreen.renderToScreen = true;
 
@@ -171,6 +171,14 @@ function GraphicsEngine() {
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
+        
+        var dirlight3 = new THREE.DirectionalLight(0xffffff);
+        dirlight3.position.set(0, 500, 0).normalize();
+        this.gameplay_glow_scene.add(dirlight3);
+
+        var dirlight4 = new THREE.DirectionalLight(0xffffff);
+        dirlight4.position.set(0, -500, 0).normalize();
+        this.gameplay_glow_scene.add(dirlight4);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
@@ -470,7 +478,7 @@ function GraphicsEngine() {
             laserContainer.parentShipID = parentShip.drawParameters.shipID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xffffff}));
+                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
@@ -480,13 +488,14 @@ function GraphicsEngine() {
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
-            //                laserMesh.visible = false;
+                laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
             }
 
             sceneElements.lasers.push(laserContainer);
-            scene.add(laserContainer);
+            glowscene.add(laserContainer);
+//            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -513,8 +522,8 @@ function GraphicsEngine() {
                         container.children[i+1].fired = false;
                         container.children[i].hit = false;
                         container.children[i+1].hit = false;
-//                        container.children[i].visible = false;
-//                        container.children[i+1].visible = false;
+                        container.children[i].visible = false;
+                        container.children[i+1].visible = false;
                     }
                     if(!container.children[i].fired) {
                         container.children[i].quaternion.copy(container.parentShip.quaternion);
