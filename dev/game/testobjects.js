@@ -91,7 +91,7 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/player_ship002.js",
+                    geometry: "models/ships/player_ship002_scaled_textured.dae",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine

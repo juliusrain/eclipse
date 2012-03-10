@@ -32,6 +32,14 @@ function GraphicsEngine() {
     this.gameplay_glow_scene = new THREE.Scene();
     this.gameplay_glow_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
     this.gameplay_glow_scene.add(this.gameplay_glow_camera);
+    //sync regular and glow camera
+    this.gameplay_glow_camera.useQuaternion = true;
+    this.gameplay_glow_camera.position = this.gameplay_camera.position;
+    this.gameplay_glow_camera.quaternion = this.gameplay_camera.quaternion;
+
+//    this.gameplay_glow_camera.useQuaternion = true;
+//    this.gameplay_glow_camera.position = this.gameplay_camera.position;
+//    this.gameplay_glow_camera.quaterion = this.gameplay_camera.quaternion;
 
 
     //threejs scene elements for map overlay (jump map)
@@ -41,16 +49,27 @@ function GraphicsEngine() {
     //main renderer
     this.renderer = new THREE.WebGLRenderer({
         clearColor: 0x000000,
-        clearAlpha: 1
+        clearAlpha: 1,
     });
     this.renderer.setSize(this.canvas_width, this.canvas_height);
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
 
-    
+    var renderModel = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_glow_camera);
+    var effectBloom = new THREE.BloomPass(4.3);
+    var effectScreen = new THREE.ShaderPass(THREE.ShaderExtras["screen"]);
     var effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
 
     effectFXAA.uniforms['resolution'].value.set(1 / this.canvas_width, 1 / this.canvas_height);
+    effectScreen.uniforms['opacity'].value = 0.5;
+
+    effectScreen.renderToScreen = true;
+
+    this.composer = new THREE.EffectComposer(this.renderer);
+    this.composer.addPass(renderModel);
+    this.composer.addPass(effectFXAA);
+    this.composer.addPass(effectBloom);
+    this.composer.addPass(effectScreen);
 
 
     //create minimap
@@ -146,12 +165,20 @@ function GraphicsEngine() {
         //this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
-        dirlight.position.set(0, 300, 0).normalize();
+        dirlight.position.set(0, 500, 0).normalize();
         this.gameplay_scene.add(dirlight);
 
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
-        dirlight2.position.set(0, -300, 0).normalize();
+        dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
+        
+        var dirlight3 = new THREE.DirectionalLight(0xffffff);
+        dirlight3.position.set(0, 500, 0).normalize();
+        this.gameplay_glow_scene.add(dirlight3);
+
+        var dirlight4 = new THREE.DirectionalLight(0xffffff);
+        dirlight4.position.set(0, -500, 0).normalize();
+        this.gameplay_glow_scene.add(dirlight4);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
@@ -440,9 +467,9 @@ function GraphicsEngine() {
          *      parentShip: sceneObject representing parent ship the lasers belong to
          *      laserContainer: Object3D to hold individual lasers
          */
+        var glowscene = this.gameplay_glow_scene;
         function loadJSONLasers(geometry, parentShip, scene) {
             var laserContainer = new THREE.Object3D();
-
             //when deleting, make sure to null pointers
             parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
             laserContainer.parentShip = parentShip;
@@ -451,7 +478,7 @@ function GraphicsEngine() {
             laserContainer.parentShipID = parentShip.drawParameters.shipID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xffffff}));
+                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
@@ -461,13 +488,14 @@ function GraphicsEngine() {
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
-            //                laserMesh.visible = false;
+                laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
             }
 
             sceneElements.lasers.push(laserContainer);
-            scene.add(laserContainer);
+            glowscene.add(laserContainer);
+//            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -484,35 +512,35 @@ function GraphicsEngine() {
                 }
             }
 
-            var self = laserContainer;
+            var container = laserContainer;
             laserContainer.update = function() {
-                for(var i = 0; i < self.children.length; i+=2) {
-                    if(self.children[i].currentDistance >= self.children[i].maxDistance || self.children[i].hit) {
-                        self.children[i].currentDistance = 0;
-                        self.children[i+1].currentDistance = 0;
-                        self.children[i].fired = false;
-                        self.children[i+1].fired = false;
-                        self.children[i].hit = false;
-                        self.children[i+1].hit = false;
-                        self.children[i].visible = false;
-                        self.children[i+1].visible = false;
+                for(var i = 0; i < container.children.length; i+=2) {
+                    if(container.children[i].currentDistance >= container.children[i].maxDistance || container.children[i].hit) {
+                        container.children[i].currentDistance = 0;
+                        container.children[i+1].currentDistance = 0;
+                        container.children[i].fired = false;
+                        container.children[i+1].fired = false;
+                        container.children[i].hit = false;
+                        container.children[i+1].hit = false;
+                        container.children[i].visible = false;
+                        container.children[i+1].visible = false;
                     }
-                    if(!self.children[i].fired) {
-                        self.children[i].quaternion.copy(self.parentShip.quaternion);
-                        self.children[i+1].quaternion.copy(self.parentShip.quaternion);
+                    if(!container.children[i].fired) {
+                        container.children[i].quaternion.copy(container.parentShip.quaternion);
+                        container.children[i+1].quaternion.copy(container.parentShip.quaternion);
 
-                        self.children[i].position.copy(self.parentShip.position);
-                        self.children[i+1].position.copy(self.parentShip.position);
+                        container.children[i].position.copy(container.parentShip.position);
+                        container.children[i+1].position.copy(container.parentShip.position);
 
-                        self.children[i].translateX(-10);
-                        self.children[i+1].translateX(10);
+                        container.children[i].translateX(-10);
+                        container.children[i+1].translateX(10);
 
                     } else {
-                        self.children[i].translateZ(-self.children[i].speed);
-                        self.children[i+1].translateZ(-self.children[i+1].speed);
+                        container.children[i].translateZ(-container.children[i].speed);
+                        container.children[i+1].translateZ(-container.children[i+1].speed);
 
-                        self.children[i].currentDistance += 1;
-                        self.children[i+1].currentDistance += 1;
+                        container.children[i].currentDistance += 1;
+                        container.children[i+1].currentDistance += 1;
                     }
 
                 }
@@ -726,6 +754,7 @@ function GraphicsEngine() {
             //self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
+            self.composer.render();
         }
 
 
