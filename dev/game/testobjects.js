@@ -34,7 +34,7 @@ var playerShip = {  type: PLAYER_SHIP,
                             lasers: {
                                 type: 0, //particle vs elongated?
                                 damage: 0,
-                                range: 500,
+                                range: 300,
                                 speed: 35,
                                 amount: 50,
                                 maxCharge: 15400,
@@ -78,7 +78,7 @@ var AIShip = {  type: AI_SHIP,
                         lasers: {
                             type: 0, //particle vs elongated?
                             damage: 0,
-                            range: 500,
+                            range: 300,
                             speed: 35,
                             amount: 30,
 
@@ -91,7 +91,7 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/player_ship002.js",
+                    geometry: "models/ships/player_ship002_scaled_textured.dae",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
@@ -116,7 +116,7 @@ var AIShip2 = {  type: AI_SHIP,
                         lasers: {
                             type: 0, //particle vs elongated?
                             damage: 0,
-                            range: 500,
+                            range: 300,
                             speed: 35,
                             amount: 30,
 
