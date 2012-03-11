@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.62.1 r44749</authoring_tool>
     </contributor>
-    <created>2012-03-10T19:36:31</created>
-    <modified>2012-03-10T19:36:31</modified>
+    <created>2012-03-10T19:53:47</created>
+    <modified>2012-03-10T19:53:47</modified>
     <unit name="inch" meter="0.0254"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -576,7 +576,7 @@
         <instance_light url="#VisualSceneNode-light"/>
       </node>
       <node id="Cube" type="NODE">
-        <translate sid="location">0 0 0</translate>
+        <translate sid="location">0 0 -15.12305</translate>
         <rotate sid="rotationZ">0 0 1 180.0001</rotate>
         <rotate sid="rotationY">0 1 0 0</rotate>
         <rotate sid="rotationX">1 0 0 90.00004</rotate>

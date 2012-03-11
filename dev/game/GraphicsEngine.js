@@ -19,8 +19,16 @@ function GraphicsEngine() {
     this.canvas_width = parseInt($('#main').css('width'));
     this.canvas_height = parseInt($('#main').css('height'));
 
+    //MAIN THREEJS RENDERER
+    //main renderer
+    this.renderer = new THREE.WebGLRenderer({
 
+    });
+    this.renderer.setSize(this.canvas_width, this.canvas_height);
+    this.renderer.autoClear = false;
+    this.container.appendChild(this.renderer.domElement);
 
+    //MAIN SCENE
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
     this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
@@ -29,48 +37,47 @@ function GraphicsEngine() {
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
 
+    //GLOW SCENE
+    //glow scene elements
     this.gameplay_glow_scene = new THREE.Scene();
-    this.gameplay_glow_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
-    this.gameplay_glow_scene.add(this.gameplay_glow_camera);
-    //sync regular and glow camera
-    this.gameplay_glow_camera.useQuaternion = true;
-    this.gameplay_glow_camera.position = this.gameplay_camera.position;
-    this.gameplay_glow_camera.quaternion = this.gameplay_camera.quaternion;
 
-//    this.gameplay_glow_camera.useQuaternion = true;
-//    this.gameplay_glow_camera.position = this.gameplay_camera.position;
-//    this.gameplay_glow_camera.quaterion = this.gameplay_camera.quaternion;
+    //antialiasing via shader
+    this.effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
+    this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
 
+    //bloom shader
+    var effectBloom = new THREE.BloomPass(5.0);
 
-    //threejs scene elements for map overlay (jump map)
-    this.map_scene = new THREE.Scene();
-    this.map_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
+    var renderTargetParameters = {  minFilter: THREE.LinearFilter,
+                                    magFilter: THREE.LinearFilter,
+                                    format: THREE.RGBAFormat,
+                                    stencilBufer: false };
 
-    //main renderer
-    this.renderer = new THREE.WebGLRenderer({
-        clearColor: 0x000000,
-        clearAlpha: 1,
-    });
-    this.renderer.setSize(this.canvas_width, this.canvas_height);
-    this.renderer.autoClear = false;
-    this.container.appendChild(this.renderer.domElement);
+    //render glow scene to texture
+    this.renderTargetGlow = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+    var renderModelGlow = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_camera);
 
-    var renderModel = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_glow_camera);
-    var effectBloom = new THREE.BloomPass(4.3);
-    var effectScreen = new THREE.ShaderPass(THREE.ShaderExtras["screen"]);
-    var effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
+    //effect composer for fbo
+    this.glow_composer = new THREE.EffectComposer(this.renderer, this.renderTargetGlow);
+    this.glow_composer.addPass(renderModelGlow);
+    this.glow_composer.addPass(effectBloom);
 
-    effectFXAA.uniforms['resolution'].value.set(1 / this.canvas_width, 1 / this.canvas_height);
-    effectScreen.uniforms['opacity'].value = 0.5;
+    blend_shader.uniforms['tGlow'].texture = this.glow_composer.renderTarget2;
 
-    effectScreen.renderToScreen = true;
+    //render texture to screen with rest of scene (alpha blended)
+    this.renderTargetScreen = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+    var renderModel = new THREE.RenderPass(this.gameplay_scene, this.gameplay_camera);
+    var blend_pass = new THREE.ShaderPass(blend_shader);
+    blend_pass.needsSwap = true;
+    blend_pass.renderToScreen = true;
 
-    this.composer = new THREE.EffectComposer(this.renderer);
-    this.composer.addPass(renderModel);
-    this.composer.addPass(effectFXAA);
-    this.composer.addPass(effectBloom);
-    this.composer.addPass(effectScreen);
+    //effect composer for screen rendering
+    this.blend_composer = new THREE.EffectComposer(this.renderer, this.renderTargetScreen);
+    this.blend_composer.addPass(renderModel);
+    this.blend_composer.addPass(this.effectFXAA);
+    this.blend_composer.addPass(blend_pass);
 
+////////////
 
     //create minimap
     this.minimap = new Minimap(this.gameplay_controls, this.gameplay_camera);
@@ -134,6 +141,13 @@ function GraphicsEngine() {
         this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
         this.gameplay_camera.updateProjectionMatrix();
 
+        this.renderTargetGlow.width = this.canvas_width;
+        this.renderTargetFlow.height = this.canvas_height;
+        this.renderTargetScreen.width = this.canvas_width;
+        this.renderTargetScreen.height = this.canvas_height;
+
+        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+
         this.minimap.resizeMinimap();
     }
 
@@ -172,28 +186,8 @@ function GraphicsEngine() {
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
         
-        var dirlight3 = new THREE.DirectionalLight(0xffffff);
-        dirlight3.position.set(0, 500, 0).normalize();
-        this.gameplay_glow_scene.add(dirlight3);
-
-        var dirlight4 = new THREE.DirectionalLight(0xffffff);
-        dirlight4.position.set(0, -500, 0).normalize();
-        this.gameplay_glow_scene.add(dirlight4);
-
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
-
-        var cloader = THREE.ColladaLoader();
-        cloader.load("models/ships/player_ship002.dae",
-                    function(collada) {
-                        var model = collada.scene;
-                        model.rotation.x = -Math.PI/2;
-                        //model.scale.set();
-                        self.gameplay_scene.add(model);
-                    }
-        );
-
-
     }
 
     /*
@@ -217,6 +211,20 @@ function GraphicsEngine() {
             this.renderer.deallocateObject(sceneChild);
         }
 
+        //delete elements from gameplay_glow_scene
+        sceneChildren = this.gameplay_glow_scene.children;
+        i = 0;
+        while(i < sceneChildren.length) {
+            sceneChild = sceneChildren[i];
+            if(sceneChild instanceof THREE.Camera) {
+                i++;
+                continue;
+            }
+            this.gameplay_glow_scene.remove(sceneChild);
+            this.renderer.deallocateObject(sceneChild);
+        }
+
+        //clene sceneElements object
         sceneElements.mainShip = null;
         for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
@@ -400,7 +408,9 @@ function GraphicsEngine() {
 
 
             cmodel.position.set(cmodel.drawParameters.position.x, cmodel.drawParameters.position.y, cmodel.drawParameters.position.z);
+            self.gameplay_glow_scene.add(cmodel);
             scene.add(cmodel);
+
         }
 
         //JSON
@@ -413,7 +423,13 @@ function GraphicsEngine() {
         */
         function loadJSON(geometry, gameObject, scene) {
             var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
-            var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
+            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+            var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+            modelMeshDark.useQuaternion = true;
+            modelMeshDark.name = gameObject.gameParameters.name + " dark";
+
+            modelMeshDark.position = modelMesh.position;
+            modelMeshDark.quaternion = modelMesh.quaternion;
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
@@ -429,7 +445,7 @@ function GraphicsEngine() {
                   modelMesh.currentYOffset = 0;
 
                   loadLasers(modelMesh, scene);
-                  sceneElements.mainShip = modelMesh;
+                  sceneElements.mainShip = modelMesh
 
                   break;
               }
@@ -446,6 +462,7 @@ function GraphicsEngine() {
 
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
+            self.gameplay_glow_scene.add(modelMeshDark);
         }
 
 
@@ -457,7 +474,7 @@ function GraphicsEngine() {
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
             var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
             //loader.load(parentShip.drawParameters.laserModel, callback);
-            jloader.load("models/lasers/laser.js", callback);
+            jloader.load("models/lasers/lasertest.js", callback);
         }
 
         /*
@@ -467,7 +484,6 @@ function GraphicsEngine() {
          *      parentShip: sceneObject representing parent ship the lasers belong to
          *      laserContainer: Object3D to hold individual lasers
          */
-        var glowscene = this.gameplay_glow_scene;
         function loadJSONLasers(geometry, parentShip, scene) {
             var laserContainer = new THREE.Object3D();
             //when deleting, make sure to null pointers
@@ -478,7 +494,9 @@ function GraphicsEngine() {
             laserContainer.parentShipID = parentShip.drawParameters.shipID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
+//                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
+                laserMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+                laserMesh.overdraw = true;
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
@@ -488,13 +506,13 @@ function GraphicsEngine() {
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
-                laserMesh.visible = false;
+//                laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
             }
 
             sceneElements.lasers.push(laserContainer);
-            glowscene.add(laserContainer);
+            self.gameplay_glow_scene.add(laserContainer);
 //            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
@@ -753,8 +771,9 @@ function GraphicsEngine() {
             }
             //self.jumpmap.updateJumpmap();
             self.renderer.clear();
-            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
-            self.composer.render();
+//            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
+            self.glow_composer.render();
+            self.blend_composer.render();
         }
 
 
@@ -862,7 +881,7 @@ function GraphicsEngine() {
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
-            sceneObject.translateZ(-70); //(distance from camera)
+            sceneObject.translateZ(-80); //(distance from camera)
 //            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 
@@ -879,7 +898,7 @@ function GraphicsEngine() {
 //                         HUDObject.position.x = -gameControls.rotationVector.y * 0.1;
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
 //                         HUDObject.position.y = gameControls.rotationVector.x * 0.1;
-                        HUDObject.translateZ(-71);
+                        HUDObject.translateZ(-81);
                         break;
                     }
                     case RING: {
@@ -887,7 +906,7 @@ function GraphicsEngine() {
                         break;
                     }
                     case MINIMAP: {
-                        HUDObject.updateMinimap();
+//                        HUDObject.updateMinimap();
                         break;
                     }
                 }
