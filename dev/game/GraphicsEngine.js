@@ -46,7 +46,7 @@ function GraphicsEngine() {
     this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
 
     //bloom shader
-    var effectBloom = new THREE.BloomPass(5.0);
+    var effectBloom = new THREE.BloomPass(10.0);
 
     var renderTargetParameters = {  minFilter: THREE.LinearFilter,
                                     magFilter: THREE.LinearFilter,
@@ -161,8 +161,8 @@ function GraphicsEngine() {
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
 /////////////////////////////
         //this.gameplay_scene.add(axishelper);
-        this.gameplay_scene.add(tempSphere1);
-        this.gameplay_scene.add(tempSphere2);
+        this.gameplay_glow_scene.add(tempSphere1);
+        this.gameplay_glow_scene.add(tempSphere2);
 
 ////////////////////////////
 
@@ -185,7 +185,23 @@ function GraphicsEngine() {
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
-        
+
+        var dirlight3 = new THREE.DirectionalLight(0xffffff);
+        dirlight3.position.set(500, 0, 0).normalize();
+        this.gameplay_scene.add(dirlight3);
+
+        var dirlight4 = new THREE.DirectionalLight(0xffffff);
+        dirlight4.position.set(-500, 0, 0).normalize();
+        this.gameplay_scene.add(dirlight4);
+
+        var dirlight5 = new THREE.DirectionalLight(0xffffff);
+        dirlight5.position.set(0, 0, -500).normalize();
+        this.gameplay_scene.add(dirlight5);
+
+        var dirlight6 = new THREE.DirectionalLight(0xffffff);
+        dirlight6.position.set(0, 0, 500).normalize();
+        this.gameplay_scene.add(dirlight6);
+
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
     }
@@ -425,39 +441,80 @@ function GraphicsEngine() {
             var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
             var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
             var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
-            modelMeshDark.useQuaternion = true;
-            modelMeshDark.name = gameObject.gameParameters.name + " dark";
 
-            modelMeshDark.position = modelMesh.position;
-            modelMeshDark.quaternion = modelMesh.quaternion;
+            //set mesh parameters
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
 
+            //sync positions/rotations of normal and dark meshes
+            modelMeshDark.useQuaternion = true;
+            modelMeshDark.name = gameObject.gameParameters.name + " dark";
+            modelMeshDark.position = modelMesh.position;
+            modelMeshDark.quaternion = modelMesh.quaternion;
+
             switch(modelMesh.objectType) {
-              case PLAYER_SHIP: {
-                  modelMesh.gameParameters = gameObject.gameParameters;
-                  modelMesh.drawParameters = gameObject.drawParameters;
-                  //for 3rd person ship positioning
-                  modelMesh.currentRoll = 0;
-                  modelMesh.currentXOffset = 0;
-                  modelMesh.currentYOffset = 0;
+                case PLAYER_SHIP: {
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    //for 3rd person ship positioning
+                    modelMesh.currentRoll = 0;
+                    modelMesh.currentXOffset = 0;
+                    modelMesh.currentYOffset = 0;
 
-                  loadLasers(modelMesh, scene);
-                  sceneElements.mainShip = modelMesh
+                    loadLasers(modelMesh, scene);
+                    sceneElements.mainShip = modelMesh
 
-                  break;
-              }
-              case AI_SHIP: {
-                  console.log("load ai ship");
-                  modelMesh.gameParameters = gameObject.gameParameters;
-                  modelMesh.drawParameters = gameObject.drawParameters;
-                  loadLasers(modelMesh, scene);
-                  sceneElements.AIShips.push(modelMesh);
-                  self.minimap.addMinimapObject(AI_SHIP)
-                  break;
-              }
+                    break;
+                }
+                case AI_SHIP: {
+                    console.log("load ai ship");
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    loadLasers(modelMesh, scene);
+
+
+                    modelMesh.tempDir = new THREE.Vector3(0, 0, 0);
+                    modelMesh.targetPos = new THREE.Vector3(0, 0, 0);
+                    modelMesh.tempQuat = new THREE.Quaternion();
+                    modelMesh.tempMat = new THREE.Matrix4();
+                    modelMesh.FORWARD = new THREE.Vector3(0, 0, -1);
+                    modelMesh.UP = new THREE.Vector3(0, 1, 0);
+
+                    var mesh = modelMesh;
+                    modelMesh.turn = function(x, y, z) {
+                        //set target position (might change depending on huy)
+                        mesh.targetPos.set(x, y, z);
+
+                        //get new look direction vector
+                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+
+                        //copy inverse rotation and apply to direction to get new look in local coords
+                        mesh.tempQuat.copy(mesh.quaternion).inverse();
+                        mesh.tempQuat.multiplyVector3(mesh.tempDir, mesh.tempDir);
+                        mesh.tempDir.normalize();
+
+                        //calculate roll based on look dir and new dir (in local coords)
+                        mesh.tempQuat.setFromAxisAngle(mesh.FORWARD, (Math.PI * 0.25) * mesh.tempDir.x);
+
+                        //calculate new look quaternion in world coords
+                        mesh.tempMat.lookAt(mesh.position, mesh.targetPos, mesh.up);
+                        mesh.quaternion.setFromRotationMatrix(mesh.tempMat);
+
+                        //apply roll calculated earlier
+                        mesh.quaternion.multiplySelf(mesh.tempQuat);
+
+                        //update look direction
+                        mesh.quaternion.multiplyVector3(mesh.FORWARD, mesh.direction);
+                        //update up direction
+                        mesh.quaternion.multiplyVector3(mesh.UP, mesh.up);
+                    }
+
+                    sceneElements.AIShips.push(modelMesh);
+                    self.minimap.addMinimapObject(AI_SHIP)
+                    break;
+                }
             }
 
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
@@ -513,7 +570,6 @@ function GraphicsEngine() {
 
             sceneElements.lasers.push(laserContainer);
             self.gameplay_glow_scene.add(laserContainer);
-//            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -552,6 +608,8 @@ function GraphicsEngine() {
 
                         container.children[i].translateX(-10);
                         container.children[i+1].translateX(10);
+                        container.children[i].translateZ(20);
+                        container.children[i+1].translateZ(20);
 
                     } else {
                         container.children[i].translateZ(-container.children[i].speed);
@@ -560,118 +618,9 @@ function GraphicsEngine() {
                         container.children[i].currentDistance += 1;
                         container.children[i+1].currentDistance += 1;
                     }
-
                 }
-
             }
         }
-
-
-
-
-
-
-
-//
-//        /*
-//         *  Creates lasers for a given ship (sceneObject).
-//         *      parentShip: sceneObject that represents parent ship that lasers belong to
-//         *      scene: scene to add lasers to
-//         */
-//        function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
-//            var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
-//            //loader.load(parentShip.drawParameters.laserModel, callback);
-//            loader.load("models/lasers/laser.js", callback);
-//
-//
-//        }
-//
-//        /*
-//         *  Creates mesh based on model, fills in parameters based on parentShip's parameters,
-//         *  fills in parameters necessary for drawing and computations, and populates container.
-//         *  (called by loadLasers only)
-//         *      parentShip: sceneObject representing parent ship the lasers belong to
-//         *      laserContainer: Object3D to hold individual lasers
-//         */
-//        function loadJSONLasers(geometry, parentShip, scene) {
-//            var laserContainer = new THREE.Object3D();
-//
-//            //when deleting, make sure to null pointers
-//            parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
-//            laserContainer.parentShip = parentShip;
-//
-//            laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
-//            laserContainer.parentShipID = parentShip.drawParameters.shipID;
-//
-//            for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-//                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xffffff}));
-//                laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
-//                laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
-//                laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
-//                laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
-//                laserMesh.parentShipID = parentShip.drawParameters.shipID;
-//
-//                laserMesh.useQuaternion = true;
-//                laserMesh.fired = false;
-//                laserMesh.currentDistance = 0;
-//            //                laserMesh.visible = false;
-//
-//                laserContainer.add(laserMesh);
-//            }
-//
-//            sceneElements.lasers.push(laserContainer);
-//            scene.add(laserContainer);
-//
-//            //laser firing function to be called to fire laser;
-//            parentShip.fireLaser = function() {
-//                for(var i = 0; i < laserContainer.children.length; i++) {
-//                    if(!laserContainer.children[i].fired) {
-//                        laserContainer.children[i].fired = true;
-//                        laserContainer.children[i+1].fired = true;
-//                        laserContainer.children[i].currentDistance += 1;
-//                        laserContainer.children[i+1].currentDistance += 1;
-//                        laserContainer.children[i].visible = true;
-//                        laserContainer.children[i+1].visible = true;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            var self = laserContainer;
-//            laserContainer.update = function() {
-//                for(var i = 0; i < self.children.length; i+=2) {
-//                    if(self.children[i].currentDistance >= self.children[i].maxDistance || self.children[i].hit) {
-//                        self.children[i].currentDistance = 0;
-//                        self.children[i+1].currentDistance = 0;
-//                        self.children[i].fired = false;
-//                        self.children[i+1].fired = false;
-//                        self.children[i].hit = false;
-//                        self.children[i+1].hit = false;
-//                        self.children[i].visible = false;
-//                        self.children[i+1].visible = false;
-//                    }
-//                    if(!self.children[i].fired) {
-//                        self.children[i].quaternion.copy(self.parentShip.quaternion);
-//                        self.children[i+1].quaternion.copy(self.parentShip.quaternion);
-//
-//                        self.children[i].position.copy(self.parentShip.position);
-//                        self.children[i+1].position.copy(self.parentShip.position);
-//
-//                        self.children[i].translateX(-10);
-//                        self.children[i+1].translateX(10);
-//
-//                    } else {
-//                        self.children[i].translateZ(-self.children[i].speed);
-//                        self.children[i+1].translateZ(-self.children[i+1].speed);
-//
-//                        self.children[i].currentDistance += 1;
-//                        self.children[i+1].currentDistance += 1;
-//                    }
-//
-//                }
-//
-//            }
-//        }
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
@@ -881,7 +830,7 @@ function GraphicsEngine() {
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
-            sceneObject.translateZ(-80); //(distance from camera)
+            sceneObject.translateZ(-90); //(distance from camera)
 //            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 
@@ -898,7 +847,7 @@ function GraphicsEngine() {
 //                         HUDObject.position.x = -gameControls.rotationVector.y * 0.1;
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
 //                         HUDObject.position.y = gameControls.rotationVector.x * 0.1;
-                        HUDObject.translateZ(-81);
+                        HUDObject.translateZ(-91);
                         break;
                     }
                     case RING: {
@@ -906,7 +855,7 @@ function GraphicsEngine() {
                         break;
                     }
                     case MINIMAP: {
-//                        HUDObject.updateMinimap();
+                        HUDObject.updateMinimap();
                         break;
                     }
                 }
@@ -951,65 +900,75 @@ function GraphicsEngine() {
                             case 1: {
 
                                 //TODO: NEED TO CONVERT THIS INTO aiTurn() function
-
-                                //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
-
-                                //multiply reference UP by quaternion to keep current UP
-                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-
-                                //object's new look direction
-                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
-
-                                //invert ship quaternion and apply to new look dir to get it in local coords
-                                tempQuat.copy(sceneObject.quaternion).inverse();
-                                tempQuat.multiplyVector3(tempVecDir, tempVec);
-                                tempVec.normalize();
-
-                                //set a rotation based on x offset of forward dir and new look dir (in local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x); //get max angle based on huy's direction vector
-
-                                //look at new dir (world coords)
-                                tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
-                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
-
-                                //apply turn rotation
-                                sceneObject.quaternion.multiplySelf(tempQuat);
-
+//
+//                                //calculate object's current look direction
+//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+////                                sceneObject.direction.normalize();
+//
+//                                //multiply reference UP by quaternion to keep current transformed up 
+//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+//
+//                                //object's new look direction
+//                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
+//
+//                                //invert ship quaternion and apply to new look dir to get it in local coords
+//                                tempQuat.copy(sceneObject.quaternion).inverse();
+//                                tempQuat.multiplyVector3(tempVecDir, tempVecDir);
+//                                tempVecDir.normalize();
+//
+//                                if(tempVecDir.x > 0.5) {
+//                                    tempVecDir.x = 0.5;
+//                                }
+//                                if(tempVecDir.y > 0.5) {
+//                                    tempVecDir.y = 0.5;
+//                                }
+//
+//
+//                                //set a rotation(roll) based on x offset of forward dir and new look dir (in local coords)
+//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVecDir.x); //get max angle based on huy's direction vector
+//
+//                                //look at new dir (world coords)
+//                                tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
+//                                sceneObject.quaternion.setFromRotationMatrix(tempMat); //reset the quaternion with new look dir
+//
+//                                //apply turn (roll) rotation calculated earlier
+//                                sceneObject.quaternion.multiplySelf(tempQuat);
                                 //go forward
-                                sceneObject.translateZ(-2);
+//                                sceneobject.translatez(-2);
+                                sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
+
                                 break;
                             }
                             case 2: {
 
-                                //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
-
-                                //multiply reference UP by quaternion to keep current UP
-                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-
-                                //object's new look direction
-                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
-
-                                //invert ship quaternion and apply to new look dir
-                                tempQuat.copy(sceneObject.quaternion).inverse();
-                                tempQuat.multiplyVector3(tempVecDir, tempVec);
-                                tempVec.normalize();
-
-                                //set a rotation based on x offset of forward dir and new look dir (local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x);
-
-                                //look at new dir (world coords)
-                                tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
-                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
-
-                                //apply turn rotation
-                                sceneObject.quaternion.multiplySelf(tempQuat);
+//                                //calculate object's current look direction
+//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+//                                sceneObject.direction.normalize();
+//
+//                                //multiply reference UP by quaternion to keep current UP
+//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+//
+//                                //object's new look direction
+//                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
+//
+//                                //invert ship quaternion and apply to new look dir
+//                                tempQuat.copy(sceneObject.quaternion).inverse();
+//                                tempQuat.multiplyVector3(tempVecDir, tempVec);
+//                                tempVec.normalize();
+//
+//                                //set a rotation based on x offset of forward dir and new look dir (local coords)
+//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVec.x);
+//
+//                                //look at new dir (world coords)
+//                                tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
+//                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
+//
+//                                //apply turn rotation
+//                                sceneObject.quaternion.multiplySelf(tempQuat);
+                                sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
 
                                 //go forward
-                                sceneObject.translateZ(-2);
+//                                sceneObject.translateZ(-2);
                                 break;
                             }
                         }
@@ -1019,13 +978,17 @@ function GraphicsEngine() {
                 }
 
                 var t = Date.now() * 0.0008;
-                tempSphere1.position.x = 500*Math.cos(t)
-                tempSphere1.position.y = -1000*Math.sin(t)
-                tempSphere1.position.z = 800*Math.sin(t) - 400;
+//                tempSphere1.position.x = 2000*Math.cos(t)
+//                tempSphere1.position.y = 2000*Math.sin(t)
+//                tempSphere1.position.z = 800*Math.sin(t);
+                tempSphere1.position.z = 300*Math.sin(t);
 
-                tempSphere2.position.x = 400*Math.sin(t);
-                tempSphere2.position.y = 500*Math.cos(t) + 150;
-                tempSphere2.position.z = 600*Math.cos(t);
+                tempSphere2.position.x = 2000*Math.sin(t);
+//                tempSphere2.position.y = 500*Math.cos(t) + 150;
+//                tempSphere2.position.z = 600*Math.cos(t);
+                tempSphere2.position.z = -1000;
+
+
 
             }
         }

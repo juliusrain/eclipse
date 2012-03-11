@@ -35,7 +35,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                 type: 0, //particle vs elongated?
                                 damage: 0,
                                 range: 300,
-                                speed: 35,
+                                speed: 20,
                                 amount: 50,
                                 maxCharge: 15400,
                                 currentCharge: 0,
@@ -79,7 +79,7 @@ var AIShip = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 35,
+                            speed: 20,
                             amount: 30,
 
                         },
@@ -97,7 +97,7 @@ var AIShip = {  type: AI_SHIP,
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
+                    position: {x: 50, y: 0, z: -100} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip);
@@ -117,7 +117,7 @@ var AIShip2 = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 35,
+                            speed: 20,
                             amount: 30,
 
                         },
@@ -135,7 +135,7 @@ var AIShip2 = {  type: AI_SHIP,
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
+                    position: {x: -50, y: 0, z: -100} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip2);
