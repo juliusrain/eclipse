@@ -625,7 +625,7 @@ function GraphicsEngine() {
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
         var duration = 4000,
-            e = new Explosion(x, y, z, this.gameplay_scene, duration, EXPLOSION_LARGE);
+            e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, duration, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
 

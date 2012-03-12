@@ -3,8 +3,8 @@ if &cp | set nocp | endif
 let s:cpo_save=&cpo
 set cpo&vim
 inoremap <S-Tab> 
-nnoremap  :s/^/\/\/:nohls
 vnoremap  :s/^/\/\/:nohls
+nnoremap  :s/^/\/\/:nohls
 nnoremap  h
 vnoremap 	 >gv
 nnoremap 	 >l
@@ -19,8 +19,8 @@ nnoremap  h i 
 nnoremap  k O
 nnoremap  j o
 nnoremap  w :wa
-nnoremap C :s/^\/\//:nohls
 vnoremap C :s/^\/\//:nohls
+nnoremap C :s/^\/\//:nohls
 nmap gx <Plug>NetrwBrowseX
 nnoremap tc :tabclose
 nnoremap tn :tabnew
@@ -69,12 +69,12 @@ set shortmess=aoO
 badd +450 GraphicsEngine.js
 badd +1 \[
 badd +1 testobjects.js
-badd +0 Explosions.js
+badd +1 Explosions.js
 badd +28 js/shaders/ExplosionLarge.js
-badd +0 GameConstants.js
-badd +0 UI.js
-badd +0 index.html
-badd +0 js/shaders/ExplosionShaders.js
+badd +1 GameConstants.js
+badd +1 UI.js
+badd +1 index.html
+badd +1 js/shaders/ExplosionShaders.js
 args GraphicsEngine.js
 edit GraphicsEngine.js
 set splitbelow splitright
@@ -194,12 +194,12 @@ setlocal nowrap
 setlocal wrapmargin=0
 626
 normal zo
-let s:l = 616 - ((0 * winheight(0) + 31) / 63)
+let s:l = 628 - ((12 * winheight(0) + 31) / 63)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-616
-normal! 033l
+628
+normal! 074l
 wincmd w
 argglobal
 edit GraphicsEngine.js
@@ -768,34 +768,28 @@ setlocal nowrap
 setlocal wrapmargin=0
 2
 normal zo
-12
+146
 normal zo
-70
+160
 normal zo
-195
+176
 normal zo
-243
+160
 normal zo
-253
+146
 normal zo
-267
-normal zo
-253
+160
 normal zo
 2
 normal zo
-253
+160
 normal zo
-268
-normal zo
-253
-normal zo
-let s:l = 145 - ((36 * winheight(0) + 31) / 63)
+let s:l = 99 - ((38 * winheight(0) + 31) / 63)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-145
-normal! 019l
+99
+normal! 029l
 wincmd w
 2wincmd w
 exe 'vert 1resize ' . ((&columns * 89 + 119) / 238)
