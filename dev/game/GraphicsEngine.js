@@ -142,7 +142,7 @@ function GraphicsEngine() {
         this.gameplay_camera.updateProjectionMatrix();
 
         this.renderTargetGlow.width = this.canvas_width;
-        this.renderTargetFlow.height = this.canvas_height;
+        this.renderTargetGlow.height = this.canvas_height;
         this.renderTargetScreen.width = this.canvas_width;
         this.renderTargetScreen.height = this.canvas_height;
 
@@ -624,8 +624,8 @@ function GraphicsEngine() {
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 2000,
-            e = new Explosion(x, y, z, this.gameplay_scene, duration);
+        var duration = 4000,
+            e = new Explosion(x, y, z, this.gameplay_scene, duration, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
 

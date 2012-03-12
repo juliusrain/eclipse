@@ -38,7 +38,7 @@ $(window).keypress(function (e){
         }
         //create explosion (for testing) p
         case 112: {
-//            graphicsEngine.addExplosionLarge(20, 0, -100);
+            graphicsEngine.addExplosionLarge(50, 0, -100);
             sceneElements.AIShips[0].fireLaser();
             break;
         }
