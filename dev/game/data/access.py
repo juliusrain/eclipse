@@ -7,6 +7,14 @@ def connect():
 	c = conn.cursor()
 	return conn, c
 
+def runner(fn, *args):
+	conn, c = connect()
+	fn(conn, c, *args)
+	conn.close()
+
+# access planet
+
+# update ship
 
 if __name__ == '__main__':
 	main()
