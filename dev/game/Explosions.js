@@ -1,5 +1,5 @@
 
-function Explosion(x, y, z, scene, renderer, duration, explosion_type) { //plus other vars
+function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
     //will need multiple systems for the different textures of explosion
     this.explosion = {
         type: explosion_type,
@@ -8,7 +8,7 @@ function Explosion(x, y, z, scene, renderer, duration, explosion_type) { //plus 
 
     this.scene = scene;
     this.renderer = renderer;
-    this.maxDuration = duration;
+    this.maxDuration = 4000;
     this.currentDuration = 0;
     this.done = false;
 
@@ -29,7 +29,7 @@ function Explosion(x, y, z, scene, renderer, duration, explosion_type) { //plus 
                 opacity: {type: "f", value: []},
             };
 
-            var spark_shader = new THREE.ShaderMaterial({
+            var spark_shader_material = new THREE.ShaderMaterial({
                 uniforms: this.spark_uniforms,
                 attributes: this.spark_attributes,
                 vertexShader: explosion_large_shader['vertexShader'],
@@ -43,15 +43,15 @@ function Explosion(x, y, z, scene, renderer, duration, explosion_type) { //plus 
             var pCount, particle_geometry, particle_position;
 
             //small particles
-            pCount = 1500;
-            radius = 200;
+            pCount = 1000;
+            radius = 250;
             particle_geometry = new THREE.Geometry();
             for(var i = 0; i < pCount; i++) {
                 particle_position = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
                 particle_position.multiplyScalar(radius);
                 particle_geometry.vertices.push(new THREE.Vertex(particle_position));
             }
-            this.spark_container = new THREE.ParticleSystem(particle_geometry, spark_shader);
+            this.spark_container = new THREE.ParticleSystem(particle_geometry, spark_shader_material);
             this.spark_container.fade_factor = 0.0015;
             this.spark_container.max_displacement = 1.5;
             this.spark_container.displacement_speed = 0.0125
@@ -147,12 +147,14 @@ function Explosion(x, y, z, scene, renderer, duration, explosion_type) { //plus 
         for(var i = this.explosion.contents.length - 1; i >= 0; i--) {
             this.renderer.deallocateTexture(fire_texture);
             this.renderer.deallocateTexture(smoke_texture);
+            this.renderer.deallocateTexture(spark_shader_material);
             this.renderer.deallocateObject(this.fire_sprite_container);
             this.renderer.deallocateObject(this.smoke_sprite_container);
             this.scene.remove(this.explosion.contents[i]);
             delete this.explosion.contents[i];
             this.explosion.contents.length--;
         }
+        console.log("explosion deleted");
     }
 
 }

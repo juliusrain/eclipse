@@ -202,6 +202,6 @@ GameEngine.prototype.fireWeapon = function () {
         console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
         sceneElements.mainShip.fireLaser();
         sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
-        this.timeouts.lasers = 2;
+        this.timeouts.lasers = 3;
     }
 };

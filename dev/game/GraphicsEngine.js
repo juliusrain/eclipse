@@ -50,8 +50,7 @@ function GraphicsEngine() {
 
     var renderTargetParameters = {  minFilter: THREE.LinearFilter,
                                     magFilter: THREE.LinearFilter,
-                                    format: THREE.RGBAFormat,
-                                    stencilBufer: false };
+                                    format: THREE.RGBAFormat };
 
     //render glow scene to texture
     this.renderTargetGlow = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
@@ -141,12 +140,14 @@ function GraphicsEngine() {
         this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
         this.gameplay_camera.updateProjectionMatrix();
 
+        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+
         this.renderTargetGlow.width = this.canvas_width;
         this.renderTargetGlow.height = this.canvas_height;
         this.renderTargetScreen.width = this.canvas_width;
         this.renderTargetScreen.height = this.canvas_height;
 
-        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+        this.blend_composer.reset();
 
         this.minimap.resizeMinimap();
     }
@@ -438,7 +439,6 @@ function GraphicsEngine() {
         *  (used only for gameObjects)
         */
         function loadJSON(geometry, gameObject, scene) {
-            var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
             var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
             var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
 
@@ -563,7 +563,7 @@ function GraphicsEngine() {
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
-//                laserMesh.visible = false;
+                laserMesh.visible = false;
 
                 laserContainer.add(laserMesh);
             }
@@ -624,8 +624,7 @@ function GraphicsEngine() {
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 4000,
-            e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, duration, EXPLOSION_LARGE);
+        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
 

@@ -184,7 +184,7 @@ function Minimap(game_controls, game_camera) {
                 sprite = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
                 sprite.scale.set(0.05, 0.05, 0.05);
                 sprite.objectType = AI_SHIP;
-                sprite.useQuaternion = true;
+//                sprite.useQuaternion = true;
                 break;
 
 
@@ -245,20 +245,26 @@ function Minimap(game_controls, game_camera) {
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
 
-                        self.game_camera.quaternion.multiplyVector3(self.tempVecForward, self.game_camera.direction);
+//                        self.game_camera.quaternion.multiplyVector3(self.tempVecForward, self.game_camera.direction);
+//                        self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
+//
+//                        self.tempMat.lookAt(self.game_camera.position, aiShip.position, self.game_camera.up)et
+//                        self.tempQuat.setFromRotationMatrix(self.tempMat);
+//                        self.tempQuat.multiplySelf(self.minimap_grid.quaternion);
+//                        minimap_object.quaternion.copy(self.tempQuat);
+//
+//                        minimap_object.position.set(0, 0, 0);
+//                        minimap_object.translateZ(-1);
+
+                        self.tempVec.set(aiShip.position.x - self.game_camera.position.x, aiShip.position.y - self.game_camera.position.y, aiShip.position.z - self.game_camera.position.z).normalize();
+                        self.tempQuat.copy(self.game_camera.quaternion).inverse();
+                        self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
+                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
+
+                        minimap_object.lookAt(self.minimap_grid.position);
+                        
 
 
-                        self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
-
-//                         newlookAt(self.game_camera, aiShip.position, self.game_camera.up, self.tempMat);
-
-                        self.tempMat.lookAt(self.game_camera.position, aiShip.position, self.game_camera.up);
-                        self.tempQuat.setFromRotationMatrix(self.tempMat);
-                        self.tempQuat.multiplySelf(self.minimap_grid.quaternion);
-                        minimap_object.quaternion.copy(self.tempQuat);
-
-                        minimap_object.position.set(0, 0, 0);
-                        minimap_object.translateZ(-1);
 
                     }
                 }
