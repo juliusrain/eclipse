@@ -18,8 +18,9 @@ function GameEngine() {
     };
     this.logicwait = 0;
 
-    //start network client
-    //network = new Network();
+    start network client
+    network = new Network();
+    network.connect();
 
     // new game portion - NO NEED FOR THIS!
        // call database, create new game(?)

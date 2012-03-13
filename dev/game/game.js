@@ -11,9 +11,6 @@ var sceneElements = {   mainShip: null,
                         env_objects: [],
                         explosions: []
                     };
-var network = new Network();
-network.connect();
-console.log("network connected");
 var graphicsEngine, gameEngine, network;
 gameEngine = new GameEngine();
 gameEngine.first();
