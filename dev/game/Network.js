@@ -2,7 +2,7 @@
 
 function Network() {
 	//this part will hold the network connection
-	this.ws;
+	this.ws=null;
 }
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
@@ -38,7 +38,7 @@ Network.prototype.connect = function () {
 
 Network.prototype.send = function (message) {
     // takes a JSON object and sends it to server as string
-    this.ws.send(JSON.stringify(message))
+    this.ws.send(JSON.stringify(message));
 }
 
 Network.prototype.disconnect = function () {
@@ -51,5 +51,5 @@ Network.prototype.chat = function (sender, body) {
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);
-    node.slideDown(100);
+    node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
 }
