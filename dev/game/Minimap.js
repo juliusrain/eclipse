@@ -92,8 +92,8 @@ function Minimap(game_controls, game_camera) {
 
         var self = this;
 
-        drawCircles(this.minimap_texture_scene);
-        //draw on to quad
+//        drawCircles(this.minimap_texture_scene);
+        drawCircle(this.minimap_texture_scene);
 
 
         //draw onto texture
@@ -105,12 +105,35 @@ function Minimap(game_controls, game_camera) {
         this.minimap_scene.add(quad);
 
 
+        function drawCircle(scene) { 
+            var line_geometry = new THREE.Geometry();
+            var line_material = new THREE.LineBasicMaterial({
+                color: 0xffffff,
+                opacity: 0.5
+            });
 
+            var position;
+            for(var i = 0; i <= 360; i++) {
+                position = new THREE.Vector3(Math.cos(Math.PI*i/180), Math.sin(Math.PI*i/180), 0);
+                line_geometry.vertices.push(new THREE.Vertex(position));
+            }
+
+            var circle = new THREE.Line(line_geometry, line_material);
+            circle.name = "grid";
+
+            scene.add(circle);
+
+
+            
+        }
+/*
         function addLights(tex_scene) {
             var dirLight = new THREE.DirectionalLight(0xffffff);
             dirLight.position.z = -1;
             tex_scene.add(dirLight);
         }
+
+
 
         function drawCircles(scene) {
             var line_geometryH = new THREE.Geometry(),
@@ -162,9 +185,8 @@ function Minimap(game_controls, game_camera) {
 
             scene.add(self.minimap_grid);
 
-
-
         }
+*/
 
     }
 
@@ -200,12 +222,11 @@ function Minimap(game_controls, game_camera) {
     }
 
 
-    var blah = 100;
     //for each ship in sceneElements array, draw ship based on its position
     Minimap.prototype.updateMinimap = function() {
 
 //         this.stats.update();
-
+/*
         //take current quaternion, transform to reference, determine added rotation based on mouse along reference, apply added rotation to current
         this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
         this.tempQuat.multiplyVector3(this.tempVecRight, this.tempVec);
@@ -221,6 +242,7 @@ function Minimap(game_controls, game_camera) {
         this.tempQuat.multiplyVector3(this.tempVecBackward, this.tempVec);
         this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.z*0.015);
         this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
+*/
 
         var self = this;
         update();
@@ -234,6 +256,24 @@ function Minimap(game_controls, game_camera) {
 
 
         function update() {
+            var minimap_object, ai_ship;
+            //assumes that each ai ship has a corresponding object on minimap
+            for(var i = 0; i < self.minimap_objects.length; i++) {
+                minimap_object = self.minimap_objects[i];
+                ai_ship = sceneElements.AIShips[i];
+                switch(minimap_object.objectType) {
+                    case AI_SHIP: {
+
+
+
+
+                    }
+                }
+            }
+
+
+
+/*
             var minimap_object;
             var aiShip;
             for(var i = 0; i < self.minimap_objects.length; i++) {
@@ -256,7 +296,7 @@ function Minimap(game_controls, game_camera) {
                         self.tempVec.set(aiShip.position.x - self.game_camera.position.x, aiShip.position.y - self.game_camera.position.y, aiShip.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
+                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, -self.tempVec.z);
 
 //                        console.log(minimap_object.position.x, minimap_object.position.y, minimap_object.position.z);
                         minimap_object.lookAt(self.minimap_grid.position);
@@ -266,6 +306,7 @@ function Minimap(game_controls, game_camera) {
                 }
 
             }
+*/
         }
     }
 

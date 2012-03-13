@@ -18,7 +18,7 @@ function GameEngine() {
     };
     this.logicwait = 0;
 
-    start network client
+    //start network client
     network = new Network();
     network.connect();
 
