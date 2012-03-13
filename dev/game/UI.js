@@ -46,8 +46,26 @@ $(window).keypress(function (e){
 });
 
 $('#chatcompose').keydown(function (e){
-
-    $('#chatcompose').val($('#chatcompose').val() + String.fromCharCode(e.keyCode));
+    console.log(e);
+    var chatbox=$("#chatcompose");
+    if (e.which == 27) {
+        $('#chatcompose').blur();
+    }
+    else if (e.which == 13) {
+        console.log("you pressed enter");
+        newMessage(chatbox.val());
+        chatbox.val("");
+    }
+    else if(e.which == 8){
+        chatbox.val(chatbox.val().slice(0,-1));
+    }
+    else{
+        var character = String.fromCharCode(e.which)
+        if(!e.shiftKey){
+            character = character.toLowerCase();
+        }
+        chatbox.val(chatbox.val() + character);
+    }
     return false;
 });
 
