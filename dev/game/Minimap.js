@@ -34,7 +34,7 @@ function Minimap(game_controls, game_camera) {
     this.minimap_scene.add(this.minimap_camera);
 
     this.minimap_texture_scene = new THREE.Scene(); //scene for texture
-    this.minimap_texture_camera = new THREE.PerspectiveCamera(20, this.map_width/this.map_height, 0.1, 1e5);
+    this.minimap_texture_camera = new THREE.PerspectiveCamera(15, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_texture_scene.add(this.minimap_texture_camera);
 
     this.minimap_texture = new THREE.WebGLRenderTarget(
@@ -50,6 +50,7 @@ function Minimap(game_controls, game_camera) {
     this.renderer.setSize(this.map_width, this.map_height);
 
     this.container.appendChild(this.renderer.domElement);
+
 
 /////////////////////////////
 //     this.stats = new Stats();
@@ -92,7 +93,6 @@ function Minimap(game_controls, game_camera) {
 
         var self = this;
 
-//        drawCircles(this.minimap_texture_scene);
         drawCircle(this.minimap_texture_scene);
 
 
@@ -126,67 +126,12 @@ function Minimap(game_controls, game_camera) {
 
             
         }
-/*
+
         function addLights(tex_scene) {
             var dirLight = new THREE.DirectionalLight(0xffffff);
             dirLight.position.z = -1;
             tex_scene.add(dirLight);
         }
-
-
-
-        function drawCircles(scene) {
-            var line_geometryH = new THREE.Geometry(),
-                line_geometryVyz = new THREE.Geometry(),
-                line_geometryVxy = new THREE.Geometry(),
-                line_material = new THREE.LineBasicMaterial({
-                    color: 0xffffff,
-                    opacity: 0.25,
-                }),
-                line_materialH = new THREE.LineBasicMaterial({
-                    color: 0x00ff00,
-                    opacity: 0.25,
-                }),
-                pos;
-
-            for(var i = 0; i <= 360; i++) {
-                pos = new THREE.Vector3(Math.cos(2*Math.PI*i/360), 0, Math.sin(2*Math.PI*i/360));
-                line_geometryH.vertices.push(new THREE.Vertex(pos));
-
-                pos = new THREE.Vector3(0, Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360));
-                line_geometryVyz.vertices.push(new THREE.Vertex(pos));
-
-                pos = new THREE.Vector3(Math.cos(2*Math.PI*i/360), Math.sin(2*Math.PI*i/360), 0);
-                line_geometryVxy.vertices.push(new THREE.Vertex(pos));
-
-            }
-
-
-            var circleH = new THREE.Line(line_geometryH, line_materialH);
-            var circleHtop = new THREE.Line(line_geometryH, line_material);
-            circleHtop.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
-            circleHtop.position.y -= Math.sin(Math.PI/4);
-
-            var circleHbottom = new THREE.Line(line_geometryH, line_material);
-            circleHbottom.scale.set(Math.cos(Math.PI/4), Math.cos(Math.PI/4), Math.cos(Math.PI/4));
-            circleHbottom.position.y += Math.sin(Math.PI/4);
-
-            var circleVyz = new THREE.Line(line_geometryVyz, line_material);
-            var circleVxy = new THREE.Line(line_geometryVxy, line_material);
-
-            self.minimap_grid.add(circleH);
-            self.minimap_grid.add(circleHtop);
-
-            self.minimap_grid.add(circleHbottom);
-            self.minimap_grid.add(circleVyz);
-            self.minimap_grid.add(circleVxy);
-            self.minimap_grid.useQuaternion = true;
-            self.minimap_grid.name = "sphere grid";
-
-            scene.add(self.minimap_grid);
-
-        }
-*/
 
     }
 
@@ -195,8 +140,16 @@ function Minimap(game_controls, game_camera) {
         var minimap_object;
         switch(objectType) {
             case AI_SHIP: {
-                minimap_object = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
-                minimap_object.scale.set(0.05, 0.05, 0.05);
+//                minimap_object = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
+//                minimap_object.scale.set(0.05, 0.05, 0.05);
+
+                minimap_object = new THREE.Sprite({
+                    map: THREE.ImageUtils.loadTexture("textures/minimap/indicator_red.png"),
+                    useScreenCoordinates: false,
+                    scaleByViewport: true,
+                    size: 10,
+                    blending: THREE.AdditiveBlending,
+                });
                 minimap_object.objectType = AI_SHIP;
                 minimap_object.objectID = OID;
                 break;
@@ -263,50 +216,20 @@ function Minimap(game_controls, game_camera) {
                 ai_ship = sceneElements.AIShips[i];
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-
-
-
-
-                    }
-                }
-            }
-
-
-
-/*
-            var minimap_object;
-            var aiShip;
-            for(var i = 0; i < self.minimap_objects.length; i++) {
-                minimap_object = self.minimap_objects[i];
-                aiShip = sceneElements.AIShips[i];
-                switch(minimap_object.objectType) {
-                    case AI_SHIP: {
-
-//                        self.game_camera.quaternion.multiplyVector3(self.tempVecForward, self.game_camera.direction);
-//                        self.game_camera.quaternion.multiplyVector3(self.tempVecUp, self.game_camera.up);
-//
-//                        self.tempMat.lookAt(self.game_camera.position, aiShip.position, self.game_camera.up)et
-//                        self.tempQuat.setFromRotationMatrix(self.tempMat);
-//                        self.tempQuat.multiplySelf(self.minimap_grid.quaternion);
-//                        minimap_object.quaternion.copy(self.tempQuat);
-//
-//                        minimap_object.position.set(0, 0, 0);
-//                        minimap_object.translateZ(-1);
-
-                        self.tempVec.set(aiShip.position.x - self.game_camera.position.x, aiShip.position.y - self.game_camera.position.y, aiShip.position.z - self.game_camera.position.z).normalize();
+                        self.tempVec.set(ai_ship.position.x - self.game_camera.position.x, ai_ship.position.y - self.game_camera.position.y, ai_ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, -self.tempVec.z);
-
-//                        console.log(minimap_object.position.x, minimap_object.position.y, minimap_object.position.z);
-                        minimap_object.lookAt(self.minimap_grid.position);
                         
+                        if(self.tempVec.z > 0) {
+                            self.tempVec.z = 0;
+                            self.tempVec.normalize();
+
+                        }
+                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
 
                     }
                 }
-
             }
-*/
         }
     }
 

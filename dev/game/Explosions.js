@@ -188,7 +188,7 @@ Explosion.prototype.updateExplosion = function() {
                 fsprites.children[i].position.y += fsprites.children[i].direction.y * fsprites.crt_displacement;
                 fsprites.children[i].position.z += fsprites.children[i].direction.z * fsprites.crt_displacement;
                 //rotate
-                fsprites.children[i].rotation += 0.00025 * i ;
+                fsprites.children[i].rotation += 0.0002 * i ;
                 //increase transparency over time
                 if(fsprites.children[i].opacity > 0.0) {
                     fsprites.children[i].opacity -= fsprites.fade_factor;
