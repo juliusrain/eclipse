@@ -34,7 +34,7 @@ function Minimap(game_controls, game_camera) {
     this.minimap_scene.add(this.minimap_camera);
 
     this.minimap_texture_scene = new THREE.Scene(); //scene for texture
-    this.minimap_texture_camera = new THREE.PerspectiveCamera(15, this.map_width/this.map_height, 0.1, 1e5);
+    this.minimap_texture_camera = new THREE.PerspectiveCamera(20, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_texture_scene.add(this.minimap_texture_camera);
 
     this.minimap_texture = new THREE.WebGLRenderTarget(
@@ -118,11 +118,11 @@ function Minimap(game_controls, game_camera) {
                 line_geometryVxy = new THREE.Geometry(),
                 line_material = new THREE.LineBasicMaterial({
                     color: 0xffffff,
-                    opacity: 0.5,
+                    opacity: 0.25,
                 }),
                 line_materialH = new THREE.LineBasicMaterial({
                     color: 0x00ff00,
-                    opacity: 0.5,
+                    opacity: 0.25,
                 }),
                 pos;
 
@@ -258,38 +258,14 @@ function Minimap(game_controls, game_camera) {
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
 
+//                        console.log(minimap_object.position.x, minimap_object.position.y, minimap_object.position.z);
                         minimap_object.lookAt(self.minimap_grid.position);
                         
-
-
 
                     }
                 }
 
             }
-            function newlookAt(eye, center, up, mat) {
-                var x = new THREE.Vector3(),
-                    y = new THREE.Vector3(),
-                    z = new THREE.Vector3();
-
-                z.sub(eye, center).normalize();
-                self.tempQuat.copy(self.game_camera.quaternion).inverse();
-                self.tempQuat.multiplyVector3(z, z);
-                if(z.length() === 0) {
-                    z.z = 1;
-                }
-                x.cross(up, z).normalize();
-                if(x.length() === 0) {
-                    z.x += 0.0001;
-                    x.cross(up, z).normalize();
-                }
-                y.cross(z, x).normalize();
-
-                mat.n11 = x.x; mat.n12 = y.x; mat.n13 = z.x;
-                mat.n21 = x.y; mat.n22 = y.y; mat.n23 = z.y;
-                mat.n31 = x.z; mat.n32 = y.z; mat.n33 = z.z;
-            }
-
         }
     }
 

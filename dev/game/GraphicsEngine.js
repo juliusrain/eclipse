@@ -130,9 +130,6 @@ function GraphicsEngine() {
                 tempSphere1.name = "sphere1";
                 tempSphere2.name = "sphere2"
 
-                var infinityreverse = false;
-                var axishelper = new THREE.AxisHelper();
-
 //////////////////////////////
 
 
@@ -166,9 +163,10 @@ function GraphicsEngine() {
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
 /////////////////////////////
-        //this.gameplay_scene.add(axishelper);
-        this.gameplay_glow_scene.add(tempSphere1);
-        this.gameplay_glow_scene.add(tempSphere2);
+//        this.gameplay_glow_scene.add(tempSphere1);
+//        this.gameplay_glow_scene.add(tempSphere2);
+        this.gameplay_scene.add(tempSphere1);
+        this.gameplay_scene.add(tempSphere2);
 
 ////////////////////////////
 
@@ -176,7 +174,6 @@ function GraphicsEngine() {
 
         //for loading models
         var self = this;
-//        var gameObject;
         for(var i = 0; i < objects.length; i++) {
             self.addGameObject(objects[i]);
         }
@@ -285,18 +282,35 @@ function GraphicsEngine() {
         for(var i = 0; i < this.gameplay_scene.children.length; i++) {
             target = this.gameplay_scene.children[i];
             if(target.objectID == OID) {
+                if(target.lasers !== undefined) {
+                    this.gameplay_scene.remove(target.lasers);
+                    target.lasers = null;
+                }
                 this.renderer.deallocateObject(target);
                 this.gameplay_scene.remove(target);
             }
-        }
-        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
-            target = this.gameplay_glow_scene.children[i];
-            if(target.objectID == OID) {
-                this.renderer.deallocateObject(target);
-                this.gameplay_glow_scene.remove(target);
-            }
 
         }
+
+
+
+//        var target;
+//        for(var i = 0; i < this.gameplay_scene.children.length; i++) {
+//            target = this.gameplay_scene.children[i];
+//            if(target.objectID == OID) {
+//                this.renderer.deallocateObject(target);
+//                this.gameplay_scene.remove(target);
+//            }
+//        }
+//
+//        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
+//            target = this.gameplay_glow_scene.children[i];
+//            if(target.objectID == OID) {
+//                this.renderer.deallocateObject(target);
+//                this.gameplay_glow_scene.remove(target);
+//            }
+//
+//        }
 
     }
 
@@ -316,7 +330,6 @@ function GraphicsEngine() {
             case PLAYER_SHIP: {
                 loadShip(gameObject, this.gameplay_scene);
                 loadCrosshair(gameObject, this.gameplay_scene);
-                //loadRing(gameObject, this.gameplay_scene);
 
                 //set camera turning and movement speed based on main ship's parameters
                 this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
@@ -555,7 +568,6 @@ function GraphicsEngine() {
          */
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
             var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
-            //loader.load(parentShip.drawParameters.laserModel, callback);
             jloader.load("models/lasers/lasertest.js", callback);
         }
 
@@ -576,7 +588,6 @@ function GraphicsEngine() {
             laserContainer.parentShipID = parentShip.drawParameters.shipID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-//                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
                 laserMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
                 laserMesh.overdraw = true;
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
@@ -594,7 +605,8 @@ function GraphicsEngine() {
             }
 
             sceneElements.lasers.push(laserContainer);
-            self.gameplay_glow_scene.add(laserContainer);
+//            self.gameplay_glow_scene.add(laserContainer);
+            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -744,9 +756,9 @@ function GraphicsEngine() {
             }
             //self.jumpmap.updateJumpmap();
             self.renderer.clear();
-//            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
-            self.glow_composer.render();
-            self.blend_composer.render();
+            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
+//            self.glow_composer.render();
+//            self.blend_composer.render();
         }
 
 
@@ -810,7 +822,6 @@ function GraphicsEngine() {
             sceneObject.quaternion.copy(self.gameplay_camera.quaternion);
 
             //set ship direction
-            //tempVec.set(0, 0, -1);
             sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
 
             //rotate ship based on roll
@@ -868,9 +879,7 @@ function GraphicsEngine() {
                         HUDObject.position.copy(self.gameplay_camera.position);
                         HUDObject.quaternion.copy(self.gameplay_camera.quaternion);
                         HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
-//                         HUDObject.position.x = -gameControls.rotationVector.y * 0.1;
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
-//                         HUDObject.position.y = gameControls.rotationVector.x * 0.1;
                         HUDObject.translateZ(-91);
                         break;
                     }
@@ -903,7 +912,6 @@ function GraphicsEngine() {
                     sceneElements.explosions.splice(i, 1);
                 }
             }
-            //console.log(sceneElements.explosions, sceneElements.explosions.length);
         }
 
         //temporary
@@ -912,14 +920,10 @@ function GraphicsEngine() {
          *  Function to update the objects in the scene (~= game engine for now)
          */
         function updateScene() {
-//            for(i = 0; i < self.gameplay_scene.objects.length; i++) {
             for(i = 0; i < sceneElements.AIShips.length; i++) {
-//                sceneObject = self.gameplay_scene.objects[i];
                 sceneObject = sceneElements.AIShips[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
-                        // tempVecForward.set(0, 0, -1);
-                        // tempVecUp.set(0, 1, 0);
                         switch(sceneObject.drawParameters.shipID) {
                             case 1: {
 
