@@ -199,7 +199,7 @@ GameEngine.prototype.update = function () {
 // checks if the selected weapon can be fired, then triggers weapons fire
 GameEngine.prototype.fireWeapon = function () {
     if(this.timeouts.lasers === 0 && sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost) {
-        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
+//        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
         sceneElements.mainShip.fireLaser();
         sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
         this.timeouts.lasers = 3;

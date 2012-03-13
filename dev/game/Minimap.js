@@ -169,36 +169,33 @@ function Minimap(game_controls, game_camera) {
     }
 
     //takes constant representing what type of object to add
-    Minimap.prototype.addMinimapObject = function(objectType) {
-        var sprite;
+    Minimap.prototype.addMinimapObject = function(objectType, OID) {
+        var minimap_object;
         switch(objectType) {
             case AI_SHIP: {
-//                 sprite = new THREE.Sprite({
-//                     map: THREE.ImageUtils.loadTexture("temp/sprite0.png"),
-//                     useScreenCoordinates: false,
-//                     scaleByViewport: true,
-//                 });
-//                 sprite.objectType = AI_SHIP;
-//                 sprite.name = "ship indicator";
-//                 break;
-                sprite = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
-                sprite.scale.set(0.05, 0.05, 0.05);
-                sprite.objectType = AI_SHIP;
-//                sprite.useQuaternion = true;
+                minimap_object = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
+                minimap_object.scale.set(0.05, 0.05, 0.05);
+                minimap_object.objectType = AI_SHIP;
+                minimap_object.objectID = OID;
                 break;
-
-
-
              }
 
         }
-        this.minimap_texture_scene.add(sprite);
-        this.minimap_objects.push(sprite);
+        this.minimap_texture_scene.add(minimap_object);
+        this.minimap_objects.push(minimap_object);
 
     }
 
-    Minimap.prototype.removeMinimapObject = function() {
-
+    Minimap.prototype.removeMinimapObject = function(objectID) {
+        var target;
+        for(var i = 0; i < this.minimap_texture_scene.children.length; i++) {
+            target = this.minimap_texture_scene.children[i];
+            if(objectID == target.objectID) {
+                this.minimap_texture_scene.remove(target);
+                this.renderer.deallocateObject(target);
+                break;
+            }
+        }
 
     }
 

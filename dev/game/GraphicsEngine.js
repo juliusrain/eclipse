@@ -10,7 +10,7 @@ function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
-
+    this.shipCount = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
 
@@ -86,6 +86,11 @@ function GraphicsEngine() {
     //this.jumpmap = new Jumpmap();
 
 
+    this.assignID = function() {
+        var ret = this.shipCount;
+        this.shipCount++;
+        return ret;
+    }
 
     /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
@@ -273,8 +278,26 @@ function GraphicsEngine() {
 //adding/removing stuff after it's been created
 
     //TODO deallocate from memory
-    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
-        this.gameplay_scene.remove(sceneObject);
+    GraphicsEngine.prototype.removeSceneObject = function(OID) { //still have to consider removing from memory and SceneElements arrays
+        this.minimap.removeMinimapObject(OID);
+
+        var target;
+        for(var i = 0; i < this.gameplay_scene.children.length; i++) {
+            target = this.gameplay_scene.children[i];
+            if(target.objectID == OID) {
+                this.renderer.deallocateObject(target);
+                this.gameplay_scene.remove(target);
+            }
+        }
+        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
+            target = this.gameplay_glow_scene.children[i];
+            if(target.objectID == OID) {
+                this.renderer.deallocateObject(target);
+                this.gameplay_glow_scene.remove(target);
+            }
+
+        }
+
     }
 
 
@@ -447,10 +470,12 @@ function GraphicsEngine() {
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
+            modelMesh.objectID = self.assignID();
 
             //sync positions/rotations of normal and dark meshes
             modelMeshDark.useQuaternion = true;
             modelMeshDark.name = gameObject.gameParameters.name + " dark";
+            modelMeshDark.objectID = modelMesh.objectID;
             modelMeshDark.position = modelMesh.position;
             modelMeshDark.quaternion = modelMesh.quaternion;
 
@@ -512,7 +537,7 @@ function GraphicsEngine() {
                     }
 
                     sceneElements.AIShips.push(modelMesh);
-                    self.minimap.addMinimapObject(AI_SHIP)
+                    self.minimap.addMinimapObject(AI_SHIP, modelMesh.objectID);
                     break;
                 }
             }
