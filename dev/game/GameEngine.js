@@ -224,7 +224,7 @@ GameEngine.prototype.fireWeapon = function () {
 			var xd = obj1.x - obj2.x,
 				yd = obj1.y - obj2.y,
 				zd = obj1.z - obj2.z,
-				rr = obj1.r - obj2.r;
+				rr = obj1.r + obj2.r;
 			var actualDistance = (xd * xd) + (yd * yd) + (zd * zd),
 				minDistance = (rr * rr);
 			if(actualDistance <= minDistance){
@@ -239,6 +239,9 @@ GameEngine.prototype.fireWeapon = function () {
 		}
 		function collision(obj){
 			var hits = [];
+			var objects = [];
+			objects.push(sceneElements.mainShip);
+			objects.concat(scenElements.AIShips);
 			// go through each object in the scene
 			for(candidate in objects){
 				// don't check against itself
