@@ -10,7 +10,7 @@ function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
-    this.shipCount = 0; //used to assign id numbers to enemy ai to be drawn on minimap
+    this.objID = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
 
@@ -83,12 +83,12 @@ function GraphicsEngine() {
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
-    //this.jumpmap = new Jumpmap();
+    this.jumpmap = new Jumpmap();
 
 
     this.assignID = function() {
-        var ret = this.shipCount;
-        this.shipCount++;
+        var ret = this.objID;
+        this.objID++;
         return ret;
     }
 
@@ -179,7 +179,7 @@ function GraphicsEngine() {
         }
 
         this.minimap.loadMinimap();
-        //this.jumpmap.loadJumpmap();
+        this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
         dirlight.position.set(0, 500, 0).normalize();
@@ -268,26 +268,47 @@ function GraphicsEngine() {
 
 
         this.scene_loaded = false;
+        this.objectCount = 0;
     }
 
 //=================================================================
 //================= Scene manipulation functions ==================
 //adding/removing stuff after it's been created
 
-    //TODO deallocate from memory
+    //Takes the objectID parameter of the object to be removed
     GraphicsEngine.prototype.removeSceneObject = function(OID) { //still have to consider removing from memory and SceneElements arrays
         this.minimap.removeMinimapObject(OID);
 
         var target;
         for(var i = 0; i < this.gameplay_scene.children.length; i++) {
             target = this.gameplay_scene.children[i];
+            //remove lasers
             if(target.objectID == OID) {
                 if(target.lasers !== undefined) {
+                    //remove lasers from scene
+                    this.renderer.deallocateObject(target.lasers);
                     this.gameplay_scene.remove(target.lasers);
                     target.lasers = null;
+                    //remove lasers from array
+                    for(var j = 0; j < sceneElements.lasers.length; j++) {
+                        if(sceneElements.lasers[j].parentID == target.objectID) {
+                            delete sceneElements.lasers[j];
+                            sceneElements.lasers.splice(j, 1);
+                        }
+
+                    }
                 }
+                //remove ship from scene
                 this.renderer.deallocateObject(target);
                 this.gameplay_scene.remove(target);
+                //remove ship from array
+                for(var j = 0; j < sceneElements.AIShips.length; j++) {
+                    if(sceneElements.AIShips[j].objectID == target.objectID) {
+                        delete sceneElements.AIShips[j];
+                        sceneElements.AIShips.splice(j, 1);
+
+                    }
+                }
             }
 
         }
@@ -585,7 +606,7 @@ function GraphicsEngine() {
             laserContainer.parentShip = parentShip;
 
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
-            laserContainer.parentShipID = parentShip.drawParameters.shipID;
+            laserContainer.parentID = parentShip.objectID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
                 laserMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
@@ -594,7 +615,7 @@ function GraphicsEngine() {
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
-                laserMesh.parentShipID = parentShip.drawParameters.shipID;
+                laserMesh.parentID = parentShip.objectID
 
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
@@ -752,9 +773,12 @@ function GraphicsEngine() {
 //               }
                 updateLasers();
                 updateExplosions();
+
+                //check if map is hidden or not before rendering
+                self.jumpmap.updateJumpmap();
+
                 updateScene();
             }
-            //self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
 //            self.glow_composer.render();
@@ -924,7 +948,7 @@ function GraphicsEngine() {
                 sceneObject = sceneElements.AIShips[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
-                        switch(sceneObject.drawParameters.shipID) {
+                        switch(sceneObject.objectID) {
                             case 1: {
 
                                 //TODO: NEED TO CONVERT THIS INTO aiTurn() function

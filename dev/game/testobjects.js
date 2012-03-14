@@ -138,4 +138,4 @@ var AIShip2 = {  type: AI_SHIP,
                     position: {x: 0, y: 0, z: -300} //starting position in scene when not main ship
                 }
             };
-//gameObjects.push(AIShip2);
+gameObjects.push(AIShip2);

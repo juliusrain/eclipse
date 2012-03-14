@@ -19,8 +19,10 @@ var EATING = 100;
 
 
 //for planet types
-var PLANET_TYPE = {},
-    GAS_GIANT = 0;
+var PLANET_TYPE = {};
+
+var GAS_GIANT = 0,
+    ROCK_PLANET = 1;
 
 PLANET_TYPE[GAS_GIANT] = {
         textures: [ //array of 6 strings for this planet's skybox

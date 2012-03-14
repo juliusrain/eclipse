@@ -122,9 +122,6 @@ function Minimap(game_controls, game_camera) {
             circle.name = "grid";
 
             scene.add(circle);
-
-
-            
         }
 
         function addLights(tex_scene) {
@@ -140,9 +137,6 @@ function Minimap(game_controls, game_camera) {
         var minimap_object;
         switch(objectType) {
             case AI_SHIP: {
-//                minimap_object = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshNormalMaterial());
-//                minimap_object.scale.set(0.05, 0.05, 0.05);
-
                 minimap_object = new THREE.Sprite({
                     map: THREE.ImageUtils.loadTexture("textures/minimap/indicator_red.png"),
                     useScreenCoordinates: false,
@@ -163,6 +157,7 @@ function Minimap(game_controls, game_camera) {
 
     Minimap.prototype.removeMinimapObject = function(objectID) {
         var target;
+        //remove from scene
         for(var i = 0; i < this.minimap_texture_scene.children.length; i++) {
             target = this.minimap_texture_scene.children[i];
             if(objectID == target.objectID) {
@@ -170,6 +165,16 @@ function Minimap(game_controls, game_camera) {
                 this.renderer.deallocateObject(target);
                 break;
             }
+        }
+
+        //remove from array
+        for(var i = 0; i < this.minimap_objects.length; i++) {
+            target = this.minimap_objects[i];
+            if(target.objectID == objectID) {
+                delete this.minimap_objects[i];
+                this.minimap_objects.splice(i, 1);
+            }
+
         }
 
     }

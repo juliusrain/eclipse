@@ -250,11 +250,11 @@ body {
 #jumpmapbox {
     position:absolute;
 
-    width:500px;
-    height:300px;
-    top:auto;
-    left:auto;
+    width:90%;
+    height:90%;
+    top:5%;
+    left:5%;
     z-index:1000;
-    background-color:rgba(0,0,0,0.5);
+    background-color:rgba(0,0,0,0.8);
     display:none;
 }
