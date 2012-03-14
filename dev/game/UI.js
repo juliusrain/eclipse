@@ -18,7 +18,9 @@ $(window).keypress(function (e){
         }
         // l = bind/unbind cursor
         case 108: {
-            toggleCursor();
+            if(!$('#jumpamapbox:visible').length) {
+                toggleCursor();
+            } 
             break;
         }
         // space = fire weapon

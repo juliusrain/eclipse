@@ -986,8 +986,8 @@ function GraphicsEngine() {
 //                                //apply turn (roll) rotation calculated earlier
 //                                sceneObject.quaternion.multiplySelf(tempQuat);
                                 //go forward
-//                                sceneobject.translatez(-2);
                                 sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
+                                sceneObject.translateZ(-5);
 
                                 break;
                             }
@@ -1020,7 +1020,7 @@ function GraphicsEngine() {
                                 sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
 
                                 //go forward
-//                                sceneObject.translateZ(-2);
+                                sceneObject.translateZ(-5);
                                 break;
                             }
                         }
@@ -1030,15 +1030,13 @@ function GraphicsEngine() {
                 }
 
                 var t = Date.now() * 0.0008;
-//                tempSphere1.position.x = 2000*Math.cos(t)
-//                tempSphere1.position.y = 2000*Math.sin(t)
-//                tempSphere1.position.z = 800*Math.sin(t);
-                tempSphere1.position.z = 300*Math.sin(t);
+                tempSphere1.position.x = 2000*Math.cos(t)
+                tempSphere1.position.y = 2000*Math.sin(t)
+                tempSphere1.position.z = 800*Math.sin(t);
 
                 tempSphere2.position.x = 2000*Math.sin(t);
-//                tempSphere2.position.y = 500*Math.cos(t) + 150;
-//                tempSphere2.position.z = 600*Math.cos(t);
-                tempSphere2.position.z = -1000;
+                tempSphere2.position.y = 500*Math.cos(t) + 150;
+                tempSphere2.position.z = 600*Math.cos(t);
 
 
 
