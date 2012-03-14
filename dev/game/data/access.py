@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sqlite3 as sq
+import json
 
 def connect():
 	conn = sq.connect('game.db')
@@ -13,6 +14,13 @@ def runner(fn, *args):
 	conn.close()
 
 # access planet
+# pid -> json
+def accessPlanet(conn, c, pid):
+	# gid int, ssid int, pid int, type int, name varchar(50)
+	c.execute("SELECT * FROM planetary_systems WHERE pid = ?", (pid,))
+	planet = c.fetchone()
+	if len(planet) > 0:
+		
 
 # update ship
 
