@@ -1,4 +1,6 @@
 
+var chatfocus = false;
+
 // window resize events
 $(window).load(sizeGame);
 $(window).resize(sizeGame);
@@ -6,6 +8,17 @@ $(window).resize(sizeGame);
 // click events
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
+$('#chatcontrol').click(switchToChat);
+$('#chatcompose').focus(function (){
+	console.log('true');
+	$('#chatcontrol span').html('Esc');
+	chatfocus = true;
+});
+$('#chatcompose').blur(function (){
+	console.log('false');
+	$('#chatcontrol span').html('C');
+	chatfocus = false;
+});
 
 // keyboard events
 $(window).keypress(function (e){
@@ -109,5 +122,11 @@ function toggleCursor() {
 }
 
 function switchToChat() {
-
+	console.log('chat?');
+	if(chatfocus){
+		$('#chatcompose').blur();
+	}
+	else{
+		$('#chatcompose').focus();
+	}
 }

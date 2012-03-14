@@ -206,3 +206,78 @@ GameEngine.prototype.fireWeapon = function () {
         this.timeouts.lasers = 3;
     }
 };
+
+
+		function cAdd(coords1, coords2){
+			var coords = {};
+			for(a in coords1){
+				if(a != 'x' && a != 'y' && a != 'z'){
+					coords[a] = coords1[a];
+				}
+			}
+			coords.x = (coords1.x + coords2.x);
+			coords.y = (coords1.y + coords2.y);
+			coords.z = (coords1.z + coords2.z);
+			return coords;
+		}
+		function intersect(obj1, obj2){
+			var xd = obj1.x - obj2.x,
+				yd = obj1.y - obj2.y,
+				zd = obj1.z - obj2.z,
+				rr = obj1.r - obj2.r;
+			var actualDistance = (xd * xd) + (yd * yd) + (zd * zd),
+				minDistance = (rr * rr);
+			if(actualDistance <= minDistance){
+				// a hit!
+				var hitLocation = new THREE.Vector3(xd, yd, zd);
+				hitLocation.normalize();
+				console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' hit:'+(hitLocation.x * obj2.r)+'x'+(hitLocation.y * obj2.r)+'x'+(hitLocation.z * obj2.r));
+				return {x:(hitLocation.x * obj2.r), y:(hitLocation.y * obj2.r), z:(hitLocation.z * obj2.r)};
+			}
+			console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' miss');
+			return false;
+		}
+		function collision(obj){
+			var hits = [];
+			// go through each object in the scene
+			for(candidate in objects){
+				// don't check against itself
+				if(objects[candidate] !== obj){
+					// check if there are spheres
+					if(typeof objects[candidate].spheres == "object" && typeof objects[candidate].spheres.outer == "object"){
+						// check outer spheres
+						var oHit = intersect(cAdd(objects[candidate].spheres.outer, objects[candidate].position), cAdd(obj.spheres.outer, obj.position));
+						if(oHit){
+							// check for inner spheres
+							var check = false,
+								cand = [objects[candidate].spheres.outer],
+								subj = [obj.spheres.outer];
+							if(typeof objects[candidate].spheres.inner == "object" && objects[candidate].spheres.inner.length != 0){
+								check = true;
+								cand = objects[candidate].spheres.inner;
+							}
+							if(typeof obj.spheres.inner == "object" && obj.spheres.inner.length != 0){
+								check = true;
+								subj = obj.spheres.inner;
+							}
+							// check inner spheres
+							if(check){
+								for(c in cand){
+									for(s in subj){
+										var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
+										if(iHit){
+											hits.push({where:iHit, obj:objects[candidate]});
+										}
+									}
+								}
+							}
+							// don't check innder spheres; mark as collision
+							else{
+								hits.push({where:oHit, obj:objects[candidate]});
+							}
+						}
+					}
+				}
+			}
+			return hits;
+		}

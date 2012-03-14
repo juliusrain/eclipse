@@ -35,7 +35,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                 type: 0, //particle vs elongated?
                                 damage: 0,
                                 range: 300,
-                                speed: 20,
+                                speed: 70,
                                 amount: 50,
                                 maxCharge: 15400,
                                 currentCharge: 0,
@@ -48,6 +48,15 @@ var playerShip = {  type: PLAYER_SHIP,
                             }
                         },
                         inventory: {},
+						spheres:{
+							outer:{
+								x:0,
+								y:0,
+								z:0,
+								r:50
+							},
+							inner:[]
+						},
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
@@ -79,7 +88,7 @@ var AIShip = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 20,
+                            speed: 70,
                             amount: 30,
 
                         },
@@ -88,6 +97,15 @@ var AIShip = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
+					spheres:{
+						outer:{
+							x:0,
+							y:0,
+							z:0,
+							r:50
+						},
+						inner:[]
+					},
                 },
                 drawParameters: {
                     shipID: 1,
@@ -117,7 +135,7 @@ var AIShip2 = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 20,
+                            speed: 70,
                             amount: 30,
 
                         },
@@ -126,6 +144,15 @@ var AIShip2 = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
+					spheres:{
+						outer:{
+							x:0,
+							y:0,
+							z:0,
+							r:50
+						},
+						inner:[]
+					},
                 },
                 drawParameters: {
                     shipID: 2,
