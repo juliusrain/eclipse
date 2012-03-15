@@ -3,8 +3,8 @@ if &cp | set nocp | endif
 let s:cpo_save=&cpo
 set cpo&vim
 inoremap <S-Tab> 
-vnoremap  :s/^/\/\/:nohls
 nnoremap  :s/^/\/\/:nohls
+vnoremap  :s/^/\/\/:nohls
 nnoremap  h
 vnoremap 	 >gv
 nnoremap 	 >l
@@ -18,8 +18,8 @@ nnoremap  h i 
 nnoremap  k O
 nnoremap  j o
 nnoremap  w :wa
-vnoremap C :s/^\/\//:nohls
 nnoremap C :s/^\/\//:nohls
+vnoremap C :s/^\/\//:nohls
 nmap gx <Plug>NetrwBrowseX
 nnoremap tc :tabclose
 nnoremap tn :tabnew
@@ -29,6 +29,8 @@ nnoremap <C-Right> :tabnext
 vnoremap <S-Tab> <gv
 nnoremap <S-Tab> <h
 noremap <F4> :nohls
+inoremap "" ""i
+inoremap '' ''i
 inoremap jj 
 cnoremap tc tabclose
 cnoremap tn tabnew
@@ -89,8 +91,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 80 + 112) / 224)
+exe 'vert 2resize ' . ((&columns * 80 + 112) / 224)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -203,7 +205,7 @@ normal zo
 normal zo
 184
 normal zo
-let s:l = 172 - ((62 * winheight(0) + 31) / 63)
+let s:l = 172 - ((53 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -433,25 +435,19 @@ normal zo
 normal zo
 996
 normal zo
-1022
-normal zo
-1033
-normal zo
-1039
-normal zo
 946
 normal zo
 726
 normal zo
-let s:l = 233 - ((17 * winheight(0) + 31) / 63)
+let s:l = 233 - ((15 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 233
 normal! 028l
 wincmd w
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 80 + 112) / 224)
+exe 'vert 2resize ' . ((&columns * 80 + 112) / 224)
 tabedit temp/webgl_geometry_hierarchy.html
 set splitbelow splitright
 set nosplitbelow
@@ -563,11 +559,11 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 109 - ((33 * winheight(0) + 32) / 64)
+let s:l = 116 - ((28 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-109
+116
 normal! 043l
 tabedit GraphicsEngine.js
 set splitbelow splitright
@@ -713,17 +709,11 @@ normal zo
 normal zo
 996
 normal zo
-1022
-normal zo
-1033
-normal zo
-1039
-normal zo
 946
 normal zo
 726
 normal zo
-let s:l = 97 - ((32 * winheight(0) + 32) / 64)
+let s:l = 97 - ((16 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -840,12 +830,12 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 62 - ((16 * winheight(0) + 32) / 64)
+let s:l = 48 - ((0 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-62
-normal! 013l
+48
+normal! 038l
 tabedit Jumpmap.js
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -856,8 +846,8 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 140 + 112) / 224)
+exe 'vert 2resize ' . ((&columns * 83 + 112) / 224)
 argglobal
 setlocal keymap=
 setlocal noarabic
@@ -964,34 +954,40 @@ setlocal nowrap
 setlocal wrapmargin=0
 3
 normal zo
-62
+50
 normal zo
-84
+64
 normal zo
-110
+93
 normal zo
-139
+109
 normal zo
-62
+93
 normal zo
-84
+130
 normal zo
-110
+162
 normal zo
-139
+191
+normal zo
+162
+normal zo
+64
+normal zo
+93
 normal zo
 3
 normal zo
-110
+119
 normal zo
-139
+151
 normal zo
-let s:l = 168 - ((59 * winheight(0) + 31) / 63)
+let s:l = 180 - ((40 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-168
-normal! 027l
+180
+normal! 055l
 wincmd w
 argglobal
 edit temp/webgl_geometry_hierarchy.html
@@ -1099,15 +1095,15 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 69 - ((62 * winheight(0) + 31) / 63)
+let s:l = 136 - ((12 * winheight(0) + 27) / 54)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-69
-normal! 040l
+136
+normal! 036l
 wincmd w
-exe 'vert 1resize ' . ((&columns * 119 + 119) / 238)
-exe 'vert 2resize ' . ((&columns * 118 + 119) / 238)
+exe 'vert 1resize ' . ((&columns * 140 + 112) / 224)
+exe 'vert 2resize ' . ((&columns * 83 + 112) / 224)
 tabedit testobjects.js
 set splitbelow splitright
 set nosplitbelow
@@ -1218,11 +1214,11 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 87 - ((63 * winheight(0) + 32) / 64)
+let s:l = 55 - ((54 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-87
+55
 normal! 0
 tabedit frame.js
 set splitbelow splitright
@@ -1334,12 +1330,12 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 6 - ((5 * winheight(0) + 32) / 64)
+let s:l = 10 - ((3 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-6
-normal! 08l
+10
+normal! 023l
 tabedit gamestyle.css
 set splitbelow splitright
 set nosplitbelow
@@ -1451,12 +1447,12 @@ set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 256 - ((47 * winheight(0) + 32) / 64)
+let s:l = 264 - ((44 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-256
-normal! 010l
+264
+normal! 043l
 tabedit UI.js
 set splitbelow splitright
 set nosplitbelow
@@ -1567,7 +1563,7 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 57 - ((56 * winheight(0) + 32) / 64)
+let s:l = 57 - ((48 * winheight(0) + 27) / 55)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt

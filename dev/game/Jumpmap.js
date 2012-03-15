@@ -57,13 +57,17 @@ function Jumpmap() {
     this.container.addEventListener('mousedown', onMouseDown, false);
     this.container.addEventListener('mousemove', onMouseMove, false);
 
+    this.mouse = {x: 0, y: 0};
+
     var self = this;
     var mouseX, mouseY;
     function onMouseDown(event) {
-        mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1,
+        self.mouse.x = event.clientX - self.container.offsetLeft;
+        self.mouse.y = event.clientY - self.container.offsetTop;
+        mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1;
         mouseY = -((event.clientY - self.container.offsetTop) / self.map_height) * 2 + 1;
-//            console.log(mouseX, mouseY);
-        
+//            console.log(self.mouse.x, self.mouse.y);
+      
         self.tempVec.set(mouseX, mouseY, 0.5);
         self.projector.unprojectVector(self.tempVec, self.jumpmap_camera);
 
@@ -75,13 +79,20 @@ function Jumpmap() {
             if(!self.zoomed_in) {
                 self.selected = null;
             }
-            self.maxX = self.intersects[0].object.position.x;
-            self.maxY = self.intersects[0].object.position.y;
+            if(self.intersects[0].object.isParent) {
+                self.maxX = self.intersects[0].object.position.x;
+                self.maxY = self.intersects[0].object.position.y;
+            } else {
+                self.maxX = self.intersects[0].object.parentCoords.x;
+                self.maxY = self.intersects[0].object.parentCoords.y;
+            }
         }
 
     }
 
     function onMouseMove(event) {
+        self.mouse.x = event.clientX - self.container.offsetLeft;
+        self.mouse.y = event.clientY - self.container.offsetTop;
         mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1,
         mouseY = -((event.clientY - self.container.offsetTop) / self.map_height) * 2 + 1;
         
@@ -94,9 +105,7 @@ function Jumpmap() {
             if(self.zoomed_in) {
                 if(self.selected != self.intersects[0].object) {
                     self.selected = self.intersects[0].object;
-                    console.log(self.selected);
                 }
-
             }
         } else {
             self.selected = null;
@@ -121,15 +130,18 @@ function Jumpmap() {
             system.scale.set(1.5, 1.5, 1.5);
             system.name = ss.name;
             system.systemID = this.assignID();
+            system.isParent = true;
             this.jumpmap_scene.add(system);
             
             for(var j = 0; j < ss.planets.length; j++) {
                 p = ss.planets[j];
                 planet = new THREE.Mesh(sphereGeometry, mat);
                 planet.position.set(system.position.x + p.x, system.position.y + p.y, system.position.z + p.z);
+                planet.parentCoords = new THREE.Vector3(system.position.x, system.position.y, system.position.z);
                 planet.scale.set(p.radius, p.radius, p.radius);
                 planet.name = p.name;
                 planet.parentID = system.systemID;
+                planet.isParent = false;
                 this.jumpmap_scene.add(planet);
             }
 
@@ -163,6 +175,13 @@ function Jumpmap() {
 
         if(this.selected != null) {
             this.selected.rotation.y += 0.025;
+            $('#jumpinfobox').fadeIn('fast');
+            $('#jumpinfobox').html(this.selected.name);
+            $('#jumpinfobox').css('left', this.mouse.x);
+            $('#jumpinfobox').css('top', this.mouse.y);
+        } else {
+            $('#jumpinfobox').empty();
+            $('#jumpinfobox').hide();
         }
 
         this.stats.update();

@@ -258,3 +258,9 @@ body {
     background-color:rgba(0,0,0,0.8);
     display:none;
 }
+#jumpinfobox {
+    position: absolute;
+    z-index: 1001;
+    background-color: rgba(25, 25, 25, 0.8);
+    display: none;
+}

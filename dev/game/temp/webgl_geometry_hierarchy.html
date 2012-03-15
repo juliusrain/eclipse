@@ -12,10 +12,17 @@
 				font-weight: bold;
 				overflow:hidden;
 			}
+
+            #box {
+                position: absolute;
+                background-color: green;
+            }
+
 		</style>
 	</head>
 	<body>
-
+        <div id="box"></div>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<script src="../build/Three.r48.js"></script>
 		<script src="../js/Stats.js"></script>
 
@@ -145,10 +152,19 @@
 
                 var ray = new THREE.Ray(camera.position, vector.subSelf(camera.position).normalize());
 
-                var intersects = ray.intersectScene(scene);
+                var intersects = ray.intersectObjects(scene.children);
                 if(intersects.length > 0) {
-                    intersects[0].object.rotation.y += 0.5;
-                }
+                    console.log("blah");
+                    $('#box').fadeIn('slow', 'swing');
+                    $('#box').html("fjdkfjkdslfd");
+
+                    $('#box').css('top', (event.clientY));
+                    $('#box').css('left', (event.clientX));
+
+                } else {
+                    $('#box').fadeOut('fast', 'swing');
+
+                }   
 
 			}
 
