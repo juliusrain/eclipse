@@ -15,14 +15,23 @@ def runner(fn, *args):
 
 # access planet
 # pid -> json
-def accessPlanet(conn, c, pid):
+def accessPlanet(conn, c, gid, ssid, pid):
 	# gid int, ssid int, pid int, type int, name varchar(50)
-	c.execute("SELECT * FROM planetary_systems WHERE pid = ?", (pid,))
+	# {type: SKYBOX, parameters: { name: "skybox",textures: [ "skybox/starfield.png", "skybox/starfield.png", "skybox/starfield.png", "skybox/starfield.png", "skybox/starfield.png", "skybox/starfield.png"]}};
+	planet = {}
+	c.execute("SELECT * FROM planetary_systems WHERE gid = ? AND ssid = ? AND pid = ?", (gid, ssid, pid))
 	planet = c.fetchone()
 	if len(planet) > 0:
 		
 
+# access objects at planet
+def accessObjectsAt(conn, c, gid, ssid, pid):
+	c.execute("SELECT * FROM ")
+
 # update ship
+
+def main():
+	print 'database access program.'
 
 if __name__ == '__main__':
 	main()
