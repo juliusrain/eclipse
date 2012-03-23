@@ -82,6 +82,10 @@ def createPlanet(conn, c, **kw):
 	planet = {'gameParameters':{}}
 	if 'type' in kw:
 		pass
+	else:
+		skybox = c.execute("select * from preset_planetary_systems where type = ?", kw['type']).fetchone()
+		if skybox:
+			pass
 	if 'name' in kw:
 		planet['gameParameters']['name'] = kw['name']
 	else:
