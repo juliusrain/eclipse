@@ -2,21 +2,37 @@
 
 import sqlite3 as sq
 import json
+from random import randint
 
 SKYBOX = 0
+
+##################################################
+# Database Functions
+##################################################
 
 def connect():
 	conn = sq.connect('game.db')
 	c = conn.cursor()
 	return conn, c
 
-def runner(fn, *args):
-	conn, c = connect()
-	fn(conn, c, *args)
-	conn.close()
+def runner(fn):
+	def newfn(*args, **kwargs):
+		conn, c = connect()
+		value = fn(conn, c, *args, **kwargs)
+		conn.close()
+		return value
+	newfn.__name__ = fn.__name__
+	newfn.__doc__ = newfn.__doc__
+	return newfn
+
+##################################################
+# Access Functions
+##################################################
+
 
 # access planet
 # pid -> json
+@runner
 def accessPlanet(conn, c, gid, ssid, pid):
 	planet = {}
 	# retrieve specific planet
@@ -42,6 +58,35 @@ def accessPlanet(conn, c, gid, ssid, pid):
 
 # access objects at planet def accessObjectsAt(conn, c, gid, ssid, pid): c.execute("SELECT * FROM ") 
 # update ship
+
+##################################################
+# Randomize Functions
+##################################################
+
+def randomName():
+	# THIS IS TEMPORARY!
+	chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	string = ""
+	for i in range(randint(10,20)):
+		string += chars[randint(0, len(chars)-1)]
+	return string
+
+
+##################################################
+# Generator Functions
+##################################################
+
+# generate a random planet
+# possible arguments: name, type
+def createPlanet(conn, c, **kw):
+	planet = {'gameParameters':{}}
+	if 'type' in kw:
+		pass
+	if 'name' in kw:
+		planet['gameParameters']['name'] = kw['name']
+	else:
+		planet['gameParameters']['name'] = randomName()
+	return planet
 
 def main():
 	print 'database access program.'
