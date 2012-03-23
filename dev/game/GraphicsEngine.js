@@ -547,7 +547,8 @@ function GraphicsEngine() {
                         mesh.targetPos.set(x, y, z);
 
                         //get new look direction vector
-                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+//                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+                        mesh.tempDir.set(x, y, z);
 
                         //copy inverse rotation and apply to direction to get new look in local coords
                         mesh.tempQuat.copy(mesh.quaternion).inverse();
