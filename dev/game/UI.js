@@ -23,38 +23,49 @@ $('#chatcompose').blur(function (){
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
+    e.stopImmediatePropagation();
     switch(e.keyCode){
         // j = toggle jump map
         case 106: {
-            toggleJumpMap();
+            if (!chatfocus) {
+                toggleJumpMap();
+            }
             break;
         }
         // l = bind/unbind cursor
         case 108: {
-            if(!$('#jumpamapbox:visible').length) {
+            if(!$('#jumpamapbox:visible').length && !chatfocus) {
                 toggleCursor();
             } 
             break;
         }
         // space = fire weapon
         case 32: {
-            gameEngine.fireWeapon();
+            if (!chatfocus) {
+                gameEngine.fireWeapon();
+            }
             break;
         }
         // t = auto repair
         case 116:{
-            toggleAutoRepair();
+            if (!chatfocus) {
+                toggleAutoRepair();
+            }
             break;
         }
         // c = chat box
         case 99: {
-            switchToChat();
+            if (!chatfocus) {
+                switchToChat();
+            }
             break;
         }
         //create explosion (for testing) p
         case 112: {
-            graphicsEngine.addExplosionLarge(50, 0, -100);
-            sceneElements.AIShips[0].fireLaser();
+            if (!chatfocus) {
+                graphicsEngine.addExplosionLarge(50, 0, -100);
+                sceneElements.AIShips[0].fireLaser();
+            }
             break;
         }
     }
@@ -62,6 +73,7 @@ $(window).keypress(function (e){
 
 $('#chatcompose').keydown(function (e){
     console.log(e);
+    e.stopImmediatePropagation();
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
         $('#chatcompose').blur();
@@ -70,18 +82,8 @@ $('#chatcompose').keydown(function (e){
         console.log("you pressed enter");
         newMessage(chatbox.val());
         chatbox.val("");
+    } else {
     }
-    else if(e.which == 8){
-        chatbox.val(chatbox.val().slice(0,-1));
-    }
-    else{
-        var character = String.fromCharCode(e.which)
-        if(!e.shiftKey){
-            character = character.toLowerCase();
-        }
-        chatbox.val(chatbox.val() + character);
-    }
-    return false;
 });
 
 function toggleJumpMap() {

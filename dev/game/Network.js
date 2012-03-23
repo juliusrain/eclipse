@@ -31,7 +31,7 @@ Network.prototype.connect = function () {
         var sender = parsed.sender;
         var body = parsed.body;
         if (action == "chat") {
-            nw.chat(sender, body);
+            nw.displayChat(sender, body);
         }
     }
 }
@@ -46,10 +46,10 @@ Network.prototype.disconnect = function () {
     this.ws.close();
 }
 
-Network.prototype.chat = function (sender, body) {
+Network.prototype.displayChat = function (sender, body) {
     var wrapped = '<div class="chatmessage">'+sender+' at <span>'+body.time+':</span><div>'+body.message+'</div></div>';
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);
-    node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
+    node.show(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
 }
