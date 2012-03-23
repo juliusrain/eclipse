@@ -53,7 +53,7 @@ var playerShip = {  type: PLAYER_SHIP,
 								x:0,
 								y:0,
 								z:0,
-								r:50
+								r:30
 							},
 							inner:[]
 						},
@@ -102,7 +102,7 @@ var AIShip = {  type: AI_SHIP,
 							x:0,
 							y:0,
 							z:0,
-							r:50
+							r:30
 						},
 						inner:[]
 					},
@@ -149,7 +149,7 @@ var AIShip2 = {  type: AI_SHIP,
 							x:0,
 							y:0,
 							z:0,
-							r:50
+							r:30
 						},
 						inner:[]
 					},

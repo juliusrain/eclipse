@@ -547,7 +547,8 @@ function GraphicsEngine() {
                         mesh.targetPos.set(x, y, z);
 
                         //get new look direction vector
-                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+//                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+                        mesh.tempDir.set(x, y, z);
 
                         //copy inverse rotation and apply to direction to get new look in local coords
                         mesh.tempQuat.copy(mesh.quaternion).inverse();
@@ -617,6 +618,13 @@ function GraphicsEngine() {
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
                 laserMesh.parentID = parentShip.objectID
 
+                laserMesh.spheres = {outer: {x: 0,
+                                             y: 0,
+                                             z: 0,
+                                             r: 10},
+                                     inner: []
+                }
+
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
                 laserMesh.currentDistance = 0;
@@ -682,6 +690,11 @@ function GraphicsEngine() {
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
+        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
+        sceneElements.explosions.push(e);
+    }
+    GraphicsEngine.prototype.addExplosionSmall = function(x, y, z) {
+        // TODO - change it so that it's small
         var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
@@ -986,8 +999,8 @@ function GraphicsEngine() {
 //                                //apply turn (roll) rotation calculated earlier
 //                                sceneObject.quaternion.multiplySelf(tempQuat);
                                 //go forward
-                                sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
-                                sceneObject.translateZ(-5);
+//                                sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
+//                                sceneObject.translateZ(-5);
 
                                 break;
                             }
@@ -1018,9 +1031,10 @@ function GraphicsEngine() {
 //                                //apply turn rotation
 //                                sceneObject.quaternion.multiplySelf(tempQuat);
                                 sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
+//                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
 
                                 //go forward
-                                sceneObject.translateZ(-5);
+//                                sceneObject.translateZ(-5);
                                 break;
                             }
                         }

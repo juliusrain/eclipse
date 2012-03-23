@@ -60,12 +60,17 @@ $(window).keypress(function (e){
             }
             break;
         }
+        case 111: {
+            sceneElements.AIShips[0].fireLaser();
+            break;
+        }
         //create explosion (for testing) p
         case 112: {
             if (!chatfocus) {
                 graphicsEngine.addExplosionLarge(50, 0, -100);
                 sceneElements.AIShips[0].fireLaser();
             }
+            graphicsEngine.addExplosionLarge(50, 0, -100);
             break;
         }
     }
