@@ -168,6 +168,15 @@ GameEngine.prototype.updateVitalsInfo = function () {
     this.updateVitalSlot('laser', sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge, sceneElements.mainShip.gameParameters.weapons.lasers.maxCharge);
 };
 
+GameEngine.prototype.updateCollisions = function() {
+    var colls = collision(sceneElements.mainShip);
+    colls = colls.concat(collision(sceneElements.AIShips[0]));
+    colls = colls.concat(collision(sceneElements.AIShips[1]));
+    if(colls.length){
+        console.log(colls);
+    }
+};
+
 // GameEngine update function
 // called each frame
 GameEngine.prototype.update = function () {
@@ -186,6 +195,9 @@ GameEngine.prototype.update = function () {
         if(this.timeouts.lasers > 0){
             this.timeouts.lasers--;
         }
+
+        // check for collisions
+        this.updateCollisions();
 
         // reset counter
         this.logicwait = 4;
@@ -231,37 +243,62 @@ GameEngine.prototype.fireWeapon = function () {
 				// a hit!
 				var hitLocation = new THREE.Vector3(xd, yd, zd);
 				hitLocation.normalize();
-				console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' hit:'+(hitLocation.x * obj2.r)+'x'+(hitLocation.y * obj2.r)+'x'+(hitLocation.z * obj2.r));
+				//console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' hit:'+(hitLocation.x * obj2.r)+'x'+(hitLocation.y * obj2.r)+'x'+(hitLocation.z * obj2.r));
 				return {x:(hitLocation.x * obj2.r), y:(hitLocation.y * obj2.r), z:(hitLocation.z * obj2.r)};
 			}
-			console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' miss');
+			//console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' miss');
 			return false;
 		}
 		function collision(obj){
 			var hits = [];
 			var objects = [];
 			objects.push(sceneElements.mainShip);
-			objects.concat(scenElements.AIShips);
+            //console.log(objects.length);
+            //console.log(sceneElements.AIShips.length);
+			objects = objects.concat(sceneElements.AIShips);
+            //console.log(objects.length);
+            for(var i in sceneElements.lasers) {
+                objects = objects.concat(sceneElements.lasers[i].children);
+                //console.log(objects.length);
+            }
+            objects = objects.concat(sceneElements.missiles);
+            //console.log(objects.length);
 			// go through each object in the scene
 			for(candidate in objects){
 				// don't check against itself
-				if(objects[candidate] !== obj){
+				if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired) || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){
+                    //console.log('not me, not an unfired laser');
 					// check if there are spheres
-					if(typeof objects[candidate].spheres == "object" && typeof objects[candidate].spheres.outer == "object"){
-						// check outer spheres
-						var oHit = intersect(cAdd(objects[candidate].spheres.outer, objects[candidate].position), cAdd(obj.spheres.outer, obj.position));
+                    var cspheres = undefined, ospheres = undefined;
+                    if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
+                        cspheres = objects[candidate].gameParameters.spheres;
+                    }
+                    else if(typeof objects[candidate].spheres == "object") {
+                        cspheres = objects[candidate].spheres;
+                    }
+                    if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
+                        ospheres = obj.gameParameters.spheres;
+                    }
+                    else if(typeof obj.spheres == "object") {
+                        ospheres = obj.spheres;
+                    }
+					if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
+                        //console.log('spheres present');
+						// check outer.gameParameters.spheres
+						var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
 						if(oHit){
-							// check for inner spheres
+                            console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+							// check for inner.gameParameters.spheres
 							var check = false,
-								cand = [objects[candidate].spheres.outer],
-								subj = [obj.spheres.outer];
-							if(typeof objects[candidate].spheres.inner == "object" && objects[candidate].spheres.inner.length != 0){
+								cand = [cspheres.outer],
+								subj = [ospheres.outer];
+							if(typeof cspheres.inner == "object" && cspheres.inner.length != 0){
 								check = true;
-								cand = objects[candidate].spheres.inner;
+								cand = cspheres.inner;
 							}
-							if(typeof obj.spheres.inner == "object" && obj.spheres.inner.length != 0){
+							if(typeof ospheres.inner == "object" && ospheres.inner.length != 0){
 								check = true;
-								subj = obj.spheres.inner;
+								subj = ospheres.inner;
 							}
 							// check inner spheres
 							if(check){
