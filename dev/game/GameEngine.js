@@ -168,12 +168,34 @@ GameEngine.prototype.updateVitalsInfo = function () {
     this.updateVitalSlot('laser', sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge, sceneElements.mainShip.gameParameters.weapons.lasers.maxCharge);
 };
 
+function laserHit(target, hit) {
+    // trigger explosion
+    graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
+    // reset lasers
+    hit.obj.hit = true;
+
+}
+
 GameEngine.prototype.updateCollisions = function() {
-    var colls = collision(sceneElements.mainShip);
-    colls = colls.concat(collision(sceneElements.AIShips[0]));
-    colls = colls.concat(collision(sceneElements.AIShips[1]));
-    if(colls.length){
-        console.log(colls);
+    var colls;
+    // collisions with main ship
+    colls = collision(sceneElements.mainShip);
+    // process
+    for(var c in colls) {
+        if(colls[c].obj.hasOwnProperty('fired')) {
+            // hit by a laser!
+            laserHit(sceneElements.mainShip, colls[c]);
+        }
+    }
+    for(var s in sceneElements.AIShips) {
+        colls = collision(sceneElements.AIShips[s]);
+        // process
+        for(var c in colls) {
+            if(colls[c].obj.hasOwnProperty('fired')) {
+                // hit by a laser!
+                laserHit(sceneElements.AIShips[s], colls[c]);
+            }
+        }
     }
 };
 
@@ -266,7 +288,8 @@ GameEngine.prototype.fireWeapon = function () {
 			// go through each object in the scene
 			for(candidate in objects){
 				// don't check against itself
-				if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired) || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){
+				if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired && objects[candidate].parent.parentShip != obj) // it's an active laser
+                        || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){ // it's another object
                     //console.log('not me, not an unfired laser');
 					// check if there are spheres
                     var cspheres = undefined, ospheres = undefined;
