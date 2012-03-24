@@ -78,14 +78,27 @@ def randomName():
 
 # generate a random planet
 # possible arguments: name, type
+@runner
 def createPlanet(conn, c, **kw):
-	planet = {'gameParameters':{}}
+	planet = {'parameters':{}, 'gameParameters':{}}
+	chosen = 0
 	if 'type' in kw:
-		pass
+		# selected specified type
+		chosen = kw['type']
 	else:
-		skybox = c.execute("select * from preset_planetary_systems where type = ?", kw['type']).fetchone()
-		if skybox:
-			pass
+		# get random type
+		types = c.execute("select type from preset_planetary_systems").fetchall()
+		types = [e[0] for e in types]
+		print types
+		chosen = types[randint(0,len(types)-1)]
+		print chosen
+	skybox = c.execute("select * from preset_planetary_systems where type = ?", str(chosen)).fetchone()
+	if skybox:
+		textures = skybox[1:7]
+		planet['type'] = SKYBOX
+		planet['parameters']['name'] = 'skybox'
+		planet['parameters']['textures'] = textures
+	planet['gameParameters']['type'] = chosen
 	if 'name' in kw:
 		planet['gameParameters']['name'] = kw['name']
 	else:
@@ -93,7 +106,9 @@ def createPlanet(conn, c, **kw):
 	return planet
 
 def main():
-	print 'database access program.'
+	print '###########################'
+	print '# database access program #'
+	print '###########################'
 
 if __name__ == '__main__':
 	main()
