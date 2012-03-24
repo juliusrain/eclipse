@@ -71,17 +71,40 @@ def randomName():
 		string += chars[randint(0, len(chars)-1)]
 	return string
 
+def uniqueNumber():
+	a = set([0])
+	num = 0
+	while True:
+		while num in a:
+			num = randint(0,999)
+		a.add(num)
+		yield num
+
+uniqueNumberGenerator = None
+
+def randomNumber():
+	try:
+		n = uniqueNumberGenerator.next()
+	except:
+		uniqueNumberGenerator = uniqueNumber()
+		n = uniqueNumberGenerator.next()
+	finally:
+		return n
 
 ##################################################
 # Generator Functions
 ##################################################
 
 # generate a random planet
-# possible arguments: name, type
+# possible arguments: pid, name, type
 @runner
 def createPlanet(conn, c, **kw):
 	planet = {'parameters':{}, 'gameParameters':{}}
 	chosen = 0
+	if 'pid' in kw:
+		planet['pid'] = kw['pid']
+	else:
+		planet['pid'] = randNumber()
 	if 'type' in kw:
 		# selected specified type
 		chosen = kw['type']
@@ -104,6 +127,22 @@ def createPlanet(conn, c, **kw):
 	else:
 		planet['gameParameters']['name'] = randomName()
 	return planet
+
+
+# generate a random solar system
+# possible arguments: name, numberOfPlanets, x, y
+@runner
+def createSystem(conn, c, **kw):
+	# solar_systems
+	# 0 gid int, 1 ssid int, 2 x int, 3 y int, 4 name varchar(50)
+	system = {}
+	if 'ssid' in kw:
+		system['ssid'] = kw['ssid']
+	else:
+		system['ssid'] = randNumber()
+	if 'name' in kw:
+		system
+
 
 def main():
 	print '###########################'
