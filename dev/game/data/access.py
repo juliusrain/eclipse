@@ -15,6 +15,10 @@ def connect():
 	c = conn.cursor()
 	return conn, c
 
+# decorator function
+# connects to database
+#   runs function
+# disconnects
 def runner(fn):
 	def newfn(*args, **kwargs):
 		conn, c = connect()
@@ -143,6 +147,15 @@ def createSystem(conn, c, **kw):
 	if 'name' in kw:
 		system
 
+# generate a new game
+# possible arguments: 
+@runner
+def createGame(conn, c, **kw):
+	game = {}
+
+##################################################
+# Program Functions
+##################################################
 
 def main():
 	print '###########################'
