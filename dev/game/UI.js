@@ -1,4 +1,6 @@
 
+var chatfocus = false;
+
 // window resize events
 $(window).load(sizeGame);
 $(window).resize(sizeGame);
@@ -6,49 +8,87 @@ $(window).resize(sizeGame);
 // click events
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
+$('#chatcontrol').click(switchToChat);
+$('#chatcompose').focus(function (){
+	console.log('true');
+	$('#chatcontrol span').html('Esc');
+	chatfocus = true;
+});
+$('#chatcompose').blur(function (){
+	console.log('false');
+	$('#chatcontrol span').html('C');
+	chatfocus = false;
+});
 
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
+    e.stopImmediatePropagation();
     switch(e.keyCode){
         // j = toggle jump map
         case 106: {
-            toggleJumpMap();
+            if (!chatfocus) {
+                toggleJumpMap();
+            }
             break;
         }
         // l = bind/unbind cursor
         case 108: {
-            toggleCursor();
+            if(!$('#jumpamapbox:visible').length && !chatfocus) {
+                toggleCursor();
+            } 
             break;
         }
         // space = fire weapon
         case 32: {
-            gameEngine.fireWeapon();
+            if (!chatfocus) {
+                gameEngine.fireWeapon();
+            }
             break;
         }
         // t = auto repair
         case 116:{
-            toggleAutoRepair();
+            if (!chatfocus) {
+                toggleAutoRepair();
+            }
             break;
         }
         // c = chat box
         case 99: {
-            switchToChat();
+            if (!chatfocus) {
+                switchToChat();
+            }
+            break;
+        }
+        case 111: {
+            sceneElements.AIShips[0].fireLaser();
             break;
         }
         //create explosion (for testing) p
         case 112: {
-//            graphicsEngine.addExplosionLarge(20, 0, -100);
-            sceneElements.AIShips[0].fireLaser();
+            if (!chatfocus) {
+                graphicsEngine.addExplosionLarge(50, 0, -100);
+                sceneElements.AIShips[0].fireLaser();
+            }
+            graphicsEngine.addExplosionLarge(50, 0, -100);
             break;
         }
     }
 });
 
 $('#chatcompose').keydown(function (e){
-
-    $('#chatcompose').val($('#chatcompose').val() + String.fromCharCode(e.keyCode));
-    return false;
+    console.log(e);
+    e.stopImmediatePropagation();
+    var chatbox=$("#chatcompose");
+    if (e.which == 27) {
+        $('#chatcompose').blur();
+    }
+    else if (e.which == 13) {
+        console.log("you pressed enter");
+        newMessage(chatbox.val());
+        chatbox.val("");
+    } else {
+    }
 });
 
 function toggleJumpMap() {
@@ -89,5 +129,11 @@ function toggleCursor() {
 }
 
 function switchToChat() {
-
+	console.log('chat?');
+	if(chatfocus){
+		$('#chatcompose').blur();
+	}
+	else{
+		$('#chatcompose').focus();
+	}
 }

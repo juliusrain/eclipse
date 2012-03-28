@@ -18,8 +18,9 @@ function GameEngine() {
     };
     this.logicwait = 0;
 
-    // start network client
+    //start network client
     network = new Network();
+    network.connect();
 
     // new game portion - NO NEED FOR THIS!
        // call database, create new game(?)
@@ -167,6 +168,37 @@ GameEngine.prototype.updateVitalsInfo = function () {
     this.updateVitalSlot('laser', sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge, sceneElements.mainShip.gameParameters.weapons.lasers.maxCharge);
 };
 
+function laserHit(target, hit) {
+    // trigger explosion
+    graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
+    // reset lasers
+    hit.obj.hit = true;
+
+}
+
+GameEngine.prototype.updateCollisions = function() {
+    var colls;
+    // collisions with main ship
+    colls = collision(sceneElements.mainShip);
+    // process
+    for(var c in colls) {
+        if(colls[c].obj.hasOwnProperty('fired')) {
+            // hit by a laser!
+            laserHit(sceneElements.mainShip, colls[c]);
+        }
+    }
+    for(var s in sceneElements.AIShips) {
+        colls = collision(sceneElements.AIShips[s]);
+        // process
+        for(var c in colls) {
+            if(colls[c].obj.hasOwnProperty('fired')) {
+                // hit by a laser!
+                laserHit(sceneElements.AIShips[s], colls[c]);
+            }
+        }
+    }
+};
+
 // GameEngine update function
 // called each frame
 GameEngine.prototype.update = function () {
@@ -186,6 +218,9 @@ GameEngine.prototype.update = function () {
             this.timeouts.lasers--;
         }
 
+        // check for collisions
+        this.updateCollisions();
+
         // reset counter
         this.logicwait = 4;
     }
@@ -199,9 +234,113 @@ GameEngine.prototype.update = function () {
 // checks if the selected weapon can be fired, then triggers weapons fire
 GameEngine.prototype.fireWeapon = function () {
     if(this.timeouts.lasers === 0 && sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost) {
-        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
+//        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
         sceneElements.mainShip.fireLaser();
         sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
-        this.timeouts.lasers = 2;
+        this.timeouts.lasers = 3;
     }
 };
+
+
+		function cAdd(coords1, coords2){
+			var coords = {};
+			for(a in coords1){
+				if(a != 'x' && a != 'y' && a != 'z'){
+					coords[a] = coords1[a];
+				}
+			}
+			coords.x = (coords1.x + coords2.x);
+			coords.y = (coords1.y + coords2.y);
+			coords.z = (coords1.z + coords2.z);
+			return coords;
+		}
+		function intersect(obj1, obj2){
+			var xd = obj1.x - obj2.x,
+				yd = obj1.y - obj2.y,
+				zd = obj1.z - obj2.z,
+				rr = obj1.r + obj2.r;
+			var actualDistance = (xd * xd) + (yd * yd) + (zd * zd),
+				minDistance = (rr * rr);
+			if(actualDistance <= minDistance){
+				// a hit!
+				var hitLocation = new THREE.Vector3(xd, yd, zd);
+				hitLocation.normalize();
+				//console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' hit:'+(hitLocation.x * obj2.r)+'x'+(hitLocation.y * obj2.r)+'x'+(hitLocation.z * obj2.r));
+				return {x:(hitLocation.x * obj2.r), y:(hitLocation.y * obj2.r), z:(hitLocation.z * obj2.r)};
+			}
+			//console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' miss');
+			return false;
+		}
+		function collision(obj){
+			var hits = [];
+			var objects = [];
+			objects.push(sceneElements.mainShip);
+            //console.log(objects.length);
+            //console.log(sceneElements.AIShips.length);
+			objects = objects.concat(sceneElements.AIShips);
+            //console.log(objects.length);
+            for(var i in sceneElements.lasers) {
+                objects = objects.concat(sceneElements.lasers[i].children);
+                //console.log(objects.length);
+            }
+            objects = objects.concat(sceneElements.missiles);
+            //console.log(objects.length);
+			// go through each object in the scene
+			for(candidate in objects){
+				// don't check against itself
+				if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired && objects[candidate].parent.parentShip != obj) // it's an active laser
+                        || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){ // it's another object
+                    //console.log('not me, not an unfired laser');
+					// check if there are spheres
+                    var cspheres = undefined, ospheres = undefined;
+                    if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
+                        cspheres = objects[candidate].gameParameters.spheres;
+                    }
+                    else if(typeof objects[candidate].spheres == "object") {
+                        cspheres = objects[candidate].spheres;
+                    }
+                    if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
+                        ospheres = obj.gameParameters.spheres;
+                    }
+                    else if(typeof obj.spheres == "object") {
+                        ospheres = obj.spheres;
+                    }
+					if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
+                        //console.log('spheres present');
+						// check outer.gameParameters.spheres
+						var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
+						if(oHit){
+                            console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+							// check for inner.gameParameters.spheres
+							var check = false,
+								cand = [cspheres.outer],
+								subj = [ospheres.outer];
+							if(typeof cspheres.inner == "object" && cspheres.inner.length != 0){
+								check = true;
+								cand = cspheres.inner;
+							}
+							if(typeof ospheres.inner == "object" && ospheres.inner.length != 0){
+								check = true;
+								subj = ospheres.inner;
+							}
+							// check inner spheres
+							if(check){
+								for(c in cand){
+									for(s in subj){
+										var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
+										if(iHit){
+											hits.push({where:iHit, obj:objects[candidate]});
+										}
+									}
+								}
+							}
+							// don't check innder spheres; mark as collision
+							else{
+								hits.push({where:oHit, obj:objects[candidate]});
+							}
+						}
+					}
+				}
+			}
+			return hits;
+		}

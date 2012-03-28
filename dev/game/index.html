@@ -46,16 +46,6 @@
         <div id="right">
             <div id="chatcontainer">
                 <div id="chatmessages">
-                    <div class="chatmessage">cwong81 <span>4:58pm</span><div>message 1</div></div>
-                    <div class="chatmessage">bwong117 <span>5:03pm</span><div>message 2</div></div>
-                    <div class="chatmessage">cwong81 <span>5:08pm</span><div>message 3</div></div>
-                    <div class="chatmessage">cwong81 <span>5:18pm</span><div>message 4</div></div>
-                    <div class="chatmessage">bwong117 <span>5:23pm</span><div>message 5</div></div>
-                    <div class="chatmessage">cwong81 <span>5:28pm</span><div>message 6</div></div>
-                    <div class="chatmessage">bwong117 <span>5:33pm</span><div>message 7</div></div>
-                    <div class="chatmessage">cwong81 <span>5:38pm</span><div>message 8</div></div>
-                    <div class="chatmessage">bwong117 <span>now</span><div>it's a new message, one to rule them all!!! all other messages will bow to this one, and everyone will be in trouble!</div></div>
-                    <div class="chatmessage">cwong81 <span>now</span><div>this is an even better message than yours, rendering your whole argument invalid. Please refer to your manual for more information.</div></div>
                 </div>
                 <div id="chatwrite">
                     <input type="text" id="chatcompose" />
@@ -66,10 +56,14 @@
             <div id="jumpmapcontrol" class="control"><span>J</span>Jump Map</div>
             <div id="mouselockcontrol" class="control"><span>L</span>Lock/Unlock Mouse</div>
             <div id="autorepaircontrol" class="control"><span>T</span>Auto-Repair</div>
+            <div id="chatcontrol" class="control"><span>C</span>Chat</div>
+            <div id="" class="control"><span>H</span>Help</div>
         </div>
         <div id="minimap"></div>
     </div>
-    <div id="jumpmapbox"></div>
+    <div id="jumpmapbox">
+        <div id="jumpinfobox"></div>
+    </div>
     <div id="foot"></div>
     <!--<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>-->
     <script type="text/javascript" src="jquery/jquery-1.7.1.min.js"></script>
@@ -87,6 +81,8 @@
     <script type="text/javascript" src="frame.js"></script>
     <script type="text/javascript" src="UI.js"></script>
 
+    <script type="text/javascript" src="js/shaders/BlendShader.js"></script>
+    <script type="text/javascript" src="js/shaders/ExplosionShaders.js"></script>
     <script type="text/javascript" src="Minimap.js"></script>
     <script type="text/javascript" src="Jumpmap.js"></script>
     <script type="text/javascript" src="Explosions.js"></script>
@@ -97,6 +93,7 @@
     <script type="text/javascript" src="testobjects.js"></script>
     <script type="text/javascript" src="testsectormap.js"></script>
     <script type="text/javascript" src="Network.js"></script>
+    <script type="text/javascript" src="chat.js"></script>
 
     <script type="text/javascript" src="GameEngine.js"></script>
     <script type="text/javascript" src="game.js"></script>

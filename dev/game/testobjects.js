@@ -35,7 +35,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                 type: 0, //particle vs elongated?
                                 damage: 0,
                                 range: 300,
-                                speed: 35,
+                                speed: 70,
                                 amount: 50,
                                 maxCharge: 15400,
                                 currentCharge: 0,
@@ -48,10 +48,19 @@ var playerShip = {  type: PLAYER_SHIP,
                             }
                         },
                         inventory: {},
+						spheres:{
+							outer:{
+								x:0,
+								y:0,
+								z:0,
+								r:30
+							},
+							inner:[]
+						},
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
-                        geometry: "models/ships/player_ship002.js",
+                        geometry: "models/ships/player_ship002_scaled_copy.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
@@ -79,7 +88,7 @@ var AIShip = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 35,
+                            speed: 70,
                             amount: 30,
 
                         },
@@ -88,16 +97,25 @@ var AIShip = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
+					spheres:{
+						outer:{
+							x:0,
+							y:0,
+							z:0,
+							r:30
+						},
+						inner:[]
+					},
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/player_ship002_scaled_textured.dae",
+                    geometry: "models/ships/player_ship002_scaled_copy.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
+                    position: {x: 0, y: 0, z: 300} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip);
@@ -117,7 +135,7 @@ var AIShip2 = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 0,
                             range: 300,
-                            speed: 35,
+                            speed: 70,
                             amount: 30,
 
                         },
@@ -126,16 +144,25 @@ var AIShip2 = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
+					spheres:{
+						outer:{
+							x:0,
+							y:0,
+							z:0,
+							r:30
+						},
+						inner:[]
+					},
                 },
                 drawParameters: {
                     shipID: 2,
-                    geometry: "models/ships/player_ship002.js",
+                    geometry: "models/ships/player_ship002_scaled_copy.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
                     tiltRotationMax: 20,
 
-                    position: {x: 20, y: 0, z: -100} //starting position in scene when not main ship
+                    position: {x: 0, y: 0, z: -300} //starting position in scene when not main ship
                 }
             };
 gameObjects.push(AIShip2);

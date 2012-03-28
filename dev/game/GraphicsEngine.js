@@ -10,7 +10,7 @@ function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
-
+    this.objID = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
 
@@ -19,8 +19,16 @@ function GraphicsEngine() {
     this.canvas_width = parseInt($('#main').css('width'));
     this.canvas_height = parseInt($('#main').css('height'));
 
+    //MAIN THREEJS RENDERER
+    //main renderer
+    this.renderer = new THREE.WebGLRenderer({
 
+    });
+    this.renderer.setSize(this.canvas_width, this.canvas_height);
+    this.renderer.autoClear = false;
+    this.container.appendChild(this.renderer.domElement);
 
+    //MAIN SCENE
     //threejs scene elements for gameplay
     this.gameplay_scene = new THREE.Scene();
     this.gameplay_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
@@ -29,57 +37,60 @@ function GraphicsEngine() {
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
 
+    //GLOW SCENE
+    //glow scene elements
     this.gameplay_glow_scene = new THREE.Scene();
-    this.gameplay_glow_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e8);
-    this.gameplay_glow_scene.add(this.gameplay_glow_camera);
-    //sync regular and glow camera
-    this.gameplay_glow_camera.useQuaternion = true;
-    this.gameplay_glow_camera.position = this.gameplay_camera.position;
-    this.gameplay_glow_camera.quaternion = this.gameplay_camera.quaternion;
 
-//    this.gameplay_glow_camera.useQuaternion = true;
-//    this.gameplay_glow_camera.position = this.gameplay_camera.position;
-//    this.gameplay_glow_camera.quaterion = this.gameplay_camera.quaternion;
+    //antialiasing via shader
+    this.effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
+    this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
 
+    //bloom shader
+    var effectBloom = new THREE.BloomPass(10.0);
 
-    //threejs scene elements for map overlay (jump map)
-    this.map_scene = new THREE.Scene();
-    this.map_camera = new THREE.PerspectiveCamera(60, this.canvas_width/this.canvas_height, 0.1, 1e7);
+    var renderTargetParameters = {  minFilter: THREE.LinearFilter,
+                                    magFilter: THREE.LinearFilter,
+                                    format: THREE.RGBAFormat };
 
-    //main renderer
-    this.renderer = new THREE.WebGLRenderer({
-        clearColor: 0x000000,
-        clearAlpha: 1,
-    });
-    this.renderer.setSize(this.canvas_width, this.canvas_height);
-    this.renderer.autoClear = false;
-    this.container.appendChild(this.renderer.domElement);
+    //render glow scene to texture
+    this.renderTargetGlow = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+    var renderModelGlow = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_camera);
 
-    var renderModel = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_glow_camera);
-    var effectBloom = new THREE.BloomPass(4.3);
-    var effectScreen = new THREE.ShaderPass(THREE.ShaderExtras["screen"]);
-    var effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
+    //effect composer for fbo
+    this.glow_composer = new THREE.EffectComposer(this.renderer, this.renderTargetGlow);
+    this.glow_composer.addPass(renderModelGlow);
+    this.glow_composer.addPass(effectBloom);
 
-    effectFXAA.uniforms['resolution'].value.set(1 / this.canvas_width, 1 / this.canvas_height);
-    effectScreen.uniforms['opacity'].value = 0.5;
+    blend_shader.uniforms['tGlow'].texture = this.glow_composer.renderTarget2;
 
-    effectScreen.renderToScreen = true;
+    //render texture to screen with rest of scene (alpha blended)
+    this.renderTargetScreen = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+    var renderModel = new THREE.RenderPass(this.gameplay_scene, this.gameplay_camera);
+    var blend_pass = new THREE.ShaderPass(blend_shader);
+    blend_pass.needsSwap = true;
+    blend_pass.renderToScreen = true;
 
-    this.composer = new THREE.EffectComposer(this.renderer);
-    this.composer.addPass(renderModel);
-    this.composer.addPass(effectFXAA);
-    this.composer.addPass(effectBloom);
-    this.composer.addPass(effectScreen);
+    //effect composer for screen rendering
+    this.blend_composer = new THREE.EffectComposer(this.renderer, this.renderTargetScreen);
+    this.blend_composer.addPass(renderModel);
+    this.blend_composer.addPass(this.effectFXAA);
+    this.blend_composer.addPass(blend_pass);
 
+////////////
 
     //create minimap
     this.minimap = new Minimap(this.gameplay_controls, this.gameplay_camera);
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
-    //this.jumpmap = new Jumpmap();
+    this.jumpmap = new Jumpmap();
 
 
+    this.assignID = function() {
+        var ret = this.objID;
+        this.objID++;
+        return ret;
+    }
 
     /////////////////////////////////
     //stats (TEMPORARY) or can leave in as option
@@ -119,9 +130,6 @@ function GraphicsEngine() {
                 tempSphere1.name = "sphere1";
                 tempSphere2.name = "sphere2"
 
-                var infinityreverse = false;
-                var axishelper = new THREE.AxisHelper();
-
 //////////////////////////////
 
 
@@ -133,6 +141,15 @@ function GraphicsEngine() {
         this.renderer.setSize(this.canvas_width, this.canvas_height);
         this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
         this.gameplay_camera.updateProjectionMatrix();
+
+        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+
+        this.renderTargetGlow.width = this.canvas_width;
+        this.renderTargetGlow.height = this.canvas_height;
+        this.renderTargetScreen.width = this.canvas_width;
+        this.renderTargetScreen.height = this.canvas_height;
+
+        this.blend_composer.reset();
 
         this.minimap.resizeMinimap();
     }
@@ -146,7 +163,8 @@ function GraphicsEngine() {
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
 /////////////////////////////
-        //this.gameplay_scene.add(axishelper);
+//        this.gameplay_glow_scene.add(tempSphere1);
+//        this.gameplay_glow_scene.add(tempSphere2);
         this.gameplay_scene.add(tempSphere1);
         this.gameplay_scene.add(tempSphere2);
 
@@ -156,13 +174,12 @@ function GraphicsEngine() {
 
         //for loading models
         var self = this;
-//        var gameObject;
         for(var i = 0; i < objects.length; i++) {
             self.addGameObject(objects[i]);
         }
 
         this.minimap.loadMinimap();
-        //this.jumpmap.loadJumpmap();
+        this.jumpmap.loadJumpmap();
 
         var dirlight = new THREE.DirectionalLight(0xffffff);
         dirlight.position.set(0, 500, 0).normalize();
@@ -171,29 +188,25 @@ function GraphicsEngine() {
         var dirlight2 = new THREE.DirectionalLight(0xffffff);
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
-        
+
         var dirlight3 = new THREE.DirectionalLight(0xffffff);
-        dirlight3.position.set(0, 500, 0).normalize();
-        this.gameplay_glow_scene.add(dirlight3);
+        dirlight3.position.set(500, 0, 0).normalize();
+        this.gameplay_scene.add(dirlight3);
 
         var dirlight4 = new THREE.DirectionalLight(0xffffff);
-        dirlight4.position.set(0, -500, 0).normalize();
-        this.gameplay_glow_scene.add(dirlight4);
+        dirlight4.position.set(-500, 0, 0).normalize();
+        this.gameplay_scene.add(dirlight4);
+
+        var dirlight5 = new THREE.DirectionalLight(0xffffff);
+        dirlight5.position.set(0, 0, -500).normalize();
+        this.gameplay_scene.add(dirlight5);
+
+        var dirlight6 = new THREE.DirectionalLight(0xffffff);
+        dirlight6.position.set(0, 0, 500).normalize();
+        this.gameplay_scene.add(dirlight6);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
-
-        var cloader = THREE.ColladaLoader();
-        cloader.load("models/ships/player_ship002.dae",
-                    function(collada) {
-                        var model = collada.scene;
-                        model.rotation.x = -Math.PI/2;
-                        //model.scale.set();
-                        self.gameplay_scene.add(model);
-                    }
-        );
-
-
     }
 
     /*
@@ -217,6 +230,20 @@ function GraphicsEngine() {
             this.renderer.deallocateObject(sceneChild);
         }
 
+        //delete elements from gameplay_glow_scene
+        sceneChildren = this.gameplay_glow_scene.children;
+        i = 0;
+        while(i < sceneChildren.length) {
+            sceneChild = sceneChildren[i];
+            if(sceneChild instanceof THREE.Camera) {
+                i++;
+                continue;
+            }
+            this.gameplay_glow_scene.remove(sceneChild);
+            this.renderer.deallocateObject(sceneChild);
+        }
+
+        //clene sceneElements object
         sceneElements.mainShip = null;
         for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
@@ -241,15 +268,71 @@ function GraphicsEngine() {
 
 
         this.scene_loaded = false;
+        this.objectCount = 0;
     }
 
 //=================================================================
 //================= Scene manipulation functions ==================
 //adding/removing stuff after it's been created
 
-    //TODO deallocate from memory
-    GraphicsEngine.prototype.removeSceneObject = function(sceneObject) { //still have to consider removing from memory and SceneElements arrays
-        this.gameplay_scene.remove(sceneObject);
+    //Takes the objectID parameter of the object to be removed
+    GraphicsEngine.prototype.removeSceneObject = function(OID) { //still have to consider removing from memory and SceneElements arrays
+        this.minimap.removeMinimapObject(OID);
+
+        var target;
+        for(var i = 0; i < this.gameplay_scene.children.length; i++) {
+            target = this.gameplay_scene.children[i];
+            //remove lasers
+            if(target.objectID == OID) {
+                if(target.lasers !== undefined) {
+                    //remove lasers from scene
+                    this.renderer.deallocateObject(target.lasers);
+                    this.gameplay_scene.remove(target.lasers);
+                    target.lasers = null;
+                    //remove lasers from array
+                    for(var j = 0; j < sceneElements.lasers.length; j++) {
+                        if(sceneElements.lasers[j].parentID == target.objectID) {
+                            delete sceneElements.lasers[j];
+                            sceneElements.lasers.splice(j, 1);
+                        }
+
+                    }
+                }
+                //remove ship from scene
+                this.renderer.deallocateObject(target);
+                this.gameplay_scene.remove(target);
+                //remove ship from array
+                for(var j = 0; j < sceneElements.AIShips.length; j++) {
+                    if(sceneElements.AIShips[j].objectID == target.objectID) {
+                        delete sceneElements.AIShips[j];
+                        sceneElements.AIShips.splice(j, 1);
+
+                    }
+                }
+            }
+
+        }
+
+
+
+//        var target;
+//        for(var i = 0; i < this.gameplay_scene.children.length; i++) {
+//            target = this.gameplay_scene.children[i];
+//            if(target.objectID == OID) {
+//                this.renderer.deallocateObject(target);
+//                this.gameplay_scene.remove(target);
+//            }
+//        }
+//
+//        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
+//            target = this.gameplay_glow_scene.children[i];
+//            if(target.objectID == OID) {
+//                this.renderer.deallocateObject(target);
+//                this.gameplay_glow_scene.remove(target);
+//            }
+//
+//        }
+
     }
 
 
@@ -268,7 +351,6 @@ function GraphicsEngine() {
             case PLAYER_SHIP: {
                 loadShip(gameObject, this.gameplay_scene);
                 loadCrosshair(gameObject, this.gameplay_scene);
-                //loadRing(gameObject, this.gameplay_scene);
 
                 //set camera turning and movement speed based on main ship's parameters
                 this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
@@ -400,7 +482,9 @@ function GraphicsEngine() {
 
 
             cmodel.position.set(cmodel.drawParameters.position.x, cmodel.drawParameters.position.y, cmodel.drawParameters.position.z);
+            self.gameplay_glow_scene.add(cmodel);
             scene.add(cmodel);
+
         }
 
         //JSON
@@ -412,40 +496,90 @@ function GraphicsEngine() {
         *  (used only for gameObjects)
         */
         function loadJSON(geometry, gameObject, scene) {
-            var material = new THREE.MeshLambertMaterial( { ambient: 0x030303, color: 0xffffff, specular: 0x990000, shininess: 30 } );
-            var modelMesh = new THREE.Mesh(geometry, material);//(geometry, new THREE.MeshFaceMaterial());
+            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+            var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+
+            //set mesh parameters
             modelMesh.useQuaternion = true;
             modelMesh.direction = new THREE.Vector3(0, 0, -1);
             modelMesh.name = gameObject.gameParameters.name;
             modelMesh.objectType = gameObject.type;
+            modelMesh.objectID = self.assignID();
+
+            //sync positions/rotations of normal and dark meshes
+            modelMeshDark.useQuaternion = true;
+            modelMeshDark.name = gameObject.gameParameters.name + " dark";
+            modelMeshDark.objectID = modelMesh.objectID;
+            modelMeshDark.position = modelMesh.position;
+            modelMeshDark.quaternion = modelMesh.quaternion;
 
             switch(modelMesh.objectType) {
-              case PLAYER_SHIP: {
-                  modelMesh.gameParameters = gameObject.gameParameters;
-                  modelMesh.drawParameters = gameObject.drawParameters;
-                  //for 3rd person ship positioning
-                  modelMesh.currentRoll = 0;
-                  modelMesh.currentXOffset = 0;
-                  modelMesh.currentYOffset = 0;
+                case PLAYER_SHIP: {
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    //for 3rd person ship positioning
+                    modelMesh.currentRoll = 0;
+                    modelMesh.currentXOffset = 0;
+                    modelMesh.currentYOffset = 0;
 
-                  loadLasers(modelMesh, scene);
-                  sceneElements.mainShip = modelMesh;
+                    loadLasers(modelMesh, scene);
+                    sceneElements.mainShip = modelMesh
 
-                  break;
-              }
-              case AI_SHIP: {
-                  console.log("load ai ship");
-                  modelMesh.gameParameters = gameObject.gameParameters;
-                  modelMesh.drawParameters = gameObject.drawParameters;
-                  loadLasers(modelMesh, scene);
-                  sceneElements.AIShips.push(modelMesh);
-                  self.minimap.addMinimapObject(AI_SHIP)
-                  break;
-              }
+                    break;
+                }
+                case AI_SHIP: {
+                    console.log("load ai ship");
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    loadLasers(modelMesh, scene);
+
+
+                    modelMesh.tempDir = new THREE.Vector3(0, 0, 0);
+                    modelMesh.targetPos = new THREE.Vector3(0, 0, 0);
+                    modelMesh.tempQuat = new THREE.Quaternion();
+                    modelMesh.tempMat = new THREE.Matrix4();
+                    modelMesh.FORWARD = new THREE.Vector3(0, 0, -1);
+                    modelMesh.UP = new THREE.Vector3(0, 1, 0);
+
+                    var mesh = modelMesh;
+                    modelMesh.turn = function(x, y, z) {
+                        //set target position (might change depending on huy)
+                        mesh.targetPos.set(x, y, z);
+
+                        //get new look direction vector
+//                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+                        mesh.tempDir.set(x, y, z);
+
+                        //copy inverse rotation and apply to direction to get new look in local coords
+                        mesh.tempQuat.copy(mesh.quaternion).inverse();
+                        mesh.tempQuat.multiplyVector3(mesh.tempDir, mesh.tempDir);
+                        mesh.tempDir.normalize();
+
+                        //calculate roll based on look dir and new dir (in local coords)
+                        mesh.tempQuat.setFromAxisAngle(mesh.FORWARD, (Math.PI * 0.25) * mesh.tempDir.x);
+
+                        //calculate new look quaternion in world coords
+                        mesh.tempMat.lookAt(mesh.position, mesh.targetPos, mesh.up);
+                        mesh.quaternion.setFromRotationMatrix(mesh.tempMat);
+
+                        //apply roll calculated earlier
+                        mesh.quaternion.multiplySelf(mesh.tempQuat);
+
+                        //update look direction
+                        mesh.quaternion.multiplyVector3(mesh.FORWARD, mesh.direction);
+                        //update up direction
+                        mesh.quaternion.multiplyVector3(mesh.UP, mesh.up);
+                    }
+
+                    sceneElements.AIShips.push(modelMesh);
+                    self.minimap.addMinimapObject(AI_SHIP, modelMesh.objectID);
+                    break;
+                }
             }
 
             modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
             scene.add(modelMesh);
+            self.gameplay_glow_scene.add(modelMeshDark);
         }
 
 
@@ -456,8 +590,7 @@ function GraphicsEngine() {
          */
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
             var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
-            //loader.load(parentShip.drawParameters.laserModel, callback);
-            jloader.load("models/lasers/laser.js", callback);
+            jloader.load("models/lasers/lasertest.js", callback);
         }
 
         /*
@@ -467,7 +600,6 @@ function GraphicsEngine() {
          *      parentShip: sceneObject representing parent ship the lasers belong to
          *      laserContainer: Object3D to hold individual lasers
          */
-        var glowscene = this.gameplay_glow_scene;
         function loadJSONLasers(geometry, parentShip, scene) {
             var laserContainer = new THREE.Object3D();
             //when deleting, make sure to null pointers
@@ -475,15 +607,23 @@ function GraphicsEngine() {
             laserContainer.parentShip = parentShip;
 
             laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
-            laserContainer.parentShipID = parentShip.drawParameters.shipID;
+            laserContainer.parentID = parentShip.objectID;
 
             for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xff00ff}));
+                laserMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+                laserMesh.overdraw = true;
                 laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
                 laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
                 laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
                 laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
-                laserMesh.parentShipID = parentShip.drawParameters.shipID;
+                laserMesh.parentID = parentShip.objectID
+
+                laserMesh.spheres = {outer: {x: 0,
+                                             y: 0,
+                                             z: 0,
+                                             r: 10},
+                                     inner: []
+                }
 
                 laserMesh.useQuaternion = true;
                 laserMesh.fired = false;
@@ -494,8 +634,8 @@ function GraphicsEngine() {
             }
 
             sceneElements.lasers.push(laserContainer);
-            glowscene.add(laserContainer);
-//            scene.add(laserContainer);
+//            self.gameplay_glow_scene.add(laserContainer);
+            scene.add(laserContainer);
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -534,6 +674,8 @@ function GraphicsEngine() {
 
                         container.children[i].translateX(-10);
                         container.children[i+1].translateX(10);
+                        container.children[i].translateZ(20);
+                        container.children[i+1].translateZ(20);
 
                     } else {
                         container.children[i].translateZ(-container.children[i].speed);
@@ -542,123 +684,18 @@ function GraphicsEngine() {
                         container.children[i].currentDistance += 1;
                         container.children[i+1].currentDistance += 1;
                     }
-
                 }
-
             }
         }
-
-
-
-
-
-
-
-//
-//        /*
-//         *  Creates lasers for a given ship (sceneObject).
-//         *      parentShip: sceneObject that represents parent ship that lasers belong to
-//         *      scene: scene to add lasers to
-//         */
-//        function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
-//            var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
-//            //loader.load(parentShip.drawParameters.laserModel, callback);
-//            loader.load("models/lasers/laser.js", callback);
-//
-//
-//        }
-//
-//        /*
-//         *  Creates mesh based on model, fills in parameters based on parentShip's parameters,
-//         *  fills in parameters necessary for drawing and computations, and populates container.
-//         *  (called by loadLasers only)
-//         *      parentShip: sceneObject representing parent ship the lasers belong to
-//         *      laserContainer: Object3D to hold individual lasers
-//         */
-//        function loadJSONLasers(geometry, parentShip, scene) {
-//            var laserContainer = new THREE.Object3D();
-//
-//            //when deleting, make sure to null pointers
-//            parentShip.lasers = laserContainer; //assign pointer from parent ship to its lasers'
-//            laserContainer.parentShip = parentShip;
-//
-//            laserContainer.name = parentShip.gameParameters.name + " " + "lasers";
-//            laserContainer.parentShipID = parentShip.drawParameters.shipID;
-//
-//            for(var i = 0; i < parentShip.gameParameters.weapons.lasers.amount; i++) {
-//                laserMesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({color: 0xffffff}));
-//                laserMesh.type = parentShip.gameParameters.weapons.lasers.type;
-//                laserMesh.damage = parentShip.gameParameters.weapons.lasers.damage;
-//                laserMesh.maxDistance = parentShip.gameParameters.weapons.lasers.range;
-//                laserMesh.speed = parentShip.gameParameters.weapons.lasers.speed;
-//                laserMesh.parentShipID = parentShip.drawParameters.shipID;
-//
-//                laserMesh.useQuaternion = true;
-//                laserMesh.fired = false;
-//                laserMesh.currentDistance = 0;
-//            //                laserMesh.visible = false;
-//
-//                laserContainer.add(laserMesh);
-//            }
-//
-//            sceneElements.lasers.push(laserContainer);
-//            scene.add(laserContainer);
-//
-//            //laser firing function to be called to fire laser;
-//            parentShip.fireLaser = function() {
-//                for(var i = 0; i < laserContainer.children.length; i++) {
-//                    if(!laserContainer.children[i].fired) {
-//                        laserContainer.children[i].fired = true;
-//                        laserContainer.children[i+1].fired = true;
-//                        laserContainer.children[i].currentDistance += 1;
-//                        laserContainer.children[i+1].currentDistance += 1;
-//                        laserContainer.children[i].visible = true;
-//                        laserContainer.children[i+1].visible = true;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            var self = laserContainer;
-//            laserContainer.update = function() {
-//                for(var i = 0; i < self.children.length; i+=2) {
-//                    if(self.children[i].currentDistance >= self.children[i].maxDistance || self.children[i].hit) {
-//                        self.children[i].currentDistance = 0;
-//                        self.children[i+1].currentDistance = 0;
-//                        self.children[i].fired = false;
-//                        self.children[i+1].fired = false;
-//                        self.children[i].hit = false;
-//                        self.children[i+1].hit = false;
-//                        self.children[i].visible = false;
-//                        self.children[i+1].visible = false;
-//                    }
-//                    if(!self.children[i].fired) {
-//                        self.children[i].quaternion.copy(self.parentShip.quaternion);
-//                        self.children[i+1].quaternion.copy(self.parentShip.quaternion);
-//
-//                        self.children[i].position.copy(self.parentShip.position);
-//                        self.children[i+1].position.copy(self.parentShip.position);
-//
-//                        self.children[i].translateX(-10);
-//                        self.children[i+1].translateX(10);
-//
-//                    } else {
-//                        self.children[i].translateZ(-self.children[i].speed);
-//                        self.children[i+1].translateZ(-self.children[i+1].speed);
-//
-//                        self.children[i].currentDistance += 1;
-//                        self.children[i+1].currentDistance += 1;
-//                    }
-//
-//                }
-//
-//            }
-//        }
     }
 
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
-        var duration = 2000,
-            e = new Explosion(x, y, z, this.gameplay_scene, duration);
+        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
+        sceneElements.explosions.push(e);
+    }
+    GraphicsEngine.prototype.addExplosionSmall = function(x, y, z) {
+        // TODO - change it so that it's small
+        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
 
@@ -749,12 +786,16 @@ function GraphicsEngine() {
 //               }
                 updateLasers();
                 updateExplosions();
+
+                //check if map is hidden or not before rendering
+                self.jumpmap.updateJumpmap();
+
                 updateScene();
             }
-            //self.jumpmap.updateJumpmap();
             self.renderer.clear();
             self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
-            self.composer.render();
+//            self.glow_composer.render();
+//            self.blend_composer.render();
         }
 
 
@@ -818,7 +859,6 @@ function GraphicsEngine() {
             sceneObject.quaternion.copy(self.gameplay_camera.quaternion);
 
             //set ship direction
-            //tempVec.set(0, 0, -1);
             sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
 
             //rotate ship based on roll
@@ -862,7 +902,7 @@ function GraphicsEngine() {
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
-            sceneObject.translateZ(-70); //(distance from camera)
+            sceneObject.translateZ(-90); //(distance from camera)
 //            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 
@@ -876,10 +916,8 @@ function GraphicsEngine() {
                         HUDObject.position.copy(self.gameplay_camera.position);
                         HUDObject.quaternion.copy(self.gameplay_camera.quaternion);
                         HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
-//                         HUDObject.position.x = -gameControls.rotationVector.y * 0.1;
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
-//                         HUDObject.position.y = gameControls.rotationVector.x * 0.1;
-                        HUDObject.translateZ(-71);
+                        HUDObject.translateZ(-91);
                         break;
                     }
                     case RING: {
@@ -911,7 +949,6 @@ function GraphicsEngine() {
                     sceneElements.explosions.splice(i, 1);
                 }
             }
-            //console.log(sceneElements.explosions, sceneElements.explosions.length);
         }
 
         //temporary
@@ -920,77 +957,84 @@ function GraphicsEngine() {
          *  Function to update the objects in the scene (~= game engine for now)
          */
         function updateScene() {
-//            for(i = 0; i < self.gameplay_scene.objects.length; i++) {
             for(i = 0; i < sceneElements.AIShips.length; i++) {
-//                sceneObject = self.gameplay_scene.objects[i];
                 sceneObject = sceneElements.AIShips[i];
                 switch(sceneObject.objectType) {
                     case AI_SHIP: {
-                        // tempVecForward.set(0, 0, -1);
-                        // tempVecUp.set(0, 1, 0);
-                        switch(sceneObject.drawParameters.shipID) {
+                        switch(sceneObject.objectID) {
                             case 1: {
 
                                 //TODO: NEED TO CONVERT THIS INTO aiTurn() function
-
-                                //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
-
-                                //multiply reference UP by quaternion to keep current UP
-                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-
-                                //object's new look direction
-                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
-
-                                //invert ship quaternion and apply to new look dir to get it in local coords
-                                tempQuat.copy(sceneObject.quaternion).inverse();
-                                tempQuat.multiplyVector3(tempVecDir, tempVec);
-                                tempVec.normalize();
-
-                                //set a rotation based on x offset of forward dir and new look dir (in local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x); //get max angle based on huy's direction vector
-
-                                //look at new dir (world coords)
-                                tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
-                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
-
-                                //apply turn rotation
-                                sceneObject.quaternion.multiplySelf(tempQuat);
-
+//
+//                                //calculate object's current look direction
+//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+////                                sceneObject.direction.normalize();
+//
+//                                //multiply reference UP by quaternion to keep current transformed up 
+//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+//
+//                                //object's new look direction
+//                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
+//
+//                                //invert ship quaternion and apply to new look dir to get it in local coords
+//                                tempQuat.copy(sceneObject.quaternion).inverse();
+//                                tempQuat.multiplyVector3(tempVecDir, tempVecDir);
+//                                tempVecDir.normalize();
+//
+//                                if(tempVecDir.x > 0.5) {
+//                                    tempVecDir.x = 0.5;
+//                                }
+//                                if(tempVecDir.y > 0.5) {
+//                                    tempVecDir.y = 0.5;
+//                                }
+//
+//
+//                                //set a rotation(roll) based on x offset of forward dir and new look dir (in local coords)
+//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVecDir.x); //get max angle based on huy's direction vector
+//
+//                                //look at new dir (world coords)
+//                                tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
+//                                sceneObject.quaternion.setFromRotationMatrix(tempMat); //reset the quaternion with new look dir
+//
+//                                //apply turn (roll) rotation calculated earlier
+//                                sceneObject.quaternion.multiplySelf(tempQuat);
                                 //go forward
-                                sceneObject.translateZ(-2);
+//                                sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
+//                                sceneObject.translateZ(-5);
+
                                 break;
                             }
                             case 2: {
 
-                                //calculate object's current look direction
-                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-                                sceneObject.direction.normalize();
-
-                                //multiply reference UP by quaternion to keep current UP
-                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-
-                                //object's new look direction
-                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
-
-                                //invert ship quaternion and apply to new look dir
-                                tempQuat.copy(sceneObject.quaternion).inverse();
-                                tempQuat.multiplyVector3(tempVecDir, tempVec);
-                                tempVec.normalize();
-
-                                //set a rotation based on x offset of forward dir and new look dir (local coords)
-                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI) * tempVec.x);
-
-                                //look at new dir (world coords)
-                                tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
-                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
-
-                                //apply turn rotation
-                                sceneObject.quaternion.multiplySelf(tempQuat);
+//                                //calculate object's current look direction
+//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
+//                                sceneObject.direction.normalize();
+//
+//                                //multiply reference UP by quaternion to keep current UP
+//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
+//
+//                                //object's new look direction
+//                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
+//
+//                                //invert ship quaternion and apply to new look dir
+//                                tempQuat.copy(sceneObject.quaternion).inverse();
+//                                tempQuat.multiplyVector3(tempVecDir, tempVec);
+//                                tempVec.normalize();
+//
+//                                //set a rotation based on x offset of forward dir and new look dir (local coords)
+//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVec.x);
+//
+//                                //look at new dir (world coords)
+//                                tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
+//                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
+//
+//                                //apply turn rotation
+//                                sceneObject.quaternion.multiplySelf(tempQuat);
+                                sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
+//                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
 
                                 //go forward
-                                sceneObject.translateZ(-2);
+//                                sceneObject.translateZ(-5);
                                 break;
                             }
                         }
@@ -1000,13 +1044,15 @@ function GraphicsEngine() {
                 }
 
                 var t = Date.now() * 0.0008;
-                tempSphere1.position.x = 500*Math.cos(t)
-                tempSphere1.position.y = -1000*Math.sin(t)
-                tempSphere1.position.z = 800*Math.sin(t) - 400;
+                tempSphere1.position.x = 2000*Math.cos(t)
+                tempSphere1.position.y = 2000*Math.sin(t)
+                tempSphere1.position.z = 800*Math.sin(t);
 
-                tempSphere2.position.x = 400*Math.sin(t);
+                tempSphere2.position.x = 2000*Math.sin(t);
                 tempSphere2.position.y = 500*Math.cos(t) + 150;
                 tempSphere2.position.z = 600*Math.cos(t);
+
+
 
             }
         }
