@@ -17,13 +17,13 @@ Hello visitor! This is the home of WALDO, a browser-based game written for COMP 
 1. Clone a copy of the repository into your public\_html
 2. Set up configuration:
 
-    $ edit dev/game/server/server.conf  
+        $ edit dev/game/server/server.conf  
     
-    $ edit dev/game/GameConstants.js  
+        $ edit dev/game/GameConstants.js  
     
 3. Start the server:
 
-    $ python dev/game/server/server.py  
+        $ python dev/game/server/server.py  
     
 4. Configure Chromium 
      Enable the following (in about:flags)
