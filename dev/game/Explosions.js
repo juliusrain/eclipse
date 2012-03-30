@@ -43,7 +43,7 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             var pCount, particle_geometry, particle_position;
 
             //small particles
-            pCount = 1000;
+            pCount = 700;
             radius = 250;
             particle_geometry = new THREE.Geometry();
             for(var i = 0; i < pCount; i++) {
@@ -84,8 +84,8 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             this.fire_sprite_container.fade_factor = 0.003;
             var fire_texture = THREE.ImageUtils.loadTexture("textures/explosions/exp1.png");
 
-            sCount = 50;
-            sSize = 10;
+            sCount = 25;
+            sSize = 15;
             for(var i = 0; i < sCount; i++) {
                 sprite = new THREE.Sprite({
                     map: fire_texture,
@@ -113,12 +113,12 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             this.smoke_sprite_container.crt_size = 0;
             this.smoke_sprite_container.growth_rate = 0.015;
             this.smoke_sprite_container.crt_displacement = 0.0; //displacement from center
-            this.smoke_sprite_container.max_displacement = 0.15;
+            this.smoke_sprite_container.max_displacement = 0.10;
             this.smoke_sprite_container.displacement_speed = 0.085;
             this.smoke_sprite_container.fade_factor = 0.002;
             var smoke_texture = THREE.ImageUtils.loadTexture("textures/explosions/smoke1.png");
 
-            sCount = 15;
+            sCount = 10;
             sSize = 10;
             for(var i = 0; i < sCount; i++) {
                 sprite = new THREE.Sprite({
