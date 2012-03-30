@@ -14,7 +14,7 @@ Hello visitor! This is the home of WALDO, a browser-based game written for COMP 
 
 ##Play (on Chromium)##
 
-1. Clone a copy of the repository into your public_html
+1. Clone a copy of the repository into your public\_html
 2. Set up configuration:  
 
     $ edit dev/game/server/server.conf  
