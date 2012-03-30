@@ -31,5 +31,5 @@ Hello visitor! This is the home of WALDO, a browser-based game written for COMP 
     * GPU Accelerated Drawing
     * GPU Accelerated Canvas 2D
 5. Start the game:
-    
-    $ chromium-browser --allow-file-access-from-files dev/game/index.html
+
+        $ chromium-browser --allow-file-access-from-files dev/game/index.html
