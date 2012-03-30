@@ -15,21 +15,21 @@ Hello visitor! This is the home of WALDO, a browser-based game written for COMP 
 ##Play (on Chromium)##
 
 1. Clone a copy of the repository into your public\_html
-2. Set up configuration:  
+2. Set up configuration:
 
     $ edit dev/game/server/server.conf  
     
     $ edit dev/game/GameConstants.js  
     
-3. Start the server:   
+3. Start the server:
 
     $ python dev/game/server/server.py  
     
 4. Configure Chromium 
-    Enable the following (in about:flags)
+     Enable the following (in about:flags)
     * Override software rendering list
     * GPU Accelerated Drawing
     * GPU Accelerated Canvas 2D
-5. Start the game
-
+5. Start the game:
+    
     $ chromium-browser --allow-file-access-from-files dev/game/index.html
