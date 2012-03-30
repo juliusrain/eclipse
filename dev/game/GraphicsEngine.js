@@ -1034,7 +1034,7 @@ function GraphicsEngine() {
 //                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
 
                                 //go forward
-//                                sceneObject.translateZ(-5);
+                                sceneObject.translateZ(-5);
                                 break;
                             }
                         }
