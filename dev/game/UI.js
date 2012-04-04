@@ -23,54 +23,41 @@ $('#chatcompose').blur(function (){
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
-    e.stopImmediatePropagation();
     switch(e.keyCode){
         // j = toggle jump map
         case 106: {
-            if (!chatfocus) {
-                toggleJumpMap();
-            }
+            toggleJumpMap();
             break;
         }
         // l = bind/unbind cursor
         case 108: {
-            if(!$('#jumpamapbox:visible').length && !chatfocus) {
+            if(!$('#jumpamapbox:visible').length) {
                 toggleCursor();
             } 
             break;
         }
         // space = fire weapon
         case 32: {
-            if (!chatfocus) {
-                gameEngine.fireWeapon();
-            }
+            gameEngine.fireWeapon();
             break;
         }
         // t = auto repair
         case 116:{
-            if (!chatfocus) {
-                toggleAutoRepair();
-            }
+            toggleAutoRepair();
             break;
         }
         // c = chat box
         case 99: {
-            if (!chatfocus) {
+            if (!chatfocus){
                 switchToChat();
+                return false;
             }
-            break;
-        }
-        case 111: {
-            sceneElements.AIShips[0].fireLaser();
             break;
         }
         //create explosion (for testing) p
         case 112: {
-            if (!chatfocus) {
-                graphicsEngine.addExplosionLarge(50, 0, -100);
-                sceneElements.AIShips[0].fireLaser();
-            }
             graphicsEngine.addExplosionLarge(50, 0, -100);
+            sceneElements.AIShips[0].fireLaser();
             break;
         }
     }
@@ -78,16 +65,18 @@ $(window).keypress(function (e){
 
 $('#chatcompose').keydown(function (e){
     console.log(e);
-    e.stopImmediatePropagation();
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
+        // if user pressed esc, leave chat mode
         $('#chatcompose').blur();
     }
     else if (e.which == 13) {
-        console.log("you pressed enter");
+        // if user pressed answer, send new msg
         newMessage(chatbox.val());
         chatbox.val("");
     } else {
+        // stop propagation of event so it doesn't affect ship steering
+        e.stopImmediatePropagation();
     }
 });
 
