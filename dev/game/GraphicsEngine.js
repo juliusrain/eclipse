@@ -3,6 +3,64 @@
 //contains HUD elements, updated by graphics engine (crosshairs, etc...)
 var HUDElements = [];
 
+var ship_template = 
+    {   type: NET_SHIP, 
+        gameParameters: {   //game related parameters
+            name: "net_ship", //model number?
+            engine: {   level: 0,
+                        speed: 1,
+                        turnFactor: 1.5, //also used by graphics engine
+                        longJumpCost: 50,
+                        medJumpCost: 20,
+                        rechargeRate: 1,
+                        rechargeCost: 1,
+                        currentCharge: 0,
+            },
+            armor: {},
+            health: 100,
+            maxHealth: 10000,
+            repairRate: 100,
+            repairCost: {food:1, fuel: 1, metals:15},
+            weapons: {
+                lasers: {
+                    type: 0, //particle vs elongated?
+                    damage: 0,
+                    range: 300,
+                    speed: 70,
+                    amount: 50,
+                    maxCharge: 15400,
+                    currentCharge: 0,
+                    rechargeRate: 350,
+                    rechargeCost: 1,
+                    fireCost: 500,
+                },
+                missiles: {
+
+                }
+            },
+            inventory: {},
+            spheres:{
+                outer:{
+                    x:0,
+                    y:0,
+                    z:0,
+                    r:25
+                },
+                inner:[]
+            },
+        },
+        drawParameters: {   //graphics/drawing related parameters
+            geometry: "models/ships/player_ship002_scaled_copy.js",
+            laserModel: "models/lasers/laser.js",
+
+            tiltRotationCurrent: 0, //can make these specific to engine
+            tiltRotationMax: 0.4, //radians
+
+            position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
+        }
+    };
+
+
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
@@ -183,6 +241,7 @@ function GraphicsEngine(glow) {
             self.addGameObject(objects[i]);
         }
 
+        //add lighting
         this.minimap.loadMinimap();
         this.jumpmap.loadJumpmap();
 
@@ -351,6 +410,7 @@ function GraphicsEngine(glow) {
         var jloader = new THREE.JSONLoader();
         var cloader = new THREE.ColladaLoader();
         var self = this;
+
 
         switch(gameObject.type) {
             case SKYBOX: { //if skybox
@@ -572,10 +632,13 @@ function GraphicsEngine(glow) {
                     var mesh = modelMesh;
                     modelMesh.turn = function(x, y, z) {
                         //set target position (might change depending on huy)
-                        mesh.targetPos.set(x, y, z);
-
+                        //mesh.tempDir.set(x, y, z);
+                        //var l = mesh.tempDir.length();
+                        mesh.targetPos.set(x,y,z);
+                        //mesh.targetPos.set(mesh.position.x*l, mesh.position.y*l, mesh.position.z*l);
+                         
                         //get new look direction vector
-//                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+                        //mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
                         mesh.tempDir.set(x, y, z);
 
                         //copy inverse rotation and apply to direction to get new look in local coords
@@ -654,7 +717,8 @@ function GraphicsEngine(glow) {
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
 
-                        asteroid_mesh.spheres = gameObject.drawParameters.bounds[i].spheres;
+                        asteroid_mesh.spheres = {outer: {}, inner:[]};
+                        asteroid_mesh.spheres.outer = gameObject.drawParameters.bounds[i].spheres;
                         asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
 
                         asteroid_container.add(asteroid_mesh);
@@ -868,8 +932,8 @@ function GraphicsEngine(glow) {
             if(self.getSceneStatus()) {
                 updateMainShip();
                 updateHUD(); //includes minimap
-
-//               ai.updateScene(); //decides direction
+                ai.react();
+                //ai.updateScene(); //decides direction
 //               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
                    gameEngine.update(); //increment laser and ship position
 //               }
@@ -1131,11 +1195,11 @@ function GraphicsEngine(glow) {
 //
 //                                //apply turn rotation
 //                                sceneObject.quaternion.multiplySelf(tempQuat);
-                                sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
+                               // sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
 //                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
 
                                 //go forward
-                                sceneObject.translateZ(-5);
+                                //sceneObject.translateZ(-3);
                                 break;
                             }
                         }

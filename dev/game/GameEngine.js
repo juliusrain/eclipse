@@ -75,6 +75,7 @@ GameEngine.prototype.load = function (ssid, pid) {
     graphicsEngine.startEngine();
     // remove loader screen
     $('#loader').hide();
+	console.log('hey this is really where I am! ' + sceneElements.mainShip.position);
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
@@ -200,6 +201,21 @@ GameEngine.prototype.updateCollisions = function() {
             }
         }
     }
+    for(var eo in sceneElements.env_objects) {
+		if(!sceneElements.env_objects[eo].hasOwnProperty('children')) {
+			continue;
+		}
+    	for(var ec in sceneElements.env_objects[eo].children) {
+	        colls = collision(sceneElements.env_objects[eo].children[ec]);
+	        // process
+	        for(var c in colls) {
+	            if(colls[c].obj.hasOwnProperty('fired')) {
+	                // hit by a laser!
+	                laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
+	            }
+	        }
+		}
+    }
 };
 
 function round2(n) {
@@ -310,6 +326,13 @@ GameEngine.prototype.netUpdate = function (message) {
 			}
             if(sceneElements.hasOwnProperty('netShips')) {
             	objects = objects.concat(sceneElements.netShips);
+			}
+            if(sceneElements.hasOwnProperty('env_objects')) {
+				for(var env in sceneElements.env_objects) {
+					if(sceneElements.env_objects[env].hasOwnProperty('children')) {
+            			objects = objects.concat(sceneElements.env_objects[env].children);
+					}
+				}
 			}
             //console.log(objects.length);
             // go through each object in the scene
