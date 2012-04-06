@@ -654,6 +654,7 @@ function GraphicsEngine(glow) {
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
 
+                        asteroid_mesh.spheres = gameObject.drawParameters.bounds[i].spheres;
                         asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
 
                         asteroid_container.add(asteroid_mesh);

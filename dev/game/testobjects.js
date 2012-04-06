@@ -171,20 +171,17 @@ var asteroid_field = {  type: ASTEROID_FIELD,
             
                         gameParameters: {
                             name: "asteroidfield",
-                            spheres: {
-                                outer: {
-                                    x: 0,
-                                    y: 0,
-                                    z: 0,
-                                    r: 10,
-                                },
-                                inner: []
-                            },
                         },
+
                         drawParameters: {
                             geometry: "models/asteroids/asteroid2.js",
                             positions: [    
-                                {x: 100, y: 100, z: -100}
+                                {x: 100, y: 100, z: -100},
+                                {x: -100, y: 100, z: -100}, 
+                            ],
+                            bounds: [
+                                {spheres: { x: 0, y: 0, z: 0, r: 10}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 10}},
                             ],
                             count: 1,
                         },
