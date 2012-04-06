@@ -256,6 +256,12 @@ GameEngine.prototype.fireWeapon = function () {
     }
 };
 
+// Receive Network Update
+// triggered when network module receives a position update
+GameEngine.prototype.netUpdate = function (message) {
+	
+};
+
 
         function cAdd(coords1, coords2){
             var coords = {};
@@ -298,7 +304,12 @@ GameEngine.prototype.fireWeapon = function () {
                 objects = objects.concat(sceneElements.lasers[i].children);
                 //console.log(objects.length);
             }
-            objects = objects.concat(sceneElements.missiles);
+            if(sceneElements.hasOwnProperty('missiles')) {
+            	objects = objects.concat(sceneElements.missiles);
+			}
+            if(sceneElements.hasOwnProperty('netShips')) {
+            	objects = objects.concat(sceneElements.netShips);
+			}
             //console.log(objects.length);
             // go through each object in the scene
             for(candidate in objects){

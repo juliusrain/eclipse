@@ -38,6 +38,9 @@ Network.prototype.connect = function () {
         if (action == "chat") {
             nw.displayChat(sender, body);
         }
+		else if(action == "pos") {
+			gameEngine.netUpdate(body);
+		}
     }
 }
 
