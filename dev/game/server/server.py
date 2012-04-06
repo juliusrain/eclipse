@@ -41,7 +41,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         logging.info("listener removed: %d listener(s)" % len(WSHandler.listeners))
         
     def on_message(self, message):
-        logging.info("got message %r", message)
+        logging.info("got message %r\r", message)
         try:
             parsed = tornado.escape.json_decode(message)
             action = parsed["action"]
