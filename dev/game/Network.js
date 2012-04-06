@@ -19,7 +19,12 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 }
 
 Network.prototype.connect = function () {
-    this.ws = new WebSocket(URL);
+	if(typeof MozWebSocket == "function") {
+		this.ws = new MozWebSocket(URL);
+	}
+	else {
+	    this.ws = new WebSocket(URL);
+	}
     // reconnect whenever connection drops
     var nw = this;
     this.ws.onclose = function (evt) {

@@ -12,7 +12,7 @@ import tornado.websocket
 
 from tornado.options import define, options
 
-import conf
+#import conf
 
 define("PORT", help="run on the given port", type=int)
 define("ROOT", help="root URL", type=str)

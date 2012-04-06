@@ -10,7 +10,7 @@ body {
     background-color:#222;
     color:white;
     overflow:hidden;
-    cursor: none;
+    cursor:crosshair;
 }
 #main {
     position:absolute;
