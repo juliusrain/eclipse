@@ -7,12 +7,14 @@
 var SKYBOX = 0,
     PLAYER_SHIP = 10,
     AI_SHIP = 11,
+    ASTEROID_FIELD = 12,
 
     CROSSHAIR = 90,
     RING = 91,
     MINIMAP = 92;
 
-var EXPLOSION_LARGE = 0;
+var EXPLOSION_LARGE = 0,
+    EXPLOSION_SMALL = 1;
 
 // values
 var EATING = 100;
