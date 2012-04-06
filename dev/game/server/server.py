@@ -12,6 +12,8 @@ import tornado.websocket
 
 from tornado.options import define, options
 
+import data.access as db
+
 define("PORT", help="run on the given port", type=int)
 define("ROOT", help="root URL", type=str)
 define("DEBUG", help="debug mode on/off", type=bool)
@@ -33,7 +35,7 @@ class Application(tornado.web.Application):
         
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-	self.write("Hello, I'm Saining Li and I like Mudkips.")
+	    self.write(db.test())
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     listeners = set()

@@ -28,6 +28,9 @@ def runner(fn):
 	newfn.__name__ = fn.__name__
 	newfn.__doc__ = newfn.__doc__
 	return newfn
+	
+def test():
+	return "lololol"
 
 ##################################################
 # Access Functions
