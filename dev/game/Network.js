@@ -14,6 +14,11 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 				console.log(received[e].parameters.textures[i]);
 			}
 		}
+		else if(received[e].type === PLAYER_SHIP || received[e].type === AI_SHIP) {
+			received[e].drawParameters.position.x = Math.random() * 1000 - 500;
+			received[e].drawParameters.position.y = Math.random() * 1000 - 500;
+			received[e].drawParameters.position.z = Math.random() * 1000 - 500;
+		}
 	}
 	return received;
 }
