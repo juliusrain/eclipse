@@ -33,7 +33,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?
-                                damage: 0,
+                                damage: 100,
                                 range: 300,
                                 speed: 70,
                                 amount: 50,
@@ -86,7 +86,7 @@ var AIShip = {  type: AI_SHIP,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
-                            damage: 0,
+                            damage: 100,
                             range: 300,
                             speed: 70,
                             amount: 30,
@@ -133,7 +133,7 @@ var AIShip2 = { type: AI_SHIP,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
-                            damage: 0,
+                            damage: 100,
                             range: 300,
                             speed: 70,
                             amount: 30,
