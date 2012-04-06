@@ -260,7 +260,7 @@ GameEngine.prototype.fireWeapon = function () {
 // Receive Network Update
 // triggered when network module receives a position update
 GameEngine.prototype.netUpdate = function (message) {
-	
+    console.log("got message");
 };
 
 
