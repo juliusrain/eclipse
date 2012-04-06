@@ -199,10 +199,24 @@ GameEngine.prototype.updateCollisions = function() {
     }
 };
 
+function round2(n) {
+	n *= 100;
+	n = Math.round(n);
+	n /= 100;
+	return n;
+}
+
 // GameEngine update function
 // called each frame
 GameEngine.prototype.update = function () {
-    //console.log(sceneElements.mainShip.position.x+":"+sceneElements.mainShip.position.y+":"+sceneElements.mainShip.position.z);
+	if(network.ws.readyState === 1) {
+		var message = {action:'pos', body:{}};
+		message.body.x = round2(sceneElements.mainShip.position.x);
+		message.body.y = round2(sceneElements.mainShip.position.y);
+		message.body.z = round2(sceneElements.mainShip.position.z);
+    	//console.log(JSON.stringify(message));
+		network.send(message);
+	}
     if(this.logicwait === 0) {
         //update things that don't need to be done strictly each frame
 
