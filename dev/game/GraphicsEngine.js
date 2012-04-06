@@ -583,10 +583,13 @@ function GraphicsEngine() {
                     var mesh = modelMesh;
                     modelMesh.turn = function(x, y, z) {
                         //set target position (might change depending on huy)
-                        mesh.targetPos.set(x, y, z);
-
+                        //mesh.tempDir.set(x, y, z);
+                        //var l = mesh.tempDir.length();
+                        mesh.targetPos.set(x,y,z);
+                        //mesh.targetPos.set(mesh.position.x*l, mesh.position.y*l, mesh.position.z*l);
+                         
                         //get new look direction vector
-//                        mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
+                        //mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
                         mesh.tempDir.set(x, y, z);
 
                         //copy inverse rotation and apply to direction to get new look in local coords
@@ -839,8 +842,8 @@ function GraphicsEngine() {
             if(self.getSceneStatus()) {
                 updateMainShip();
                 updateHUD(); //includes minimap
-
-//               ai.updateScene(); //decides direction
+                ai.react();
+                //ai.updateScene(); //decides direction
 //               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
                    gameEngine.update(); //increment laser and ship position
 //               }
@@ -1103,11 +1106,11 @@ function GraphicsEngine() {
 //
 //                                //apply turn rotation
 //                                sceneObject.quaternion.multiplySelf(tempQuat);
-                                sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
+                               // sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
 //                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
 
                                 //go forward
-                                sceneObject.translateZ(-5);
+                                //sceneObject.translateZ(-3);
                                 break;
                             }
                         }
