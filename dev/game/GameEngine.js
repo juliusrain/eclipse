@@ -312,7 +312,11 @@ GameEngine.prototype.netUpdate = function (message) {
             	objects = objects.concat(sceneElements.netShips);
 			}
             if(sceneElements.hasOwnProperty('env_objects')) {
-            	objects = objects.concat(sceneElements.env_objects);
+				for(var env in sceneElements.env_objects) {
+					if(sceneElements.env_objects[env].hasOwnProperty('children')) {
+            			objects = objects.concat(sceneElements.env_objects[env].children);
+					}
+				}
 			}
             //console.log(objects.length);
             // go through each object in the scene
