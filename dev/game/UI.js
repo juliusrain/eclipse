@@ -10,14 +10,14 @@ $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 $('#chatcontrol').click(switchToChat);
 $('#chatcompose').focus(function (){
-	console.log('true');
-	$('#chatcontrol span').html('Esc');
-	chatfocus = true;
+    console.log('true');
+    $('#chatcontrol span').html('Esc');
+    chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-	console.log('false');
-	$('#chatcontrol span').html('C');
-	chatfocus = false;
+    console.log('false');
+    $('#chatcontrol span').html('C');
+    chatfocus = false;
 });
 
 // keyboard events
@@ -56,7 +56,7 @@ $(window).keypress(function (e){
         }
         //create explosion (for testing) p
         case 112: {
-            graphicsEngine.addExplosionLarge(50, 0, -100);
+            //graphicsEngine.addExplosionLarge(50, 0, -100);
             sceneElements.AIShips[0].fireLaser();
             break;
         }
@@ -107,22 +107,22 @@ function toggleAutoRepair() {
 
 function toggleCursor() {
     graphicsEngine.toggleCursor();
-	if($('#mouselockcontrol').hasClass("on")){
-		$('#mouselockcontrol').removeClass('on');
-		$('body').css('cursor', 'none');
-	}
-	else{
-		$('#mouselockcontrol').addClass('on');
-		$('body').css('cursor', 'auto');
-	}
+    if($('#mouselockcontrol').hasClass("on")){
+        $('#mouselockcontrol').removeClass('on');
+        $('body').css('cursor', 'none');
+    }
+    else{
+        $('#mouselockcontrol').addClass('on');
+        $('body').css('cursor', 'auto');
+    }
 }
 
 function switchToChat() {
-	console.log('chat?');
-	if(chatfocus){
-		$('#chatcompose').blur();
-	}
-	else{
-		$('#chatcompose').focus();
-	}
+    console.log('chat?');
+    if(chatfocus){
+        $('#chatcompose').blur();
+    }
+    else{
+        $('#chatcompose').focus();
+    }
 }

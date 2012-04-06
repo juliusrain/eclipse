@@ -257,6 +257,10 @@ function GraphicsEngine() {
             delete sceneElements.explosions[i];
             sceneElements.explosions.length--;
         }
+        for(i = sceneElements.env_objects.length - 1; i >=0; i--) {
+            delete sceneElements.env_objects[i];
+            sceneElements.env_objects.length--;
+        }
         for(i = sceneElements.lasers.length - 1; i >= 0; i--) {
             delete sceneElements.lasers[i];
             sceneElements.lasers.length--;
@@ -362,6 +366,10 @@ function GraphicsEngine() {
                 loadShip(gameObject, this.gameplay_scene);
                 break;
             }
+            case ASTEROID_FIELD: {
+                loadAsteroidField(gameObject, this.gameplay_scene);
+                break;
+            }
         }
 
         function loadCrosshair(gameObject, scene) {
@@ -441,6 +449,12 @@ function GraphicsEngine() {
             }
         }
 
+        function loadAsteroidField(gameObject, scene) {
+            var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
+            jloader.load(gameObject.drawParameters.geometry, callback);
+            console.log(gameObject.drawParameters.geometry);
+        }
+
         /*
          *  Load model from COLLADA
          *      gameObject: gameObject to be loaded from model
@@ -478,6 +492,10 @@ function GraphicsEngine() {
                     self.minimap.addMinimapObject(AI_SHIP)
                     break;
                 }
+                case ASTEROID_FIELD: {
+                    
+                    break;
+                }
             }
 
 
@@ -496,25 +514,26 @@ function GraphicsEngine() {
         *  (used only for gameObjects)
         */
         function loadJSON(geometry, gameObject, scene) {
-            var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
-            var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
 
-            //set mesh parameters
-            modelMesh.useQuaternion = true;
-            modelMesh.direction = new THREE.Vector3(0, 0, -1);
-            modelMesh.name = gameObject.gameParameters.name;
-            modelMesh.objectType = gameObject.type;
-            modelMesh.objectID = self.assignID();
-
-            //sync positions/rotations of normal and dark meshes
-            modelMeshDark.useQuaternion = true;
-            modelMeshDark.name = gameObject.gameParameters.name + " dark";
-            modelMeshDark.objectID = modelMesh.objectID;
-            modelMeshDark.position = modelMesh.position;
-            modelMeshDark.quaternion = modelMesh.quaternion;
-
-            switch(modelMesh.objectType) {
+            switch(gameObject.type) {
                 case PLAYER_SHIP: {
+                    var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+                    var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+
+                    //set mesh parameters
+                    modelMesh.useQuaternion = true;
+                    modelMesh.direction = new THREE.Vector3(0, 0, -1);
+                    modelMesh.name = gameObject.gameParameters.name;
+                    modelMesh.objectType = gameObject.type;
+                    modelMesh.objectID = self.assignID();
+
+                    //sync positions/rotations of normal and dark meshes
+                    modelMeshDark.useQuaternion = true;
+                    modelMeshDark.name = gameObject.gameParameters.name + " dark";
+                    modelMeshDark.objectID = modelMesh.objectID;
+                    modelMeshDark.position = modelMesh.position;
+                    modelMeshDark.quaternion = modelMesh.quaternion;
+
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
                     //for 3rd person ship positioning
@@ -525,10 +544,30 @@ function GraphicsEngine() {
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh
 
+                    modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+                    scene.add(modelMesh);
+                    self.gameplay_glow_scene.add(modelMeshDark);
+
                     break;
                 }
                 case AI_SHIP: {
-                    console.log("load ai ship");
+                    var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+                    var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+
+                    //set mesh parameters
+                    modelMesh.useQuaternion = true;
+                    modelMesh.direction = new THREE.Vector3(0, 0, -1);
+                    modelMesh.name = gameObject.gameParameters.name;
+                    modelMesh.objectType = gameObject.type;
+                    modelMesh.objectID = self.assignID();
+
+                    //sync positions/rotations of normal and dark meshes
+                    modelMeshDark.useQuaternion = true;
+                    modelMeshDark.name = gameObject.gameParameters.name + " dark";
+                    modelMeshDark.objectID = modelMesh.objectID;
+                    modelMeshDark.position = modelMesh.position;
+                    modelMeshDark.quaternion = modelMesh.quaternion;
+
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
                     loadLasers(modelMesh, scene);
@@ -573,13 +612,35 @@ function GraphicsEngine() {
 
                     sceneElements.AIShips.push(modelMesh);
                     self.minimap.addMinimapObject(AI_SHIP, modelMesh.objectID);
+
+                    modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+                    scene.add(modelMesh);
+                    self.gameplay_glow_scene.add(modelMeshDark);
+                    break;
+                }
+                case ASTEROID_FIELD: {
+                    var asteroid_container = new THREE.Object3D();
+                    asteroid_container.num_asteroids = gameObject.drawParameters.count;
+                    asteroid_container.name = gameObject.gameParameters.name;
+                    asteroid_container.objectType = gameObject.type;
+
+                    var asteroid_mesh;
+                    for(var i = 0; i < asteroid_container.num_asteroids; i++) {
+                        asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+                        asteroid_mesh.type = asteroid_container.objectType;
+                        asteroid_mesh.objectID = self.assignID();
+                        console.log("blah");
+
+                        asteroid_container.add(asteroid_mesh);
+                    }
+
+                    sceneElements.env_objects.push(asteroid_container);
+                    scene.add(asteroid_container);
+
                     break;
                 }
             }
 
-            modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
-            scene.add(modelMesh);
-            self.gameplay_glow_scene.add(modelMeshDark);
         }
 
 
@@ -694,8 +755,7 @@ function GraphicsEngine() {
         sceneElements.explosions.push(e);
     }
     GraphicsEngine.prototype.addExplosionSmall = function(x, y, z) {
-        // TODO - change it so that it's small
-        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
+        var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_SMALL);
         sceneElements.explosions.push(e);
     }
 
@@ -786,6 +846,7 @@ function GraphicsEngine() {
 //               }
                 updateLasers();
                 updateExplosions();
+                updateEnvObjects();
 
                 //check if map is hidden or not before rendering
                 self.jumpmap.updateJumpmap();
@@ -947,6 +1008,18 @@ function GraphicsEngine() {
                 if(sceneElements.explosions[i].done) {
                     delete sceneElements.explosions[i];
                     sceneElements.explosions.splice(i, 1);
+                }
+            }
+        }
+
+        function updateEnvObjects() {
+            for(var i = 0; i < sceneElements.env_objects.length; i++) {
+                sceneObject = sceneElements.env_objects[i];
+                switch(sceneObject.type) {
+                    case ASTEROID_FIELD: {
+
+                        break;
+                    }
                 }
             }
         }

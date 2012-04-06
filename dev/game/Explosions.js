@@ -8,12 +8,58 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
 
     this.scene = scene;
     this.renderer = renderer;
-    this.maxDuration = 4000;
-    this.currentDuration = 0;
     this.done = false;
+    this.maxDuration;
+    this.currentDuration;
+
+    console.log("creating " + explosion_type);
 
     switch(explosion_type) {
+        case EXPLOSION_SMALL: {
+            this.maxDuration = 500;
+            this.currentDuration = 0;
+            var sprite, sCount, sSize;
+
+            this.fire_sprite_container = new THREE.Object3D();
+            this.fire_sprite_container.radius = 50; //max size per sprite
+            this.fire_sprite_container.crt_size = 0;
+            this.fire_sprite_container.growth_rate = 0.025; //growth rate per sprite
+            this.fire_sprite_container.crt_displacement = 0.0; //current displacement from center
+            this.fire_sprite_container.max_displacement = 0.025;
+            this.fire_sprite_container.displacement_speed = 0.0025;
+            this.fire_sprite_container.fade_factor = 0.03;
+
+            var fire_texture = THREE.ImageUtils.loadTexture("textures/explosions/exp1.png");
+            
+            sCount = 20;
+            sSize = 10;
+            for(var i = 0; i < sCount; i++) {
+                sprite = new THREE.Sprite({
+                    map: fire_texture,
+                    useScreenCoordinates: false,
+                    scaleByViewport: true,
+                    size: sSize,
+                    blending: THREE.AdditiveBlending,
+                });
+                sprite.direction = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+                sprite.crt_size = 0;
+                sprite.position.set(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1).normalize();
+                sprite.rotation = Math.random()*Math.PI;
+
+                this.fire_sprite_container.add(sprite);
+            }
+
+            this.fire_sprite_container.position.set(x, y, z);
+
+            this.explosion.contents.push(this.fire_sprite_container);
+            this.scene.add(this.fire_sprite_container);
+
+            break;
+        }
+
         case EXPLOSION_LARGE: {
+            this.maxDuration = 4000;
+            this.currentDuration = 0;
             //spark shader attributes/uniforms
             this.spark_uniforms = {
                 texture: {type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("textures/explosions/spark1.png")},
@@ -145,23 +191,61 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
 
     this.deleteExplosion = function() {
         for(var i = this.explosion.contents.length - 1; i >= 0; i--) {
-            this.renderer.deallocateTexture(fire_texture);
-            this.renderer.deallocateTexture(smoke_texture);
-            this.renderer.deallocateTexture(spark_shader_material);
-            this.renderer.deallocateObject(this.fire_sprite_container);
-            this.renderer.deallocateObject(this.smoke_sprite_container);
+            if(typeof fire_texture != 'undefined') {
+                this.renderer.deallocateTexture(fire_texture);
+            }
+            if(typeof smoke_texture != 'undefined') {
+                this.renderer.deallocateTexture(smoke_texture);
+            }
+            if(typeof spark_shader_material != 'undefined') {
+                this.renderer.deallocateTexture(spark_shader_material);
+            }
+            if(this.hasOwnProperty('fire_sprite_container')) {
+                this.renderer.deallocateObject(this.fire_sprite_container);
+            }
+            if(this.hasOwnProperty('smoke_sprite_container')) {
+                this.renderer.deallocateObject(this.smoke_sprite_container);
+            }
             this.scene.remove(this.explosion.contents[i]);
             delete this.explosion.contents[i];
             this.explosion.contents.length--;
         }
         console.log("explosion deleted");
     }
-
 }
 
 Explosion.prototype.updateExplosion = function() {
 
     switch(this.explosion.type) {
+        case EXPLOSION_SMALL: {
+            var fsprites = this.fire_sprite_container;
+            fsprites.crt_size += fsprites.growth_rate * (fsprites.radius - fsprites.crt_size);
+            for(var i = 0; i < fsprites.children.length; i++) {
+                //grow
+                fsprites.children[i].scale.set(fsprites.crt_size, fsprites.crt_size, 1.0);
+                //disperse
+                fsprites.children[i].position.x += fsprites.children[i].direction.x * fsprites.crt_displacement;
+                fsprites.children[i].position.y += fsprites.children[i].direction.y * fsprites.crt_displacement;
+                fsprites.children[i].position.z += fsprites.children[i].direction.z * fsprites.crt_displacement;
+                //rotate
+                fsprites.children[i].rotation += 0.0002 * i ;
+                //increase transparency over time
+                if(fsprites.children[i].opacity > 0.0) {
+                    fsprites.children[i].opacity -= fsprites.fade_factor;
+                }
+            }
+            fsprites.crt_displacement += fsprites.displacement_speed * (fsprites.max_displacement - fsprites.crt_displacement);
+
+            //check if explosion is done
+            this.currentDuration += 5;
+            if(this.currentDuration == this.maxDuration) {
+                this.deleteExplosion();
+                this.done = true;
+            }
+            break;
+        }
+
+
         case EXPLOSION_LARGE: {
 
             //update small particle system

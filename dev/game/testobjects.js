@@ -48,15 +48,15 @@ var playerShip = {  type: PLAYER_SHIP,
                             }
                         },
                         inventory: {},
-						spheres:{
-							outer:{
-								x:0,
-								y:0,
-								z:0,
-								r:30
-							},
-							inner:[]
-						},
+                        spheres:{
+                            outer:{
+                                x:0,
+                                y:0,
+                                z:0,
+                                r:25
+                            },
+                            inner:[]
+                        },
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
@@ -97,15 +97,15 @@ var AIShip = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
-					spheres:{
-						outer:{
-							x:0,
-							y:0,
-							z:0,
-							r:30
-						},
-						inner:[]
-					},
+                    spheres:{
+                        outer:{
+                            x:0,
+                            y:0,
+                            z:0,
+                            r:25
+                        },
+                        inner:[]
+                    },
                 },
                 drawParameters: {
                     shipID: 1,
@@ -120,7 +120,7 @@ var AIShip = {  type: AI_SHIP,
             };
 gameObjects.push(AIShip);
 
-var AIShip2 = {  type: AI_SHIP,
+var AIShip2 = { type: AI_SHIP,
 
                 gameParameters: {
                     name: "aiShip2", //model number?
@@ -144,15 +144,15 @@ var AIShip2 = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
-					spheres:{
-						outer:{
-							x:0,
-							y:0,
-							z:0,
-							r:30
-						},
-						inner:[]
-					},
+                    spheres:{
+                        outer:{
+                            x:0,
+                            y:0,
+                            z:0,
+                            r:25
+                        },
+                        inner:[]
+                    },
                 },
                 drawParameters: {
                     shipID: 2,
@@ -166,3 +166,28 @@ var AIShip2 = {  type: AI_SHIP,
                 }
             };
 gameObjects.push(AIShip2);
+
+var asteroid_field = {  type: ASTEROID_FIELD,
+            
+                        gameParameters: {
+                            name: "asteroidfield",
+                            spheres: {
+                                outer: {
+                                    x: 0,
+                                    y: 0,
+                                    z: 0,
+                                    r: 10,
+                                },
+                                inner: []
+                            },
+                        },
+                        drawParameters: {
+                            geometry: "models/asteroids/asteroid1.js",
+                            positions: [    
+                                {x: 30, y: 30, z: 30}
+                            ],
+                            count: 1,
+                        },
+                    };
+
+gameObjects.push(asteroid_field);

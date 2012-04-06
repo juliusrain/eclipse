@@ -1,0 +1,14 @@
+# Blender MTL File: 'ASTEROID001.blend'
+# Material Count: 1
+newmtl Material_Quartz0002_18_thumblarge.jpg
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd blender/ASTEROID001.blend/Quartz0002_18_thumblarge.jpg
+map_Bump blender/ASTEROID001.blend/Quartz0002_18_thumblarge.jpg
+
+
