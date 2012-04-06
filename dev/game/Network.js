@@ -19,12 +19,7 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 }
 
 Network.prototype.connect = function () {
-	if(typeof MozWebSocket == "function") {
-		this.ws = new MozWebSocket(URL);
-	}
-	else {
-	    this.ws = new WebSocket(URL);
-	}
+    this.ws = new WebSocket(URL);
     // reconnect whenever connection drops
     var nw = this;
     this.ws.onclose = function (evt) {
@@ -37,10 +32,9 @@ Network.prototype.connect = function () {
         var body = parsed.body;
         if (action == "chat") {
             nw.displayChat(sender, body);
+        } else if (action == "pos") {
+            gameEngine.netUpdate(body);
         }
-		else if(action == "pos") {
-			gameEngine.netUpdate(body);
-		}
     }
 }
 
@@ -59,5 +53,5 @@ Network.prototype.displayChat = function (sender, body) {
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);
-    node.show(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
+    node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
 }

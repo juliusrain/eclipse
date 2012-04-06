@@ -62,6 +62,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                         listener.write_message(message)
                     logging.info("You want to chat")
                 elif action == "pos":
+                    for listener in WSHandler.listeners:
+                        listener.write_message(message)
                     logging.info("You want to pos")
                 elif action == "new":
                     logging.info("You want to new")
