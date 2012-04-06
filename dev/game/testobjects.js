@@ -182,9 +182,9 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                             },
                         },
                         drawParameters: {
-                            geometry: "models/asteroids/asteroid1.js",
+                            geometry: "models/asteroids/asteroid2.js",
                             positions: [    
-                                {x: 30, y: 30, z: 30}
+                                {x: 100, y: 100, z: -100}
                             ],
                             count: 1,
                         },

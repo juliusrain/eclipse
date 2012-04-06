@@ -6,13 +6,15 @@ var HUDElements = [];
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
-function GraphicsEngine() {
+function GraphicsEngine(glow) {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
     this.objID = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
+
+    this.glow = glow || null;
 
     this.container = document.getElementById('main');
     //container
@@ -37,44 +39,46 @@ function GraphicsEngine() {
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
     this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
 
-    //GLOW SCENE
-    //glow scene elements
-    this.gameplay_glow_scene = new THREE.Scene();
+    if(this.glow) {
+        //GLOW SCENE
+        //glow scene elements
+        this.gameplay_glow_scene = new THREE.Scene();
 
-    //antialiasing via shader
-    this.effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
-    this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+        //antialiasing via shader
+        this.effectFXAA = new THREE.ShaderPass(THREE.ShaderExtras["fxaa"]);
+        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
 
-    //bloom shader
-    var effectBloom = new THREE.BloomPass(10.0);
+        //bloom shader
+        var effectBloom = new THREE.BloomPass(10.0);
 
-    var renderTargetParameters = {  minFilter: THREE.LinearFilter,
-                                    magFilter: THREE.LinearFilter,
-                                    format: THREE.RGBAFormat };
+        var renderTargetParameters = {  minFilter: THREE.LinearFilter,
+                                        magFilter: THREE.LinearFilter,
+                                        format: THREE.RGBAFormat };
 
-    //render glow scene to texture
-    this.renderTargetGlow = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
-    var renderModelGlow = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_camera);
+        //render glow scene to texture
+        this.renderTargetGlow = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+        var renderModelGlow = new THREE.RenderPass(this.gameplay_glow_scene, this.gameplay_camera);
 
-    //effect composer for fbo
-    this.glow_composer = new THREE.EffectComposer(this.renderer, this.renderTargetGlow);
-    this.glow_composer.addPass(renderModelGlow);
-    this.glow_composer.addPass(effectBloom);
+        //effect composer for fbo
+        this.glow_composer = new THREE.EffectComposer(this.renderer, this.renderTargetGlow);
+        this.glow_composer.addPass(renderModelGlow);
+        this.glow_composer.addPass(effectBloom);
 
-    blend_shader.uniforms['tGlow'].texture = this.glow_composer.renderTarget2;
+        blend_shader.uniforms['tGlow'].texture = this.glow_composer.renderTarget2;
 
-    //render texture to screen with rest of scene (alpha blended)
-    this.renderTargetScreen = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
-    var renderModel = new THREE.RenderPass(this.gameplay_scene, this.gameplay_camera);
-    var blend_pass = new THREE.ShaderPass(blend_shader);
-    blend_pass.needsSwap = true;
-    blend_pass.renderToScreen = true;
+        //render texture to screen with rest of scene (alpha blended)
+        this.renderTargetScreen = new THREE.WebGLRenderTarget(this.canvas_width, this.canvas_height, renderTargetParameters);
+        var renderModel = new THREE.RenderPass(this.gameplay_scene, this.gameplay_camera);
+        var blend_pass = new THREE.ShaderPass(blend_shader);
+        blend_pass.needsSwap = true;
+        blend_pass.renderToScreen = true;
 
-    //effect composer for screen rendering
-    this.blend_composer = new THREE.EffectComposer(this.renderer, this.renderTargetScreen);
-    this.blend_composer.addPass(renderModel);
-    this.blend_composer.addPass(this.effectFXAA);
-    this.blend_composer.addPass(blend_pass);
+        //effect composer for screen rendering
+        this.blend_composer = new THREE.EffectComposer(this.renderer, this.renderTargetScreen);
+        this.blend_composer.addPass(renderModel);
+        this.blend_composer.addPass(this.effectFXAA);
+        this.blend_composer.addPass(blend_pass);
+    }
 
 ////////////
 
@@ -142,14 +146,15 @@ function GraphicsEngine() {
         this.gameplay_camera.aspect = (this.canvas_width/this.canvas_height);
         this.gameplay_camera.updateProjectionMatrix();
 
-        this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+        if(this.glow) {
+            this.effectFXAA.uniforms['resolution'].value.set(1/this.canvas_width, 1/this.canvas_height);
+            this.renderTargetGlow.width = this.canvas_width;
+            this.renderTargetGlow.height = this.canvas_height;
+            this.renderTargetScreen.width = this.canvas_width;
+            this.renderTargetScreen.height = this.canvas_height;
 
-        this.renderTargetGlow.width = this.canvas_width;
-        this.renderTargetGlow.height = this.canvas_height;
-        this.renderTargetScreen.width = this.canvas_width;
-        this.renderTargetScreen.height = this.canvas_height;
-
-        this.blend_composer.reset();
+            this.blend_composer.reset();
+        }
 
         this.minimap.resizeMinimap();
     }
@@ -229,21 +234,22 @@ function GraphicsEngine() {
             this.gameplay_scene.remove(sceneChild);
             this.renderer.deallocateObject(sceneChild);
         }
-
-        //delete elements from gameplay_glow_scene
-        sceneChildren = this.gameplay_glow_scene.children;
-        i = 0;
-        while(i < sceneChildren.length) {
-            sceneChild = sceneChildren[i];
-            if(sceneChild instanceof THREE.Camera) {
-                i++;
-                continue;
+        if(this.glow) {
+            //delete elements from gameplay_glow_scene
+            sceneChildren = this.gameplay_glow_scene.children;
+            i = 0;
+            while(i < sceneChildren.length) {
+                sceneChild = sceneChildren[i];
+                if(sceneChild instanceof THREE.Camera) {
+                    i++;
+                    continue;
+                }
+                this.gameplay_glow_scene.remove(sceneChild);
+                this.renderer.deallocateObject(sceneChild);
             }
-            this.gameplay_glow_scene.remove(sceneChild);
-            this.renderer.deallocateObject(sceneChild);
         }
 
-        //clene sceneElements object
+        //clean sceneElements object
         sceneElements.mainShip = null;
         for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
@@ -366,6 +372,10 @@ function GraphicsEngine() {
                 loadShip(gameObject, this.gameplay_scene);
                 break;
             }
+            case NET_SHIP: {
+                loadShip(gameObject, this.gameplay_scene);
+                break;
+            }
             case ASTEROID_FIELD: {
                 loadAsteroidField(gameObject, this.gameplay_scene);
                 break;
@@ -389,31 +399,6 @@ function GraphicsEngine() {
             HUDElements.push(quadMesh);
             scene.add(quadMesh);
         }
-
-/*
-        function loadRing(gameObject, scene) { //pass gameobject to define radius maybe?
-            var ringGeometry = new THREE.Geometry(),
-                vertexPosition;
-
-            for(var i = 0; i <= 360; i++) {
-                vertexPosition = new THREE.Vector3(Math.cos(2 * Math.PI * i / 360), 0, Math.sin(2 * Math.PI * i / 360)); //replace 2 with radius
-                ringGeometry.vertices.push(new THREE.Vertex(vertexPosition));
-            }
-
-            var ringMaterial = new THREE.LineBasicMaterial({
-                    color: 0xeeeeee,
-                    opacity: 0.9,
-                    linewidth: 2
-            }),
-            ringLine = new THREE.Line(ringGeometry, ringMaterial);
-
-            ringLine.scale.set(20, 20, 20);
-            ringLine.name = "ship ring";
-            ringLine.objectType = RING;
-            scene.add(ringLine);
-            HUDElements.push(ringLine);
-        }
-*/
 
         /*
          *  Load skybox. (gameObject)
@@ -518,7 +503,6 @@ function GraphicsEngine() {
             switch(gameObject.type) {
                 case PLAYER_SHIP: {
                     var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
-                    var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
 
                     //set mesh parameters
                     modelMesh.useQuaternion = true;
@@ -526,13 +510,15 @@ function GraphicsEngine() {
                     modelMesh.name = gameObject.gameParameters.name;
                     modelMesh.objectType = gameObject.type;
                     modelMesh.objectID = self.assignID();
-
-                    //sync positions/rotations of normal and dark meshes
-                    modelMeshDark.useQuaternion = true;
-                    modelMeshDark.name = gameObject.gameParameters.name + " dark";
-                    modelMeshDark.objectID = modelMesh.objectID;
-                    modelMeshDark.position = modelMesh.position;
-                    modelMeshDark.quaternion = modelMesh.quaternion;
+                    if(self.glow) {
+                        var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+                        //sync positions/rotations of normal and dark meshes
+                        modelMeshDark.useQuaternion = true;
+                        modelMeshDark.name = gameObject.gameParameters.name + " dark";
+                        modelMeshDark.objectID = modelMesh.objectID;
+                        modelMeshDark.position = modelMesh.position;
+                        modelMeshDark.quaternion = modelMesh.quaternion;
+                    }
 
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
@@ -546,13 +532,14 @@ function GraphicsEngine() {
 
                     modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
                     scene.add(modelMesh);
-                    self.gameplay_glow_scene.add(modelMeshDark);
+                    if(self.glow) {
+                        self.gameplay_glow_scene.add(modelMeshDark);
+                    }
 
                     break;
                 }
                 case AI_SHIP: {
                     var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
-                    var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
 
                     //set mesh parameters
                     modelMesh.useQuaternion = true;
@@ -560,13 +547,15 @@ function GraphicsEngine() {
                     modelMesh.name = gameObject.gameParameters.name;
                     modelMesh.objectType = gameObject.type;
                     modelMesh.objectID = self.assignID();
-
-                    //sync positions/rotations of normal and dark meshes
-                    modelMeshDark.useQuaternion = true;
-                    modelMeshDark.name = gameObject.gameParameters.name + " dark";
-                    modelMeshDark.objectID = modelMesh.objectID;
-                    modelMeshDark.position = modelMesh.position;
-                    modelMeshDark.quaternion = modelMesh.quaternion;
+                    if(self.glow) {
+                        var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+                        //sync positions/rotations of normal and dark meshes
+                        modelMeshDark.useQuaternion = true;
+                        modelMeshDark.name = gameObject.gameParameters.name + " dark";
+                        modelMeshDark.objectID = modelMesh.objectID;
+                        modelMeshDark.position = modelMesh.position;
+                        modelMeshDark.quaternion = modelMesh.quaternion;
+                    }
 
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
@@ -615,7 +604,42 @@ function GraphicsEngine() {
 
                     modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
                     scene.add(modelMesh);
-                    self.gameplay_glow_scene.add(modelMeshDark);
+                    if(self.glow) {
+                        self.gameplay_glow_scene.add(modelMeshDark);
+                    }
+                    break;
+                }
+                case NET_SHIP: {
+                    var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+
+                    //set mesh parameters
+                    modelMesh.useQuaternion = true;
+                    modelMesh.direction = new THREE.Vector3(0, 0, -1);
+                    modelMesh.name = gameObject.gameParameters.name;
+                    modelMesh.objectType = gameObject.type;
+                    modelMesh.objectID = self.assignID();
+                    if(self.glow) {
+                        var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
+                        //sync positions/rotations of normal and dark meshes
+                        modelMeshDark.useQuaternion = true;
+                        modelMeshDark.name = gameObject.gameParameters.name + " dark";
+                        modelMeshDark.objectID = modelMesh.objectID;
+                        modelMeshDark.position = modelMesh.position;
+                        modelMeshDark.quaternion = modelMesh.quaternion;
+                    }
+
+                    modelMesh.gameParameters = gameObject.gameParameters;
+                    modelMesh.drawParameters = gameObject.drawParameters;
+                    loadLasers(modelMesh, scene);
+
+                    sceneElements.netShips.push(modelMesh);
+                    self.minimap.addMinimapObject(NET_SHIP, modelMesh.objectID);
+
+                    modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
+                    scene.add(modelMesh);
+                    if(self.glow) {
+                        self.gameplay_glow_scene.add(modelMeshDark);
+                    }
                     break;
                 }
                 case ASTEROID_FIELD: {
@@ -629,7 +653,8 @@ function GraphicsEngine() {
                         asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
-                        console.log("blah");
+
+                        asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
 
                         asteroid_container.add(asteroid_mesh);
                     }
@@ -695,8 +720,11 @@ function GraphicsEngine() {
             }
 
             sceneElements.lasers.push(laserContainer);
-//            self.gameplay_glow_scene.add(laserContainer);
-            scene.add(laserContainer);
+            if(self.glow) {
+                self.gameplay_glow_scene.add(laserContainer);
+            } else {
+                scene.add(laserContainer);
+            }
 
             //laser firing function to be called to fire laser;
             parentShip.fireLaser = function() {
@@ -853,10 +881,13 @@ function GraphicsEngine() {
 
                 updateScene();
             }
-            self.renderer.clear();
-            self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
-//            self.glow_composer.render();
-//            self.blend_composer.render();
+            if(self.glow) {
+                self.glow_composer.render();
+                self.blend_composer.render();
+            } else {
+                self.renderer.clear();
+                self.renderer.render(self.gameplay_scene, self.gameplay_camera); //actual game scene
+            }
         }
 
 
@@ -979,10 +1010,6 @@ function GraphicsEngine() {
                         HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
                         HUDObject.translateZ(-91);
-                        break;
-                    }
-                    case RING: {
-                        HUDObject.position.copy(sceneElements.mainShip.position);
                         break;
                     }
                     case MINIMAP: {
