@@ -18,6 +18,8 @@ function GameEngine() {
     };
     this.logicwait = 0;
 
+	ai = new AI();
+
     //start network client
     network = new Network();
     network.connect();

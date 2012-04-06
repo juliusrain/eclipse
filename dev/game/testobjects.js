@@ -90,7 +90,7 @@ var AIShip = {  type: AI_SHIP,
                             range: 300,
                             speed: 70,
                             amount: 30,
-
+							timeout: 12
                         },
                         missiles: {
 
@@ -137,7 +137,7 @@ var AIShip2 = { type: AI_SHIP,
                             range: 300,
                             speed: 70,
                             amount: 30,
-
+							timeout:12
                         },
                         missiles: {
 
