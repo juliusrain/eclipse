@@ -14,17 +14,17 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 				console.log(received[e].parameters.textures[i]);
 			}
 		}
+		else if(received[e].type === PLAYER_SHIP || received[e].type === AI_SHIP) {
+			received[e].drawParameters.position.x = Math.random() * 1000 - 500;
+			received[e].drawParameters.position.y = Math.random() * 1000 - 500;
+			received[e].drawParameters.position.z = Math.random() * 1000 - 500;
+		}
 	}
 	return received;
 }
 
 Network.prototype.connect = function () {
-	if(typeof MozWebSocket == "function") {
-		this.ws = new MozWebSocket(URL);
-	}
-	else {
-	    this.ws = new WebSocket(URL);
-	}
+    this.ws = new WebSocket(URL);
     // reconnect whenever connection drops
     var nw = this;
     this.ws.onclose = function (evt) {
@@ -37,6 +37,8 @@ Network.prototype.connect = function () {
         var body = parsed.body;
         if (action == "chat") {
             nw.displayChat(sender, body);
+        } else if (action == "pos") {
+            gameEngine.netUpdate(body);
         }
     }
 }
@@ -56,5 +58,5 @@ Network.prototype.displayChat = function (sender, body) {
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);
-    node.show(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
+    node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
 }

@@ -148,11 +148,22 @@ function Minimap(game_controls, game_camera) {
                 minimap_object.objectID = OID;
                 break;
              }
+             case NET_SHIP: {
+                 minimap_object = new THREE.Sprite({
+                     map: THREE.ImageUtils.loadTexture("textures/minimap/indicator_red.png"),
+                     useScreenCoordinates: false,
+                     scaleByViewport: true,
+                     size: 10,
+                     blending: THREE.AdditiveBlending,
+                 });
+                 minimap_object.objectType = NET_SHIP;
+                 minimap_object.objectID = OID;
+                 break;
+             }
 
         }
         this.minimap_texture_scene.add(minimap_object);
         this.minimap_objects.push(minimap_object);
-
     }
 
     Minimap.prototype.removeMinimapObject = function(objectID) {
@@ -214,14 +225,28 @@ function Minimap(game_controls, game_camera) {
 
 
         function update() {
-            var minimap_object, ai_ship;
+            var minimap_object, ship;
             //assumes that each ai ship has a corresponding object on minimap
             for(var i = 0; i < self.minimap_objects.length; i++) {
                 minimap_object = self.minimap_objects[i];
-                ai_ship = sceneElements.AIShips[i];
+                if(minimap_object.objectType == AI_SHIP) {
+                    for(var j = 0; j < sceneElements.AIShips.length; j++) {
+                        ship = sceneElements.AIShips[j];
+                        if(ship.objectID == minimap_object.objectID) {
+                            break;
+                        }
+                    }
+                } else if(minimap_object.objectType == NET_SHIP) {
+                    for(var j = 0;j < sceneElements.netShips.length; j++) {
+                        ship = sceneElements.netShips[j];
+                        if(ship.objectID == minimap_object.objectID) {
+                            break;
+                        }
+                    }
+                }
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-                        self.tempVec.set(ai_ship.position.x - self.game_camera.position.x, ai_ship.position.y - self.game_camera.position.y, ai_ship.position.z - self.game_camera.position.z).normalize();
+                        self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
                         
@@ -231,7 +256,18 @@ function Minimap(game_controls, game_camera) {
 
                         }
                         minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
+                    }
+                    case NET_SHIP: {
+                        self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
+                        self.tempQuat.copy(self.game_camera.quaternion).inverse();
+                        self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
+                        
+                        if(self.tempVec.z > 0) {
+                            self.tempVec.z = 0;
+                            self.tempVec.normalize();
 
+                        }
+                        minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
                     }
                 }
             }

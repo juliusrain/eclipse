@@ -12,7 +12,6 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
     this.maxDuration;
     this.currentDuration;
 
-    console.log("creating " + explosion_type);
 
     switch(explosion_type) {
         case EXPLOSION_SMALL: {
@@ -21,13 +20,13 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             var sprite, sCount, sSize;
 
             this.fire_sprite_container = new THREE.Object3D();
-            this.fire_sprite_container.radius = 50; //max size per sprite
+            this.fire_sprite_container.radius = 75; //max size per sprite
             this.fire_sprite_container.crt_size = 0;
             this.fire_sprite_container.growth_rate = 0.025; //growth rate per sprite
             this.fire_sprite_container.crt_displacement = 0.0; //current displacement from center
             this.fire_sprite_container.max_displacement = 0.025;
             this.fire_sprite_container.displacement_speed = 0.0025;
-            this.fire_sprite_container.fade_factor = 0.03;
+            this.fire_sprite_container.fade_factor = 0.01;
 
             var fire_texture = THREE.ImageUtils.loadTexture("textures/explosions/exp1.png");
             
@@ -210,7 +209,7 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             delete this.explosion.contents[i];
             this.explosion.contents.length--;
         }
-        console.log("explosion deleted");
+        //console.log("explosion deleted");
     }
 }
 

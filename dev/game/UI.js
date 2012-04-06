@@ -60,6 +60,12 @@ $(window).keypress(function (e){
             sceneElements.AIShips[0].fireLaser();
             break;
         }
+        case 111: {
+            var new_ship = jQuery.extend(true, {}, ship_template);
+            console.log(new_ship);
+            //graphicsEngine.addGameObject(new_ship);
+            break;
+        }
     }
 });
 
