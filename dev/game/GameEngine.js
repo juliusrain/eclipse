@@ -32,7 +32,8 @@ function GameEngine() {
 }
 
 GameEngine.prototype.first = function () {
-    graphicsEngine = new GraphicsEngine();
+    var glow = false;
+    graphicsEngine = new GraphicsEngine(glow);
     this.load(this.solarSystem, this.planet);
 };
 

@@ -7,7 +7,8 @@
 var SKYBOX = 0,
     PLAYER_SHIP = 10,
     AI_SHIP = 11,
-    ASTEROID_FIELD = 12,
+    NET_SHIP = 12,
+    ASTEROID_FIELD = 13,
 
     CROSSHAIR = 90,
     RING = 91,
