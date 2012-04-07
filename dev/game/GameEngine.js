@@ -177,7 +177,9 @@ function laserHit(target, hit) {
     graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
     // reset lasers
     hit.obj.hit = true;
-
+	if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
+		target.gameParameters.health -= hit.obj.damage;
+	}
 }
 
 GameEngine.prototype.updateCollisions = function() {
