@@ -3,12 +3,12 @@ var gameObjects = []
 var skybox = {  type: SKYBOX,
                 parameters: {
                     name: "skybox",
-                    /*textures: [ "textures/skybox/starfield.png", "textures/skybox/starfield.png",
-                                "textures/skybox/starfield.png", "textures/skybox/starfield.png",
-                                "textures/skybox/starfield.png", "textures/skybox/starfield.png"]*/
-                    textures: [ "skybox/starfield.png", "skybox/starfield.png",
+                    /*textures: [ "skybox/starfield.png", "skybox/starfield.png",
                                 "skybox/starfield.png", "skybox/starfield.png",
-                                "skybox/starfield.png", "skybox/starfield.png"]
+                                "skybox/starfield.png", "skybox/starfield.png"]*/
+                    textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",
+                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy.jpg",
+                                "skybox/testbox2/posz.jpg", "skybox/testbox2/negz.jpg"]
                 }
             };
 gameObjects.push(skybox);
