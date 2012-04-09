@@ -23,48 +23,50 @@ $('#chatcompose').blur(function (){
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
-    switch(e.keyCode){
-        // j = toggle jump map
-        case 106: {
-            toggleJumpMap();
-            break;
-        }
-        // l = bind/unbind cursor
-        case 108: {
-            if(!$('#jumpamapbox:visible').length) {
-                toggleCursor();
-            } 
-            break;
-        }
-        // space = fire weapon
-        case 32: {
-            gameEngine.fireWeapon();
-            break;
-        }
-        // t = auto repair
-        case 116:{
-            toggleAutoRepair();
-            break;
-        }
-        // c = chat box
-        case 99: {
-            if (!chatfocus){
-                switchToChat();
-                return false;
+    if(!chatfocus) {
+        switch(e.keyCode){
+            // j = toggle jump map
+            case 106: {
+                toggleJumpMap();
+                break;
             }
-            break;
-        }
-        //create explosion (for testing) p
-        case 112: {
-            //graphicsEngine.addExplosionLarge(50, 0, -100);
-            sceneElements.AIShips[0].fireLaser();
-            break;
-        }
-        case 111: {
-            var new_ship = jQuery.extend(true, {}, ship_template);
-            console.log(new_ship);
-            //graphicsEngine.addGameObject(new_ship);
-            break;
+            // l = bind/unbind cursor
+            case 108: {
+                if(!$('#jumpamapbox:visible').length) {
+                    toggleCursor();
+                } 
+                break;
+            }
+            // space = fire weapon
+            case 32: {
+                gameEngine.fireWeapon();
+                break;
+            }
+            // t = auto repair
+            case 116:{
+                toggleAutoRepair();
+                break;
+            }
+            // c = chat box
+            case 99: {
+                if (!chatfocus){
+                    switchToChat();
+                    return false;
+                }
+                break;
+            }
+            //create explosion (for testing) p
+            case 112: {
+                //graphicsEngine.addExplosionLarge(50, 0, -100);
+                sceneElements.AIShips[0].fireLaser();
+                break;
+            }
+            case 111: {
+                var new_ship = jQuery.extend(true, {}, ship_template);
+                console.log(new_ship);
+                //graphicsEngine.addGameObject(new_ship);
+                break;
+            }
         }
     }
 });
@@ -117,7 +119,7 @@ function toggleCursor() {
     graphicsEngine.toggleCursor();
     if($('#mouselockcontrol').hasClass("on")){
         $('#mouselockcontrol').removeClass('on');
-        $('body').css('cursor', 'none');
+        $('body').css('cursor', 'crosshair');
     }
     else{
         $('#mouselockcontrol').addClass('on');

@@ -1,8 +1,8 @@
 //git clone https://tooocoool@github.com/juliusrain/361project.git
 function AI() {
-	this.radar_range = 1000;
-	this.firing_range = 400;
-	this.limit = 400;
+    this.radar_range = 1000;
+    this.firing_range = 1;
+    this.limit = 400;
 }
 
 AI.prototype.react = function() {
@@ -45,7 +45,7 @@ AI.prototype.react = function() {
 					if (p2ai_distance <= (this.firing_range * this.firing_range)) {
 						
 						sceneElements.AIShips[i].fireLaser();
-						sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 12;
+						sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 20;
 					}
 					
 				} else if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout > 0 ){
