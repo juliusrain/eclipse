@@ -245,29 +245,33 @@ function GraphicsEngine(glow) {
         this.minimap.loadMinimap();
         this.jumpmap.loadJumpmap();
 
-        var dirlight = new THREE.DirectionalLight(0xffffff);
+        var dirlight = new THREE.DirectionalLight(0xaaaaaa);
         dirlight.position.set(0, 500, 0).normalize();
         this.gameplay_scene.add(dirlight);
 
-        var dirlight2 = new THREE.DirectionalLight(0xffffff);
+        var dirlight2 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
 
-        var dirlight3 = new THREE.DirectionalLight(0xffffff);
+        var dirlight3 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight3.position.set(500, 0, 0).normalize();
         this.gameplay_scene.add(dirlight3);
 
-        var dirlight4 = new THREE.DirectionalLight(0xffffff);
+        var dirlight4 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight4.position.set(-500, 0, 0).normalize();
         this.gameplay_scene.add(dirlight4);
 
-        var dirlight5 = new THREE.DirectionalLight(0xffffff);
+        var dirlight5 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight5.position.set(0, 0, -500).normalize();
         this.gameplay_scene.add(dirlight5);
 
-        var dirlight6 = new THREE.DirectionalLight(0xffffff);
+        var dirlight6 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight6.position.set(0, 0, 500).normalize();
         this.gameplay_scene.add(dirlight6);
+
+        var dirlight7 = new THREE.DirectionalLight(0xaaaaaa);
+        dirlight7.position.set(500, 500, 500).normalize();
+        this.gameplay_scene.add(dirlight7);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
@@ -375,7 +379,12 @@ function GraphicsEngine(glow) {
                     if(sceneElements.AIShips[j].objectID == target.objectID) {
                         delete sceneElements.AIShips[j];
                         sceneElements.AIShips.splice(j, 1);
-
+                    }
+                }
+                for(var j = 0; j < sceneElements.netShips.length; j++) {
+                    if(sceneElements.netShips[j].objectID == target.objectID) {
+                        delete sceneElements.netShips[j];
+                        sceneElements.AIShips.splice(j, 1);
                     }
                 }
             }
@@ -597,6 +606,101 @@ function GraphicsEngine(glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
 
+
+                    var s = new THREE.Object3D();
+                    s.useQuaternion = true;
+                    s.position = modelMesh.position;
+                    s.quaternion = modelMesh.quaternion;
+                    var sg = new THREE.SphereGeometry(10, 10, 10);
+
+                    //outer
+                    var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s0.scale.set(3, 3, 3);
+                    s0.r = 30;
+                    s0.translateZ(10);
+                    s0.material.wireframe = true;
+                    s.add(s0);
+
+                    //middle inner
+                    var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s1.translateZ(18);
+                    s1.r = 10;
+                    s1.material.wireframe = true;
+                    s.add(s1);
+
+                    //left inner
+                    var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s2.scale.set(0.5, 0.5, 0.5);
+                    s2.r = 5;
+                    s2.translateZ(22);
+                    s2.translateX(-15);
+                    s2.material.wireframe = true;
+                    s.add(s2);
+
+                    //right inner
+                    var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s3.scale.set(0.5, 0.5, 0.5);
+                    s3.r = 5;
+                    s3.translateZ(22);
+                    s3.translateX(15);
+                    s3.material.wireframe = true;
+                    s.add(s3);
+
+                    //left inner far
+                    var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s4.scale.set(0.3, 0.3, 0.3);
+                    s4.r = 3;
+                    s4.translateZ(25);
+                    s4.translateX(-22);
+                    s4.material.wireframe = true;
+                    s.add(s4);
+
+                    //right inner far
+                    var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s5.scale.set(0.3, 0.3, 0.3);
+                    s5.r = 3;
+                    s5.translateZ(25);
+                    s5.translateX(22);
+                    s5.material.wireframe = true;
+                    s.add(s5);
+
+                    //inner middle close
+                    var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s6.scale.set(0.6, 0.6, 0.6);
+                    s6.r = 6;
+                    s6.translateZ(2);
+                    s6.material.wireframe = true;
+                    s.add(s6);
+
+                    //inner middle mid
+                    var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s7.scale.set(0.4, 0.4, 0.4);
+                    s7.r = 4;
+                    s7.translateZ(-8);
+                    s7.material.wireframe = true;
+                    s.add(s7);
+                    self.gameplay_scene.add(s);
+
+                    //inner middle far
+                    var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s8.scale.set(0.3, 0.3, 0.3);
+                    s8.r = 3;
+                    s8.translateZ(-16);
+                    s8.material.wireframe = true;
+                    s.add(s8);
+
+                    modelMesh.spheres = s;
+                    s.outer = s0;
+                    s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
+
+
+
+
+                    self.gameplay_scene.add(s);
+
+
+                        
+
                     break;
                 }
                 case AI_SHIP: {
@@ -634,8 +738,7 @@ function GraphicsEngine(glow) {
                     var mesh = modelMesh;
                     modelMesh.turn = function(x, y, z) {
                         //set target position (might change depending on huy)
-                        //mesh.tempDir.set(x, y, z);
-                        //var l = mesh.tempDir.length();
+
                         mesh.targetPos.set(x,y,z);
                         //mesh.targetPos.set(mesh.position.x*l, mesh.position.y*l, mesh.position.z*l);
                          
@@ -672,6 +775,90 @@ function GraphicsEngine(glow) {
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
+
+                    var s = new THREE.Object3D();
+                    s.useQuaternion = true;
+                    s.position = modelMesh.position;
+                    s.quaternion = modelMesh.quaternion;
+                    var sg = new THREE.SphereGeometry(10, 10, 10);
+
+                    //outer
+                    var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s0.scale.set(3, 3, 3);
+                    s0.r = 30;
+                    s0.translateZ(10);
+                    s0.material.wireframe = true;
+                    s.add(s0);
+
+                    //middle inner
+                    var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s1.translateZ(18);
+                    s1.r = 10;
+                    s1.material.wireframe = true;
+                    s.add(s1);
+
+                    //left inner
+                    var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s2.scale.set(0.5, 0.5, 0.5);
+                    s2.r = 5;
+                    s2.translateZ(22);
+                    s2.translateX(-15);
+                    s2.material.wireframe = true;
+                    s.add(s2);
+
+                    //right inner
+                    var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s3.scale.set(0.5, 0.5, 0.5);
+                    s3.r = 5;
+                    s3.translateZ(22);
+                    s3.translateX(15);
+                    s3.material.wireframe = true;
+                    s.add(s3);
+
+                    //left inner far
+                    var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s4.scale.set(0.3, 0.3, 0.3);
+                    s4.r = 3;
+                    s4.translateZ(25);
+                    s4.translateX(-22);
+                    s4.material.wireframe = true;
+                    s.add(s4);
+
+                    //right inner far
+                    var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s5.scale.set(0.3, 0.3, 0.3);
+                    s5.r = 3;
+                    s5.translateZ(25);
+                    s5.translateX(22);
+                    s5.material.wireframe = true;
+                    s.add(s5);
+
+                    //inner middle close
+                    var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s6.scale.set(0.6, 0.6, 0.6);
+                    s6.r = 6;
+                    s6.translateZ(2);
+                    s6.material.wireframe = true;
+                    s.add(s6);
+
+                    //inner middle mid
+                    var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s7.scale.set(0.4, 0.4, 0.4);
+                    s7.r = 4;
+                    s7.translateZ(-8);
+                    s7.material.wireframe = true;
+                    s.add(s7);
+                    self.gameplay_scene.add(s);
+
+                    //inner middle far
+                    var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s8.scale.set(0.3, 0.3, 0.3);
+                    s8.r = 3;
+                    s8.translateZ(-16);
+                    s8.material.wireframe = true;
+                    s.add(s8);
+
+                    self.gameplay_scene.add(s);
                     break;
                 }
                 case NET_SHIP: {
@@ -706,6 +893,90 @@ function GraphicsEngine(glow) {
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
+
+                    var s = new THREE.Object3D();
+                    s.useQuaternion = true;
+                    s.position = modelMesh.position;
+                    s.quaternion = modelMesh.quaternion;
+                    var sg = new THREE.SphereGeometry(10, 10, 10);
+
+                    //outer
+                    var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s0.scale.set(3, 3, 3);
+                    s0.r = 30;
+                    s0.translateZ(10);
+                    s0.material.wireframe = true;
+                    s.add(s0);
+
+                    //middle inner
+                    var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s1.translateZ(18);
+                    s1.r = 10;
+                    s1.material.wireframe = true;
+                    s.add(s1);
+
+                    //left inner
+                    var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s2.scale.set(0.5, 0.5, 0.5);
+                    s2.r = 5;
+                    s2.translateZ(22);
+                    s2.translateX(-15);
+                    s2.material.wireframe = true;
+                    s.add(s2);
+
+                    //right inner
+                    var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s3.scale.set(0.5, 0.5, 0.5);
+                    s3.r = 5;
+                    s3.translateZ(22);
+                    s3.translateX(15);
+                    s3.material.wireframe = true;
+                    s.add(s3);
+
+                    //left inner far
+                    var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s4.scale.set(0.3, 0.3, 0.3);
+                    s4.r = 3;
+                    s4.translateZ(25);
+                    s4.translateX(-22);
+                    s4.material.wireframe = true;
+                    s.add(s4);
+
+                    //right inner far
+                    var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s5.scale.set(0.3, 0.3, 0.3);
+                    s5.r = 3;
+                    s5.translateZ(25);
+                    s5.translateX(22);
+                    s5.material.wireframe = true;
+                    s.add(s5);
+
+                    //inner middle close
+                    var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s6.scale.set(0.6, 0.6, 0.6);
+                    s6.r = 6;
+                    s6.translateZ(2);
+                    s6.material.wireframe = true;
+                    s.add(s6);
+
+                    //inner middle mid
+                    var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s7.scale.set(0.4, 0.4, 0.4);
+                    s7.r = 4;
+                    s7.translateZ(-8);
+                    s7.material.wireframe = true;
+                    s.add(s7);
+                    self.gameplay_scene.add(s);
+
+                    //inner middle far
+                    var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                    s8.scale.set(0.3, 0.3, 0.3);
+                    s8.r = 3;
+                    s8.translateZ(-16);
+                    s8.material.wireframe = true;
+                    s.add(s8);
+
+                    self.gameplay_scene.add(s);
                     break;
                 }
                 case ASTEROID_FIELD: {
