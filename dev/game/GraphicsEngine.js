@@ -566,6 +566,7 @@ function GraphicsEngine(glow) {
 
                     //set mesh parameters
                     modelMesh.useQuaternion = true;
+                    modelMesh.receiveShadow = true;
                     modelMesh.direction = new THREE.Vector3(0, 0, -1);
                     modelMesh.name = gameObject.gameParameters.name;
                     modelMesh.objectType = gameObject.type;
@@ -603,6 +604,7 @@ function GraphicsEngine(glow) {
 
                     //set mesh parameters
                     modelMesh.useQuaternion = true;
+                    modelMesh.receiveShadow = true;
                     modelMesh.direction = new THREE.Vector3(0, 0, -1);
                     modelMesh.name = gameObject.gameParameters.name;
                     modelMesh.objectType = gameObject.type;
@@ -677,6 +679,7 @@ function GraphicsEngine(glow) {
 
                     //set mesh parameters
                     modelMesh.useQuaternion = true;
+                    modelMesh.receiveShadow = true;
                     modelMesh.direction = new THREE.Vector3(0, 0, -1);
                     modelMesh.name = gameObject.gameParameters.name;
                     modelMesh.objectType = gameObject.type;
@@ -714,6 +717,7 @@ function GraphicsEngine(glow) {
                     var asteroid_mesh;
                     for(var i = 0; i < asteroid_container.num_asteroids; i++) {
                         asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+                        asteroid_mesh.receiveShadow = true;
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
 
