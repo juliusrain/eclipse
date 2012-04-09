@@ -97,6 +97,7 @@ var AIShip = {  type: AI_SHIP,
 
                         }
                     },
+          
                     inventory: {},
                     spheres:{
                         outer:{
@@ -149,6 +150,7 @@ var AIShip2 = { type: AI_SHIP,
 
                         }
                     },
+                   
                     inventory: {},
                     spheres:{
                         outer:{
