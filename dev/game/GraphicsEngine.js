@@ -1516,6 +1516,7 @@ function GraphicsEngine(glow) {
                 tempSphere2.position.x = 2000*Math.sin(t);
                 tempSphere2.position.y = 500*Math.cos(t) + 150;
                 tempSphere2.position.z = 600*Math.cos(t);
+                
 
 
 
