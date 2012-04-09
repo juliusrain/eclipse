@@ -27,9 +27,9 @@ var playerShip = {  type: PLAYER_SHIP,
                         },
                         armor: {},
                         health: 100,
-                        maxHealth: 10000,
-                        repairRate: 100,
-                        repairCost: {food:1, fuel: 1, metals:15},
+                        maxHealth: 1000,
+                        repairRate: 1000,
+                        repairCost: {food:1, fuel: 5, metals:15},
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?
@@ -178,11 +178,11 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                         drawParameters: {
                             geometry: "models/asteroids/asteroid2.js",
                             positions: [    
-                                {x: 100, y: 100, z: -100},
-                                {x: -100, y: 100, z: -100}, 
-                                {x: -200, y: 110, z: -100}, 
-                                {x: -0, y: 80, z: -100}, 
-                                {x: -200, y: 90, z: -100}, 
+                                {x: 420, y: 100, z: -100},
+                                {x: -700, y: 100, z: -400}, 
+                                {x: -200, y: 120, z: -200}, 
+                                {x: -90, y: 85, z: -150}, 
+                                {x: 200, y: 90, z: -175}, 
                             ],
                             bounds: [
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},

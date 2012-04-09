@@ -117,7 +117,7 @@ function toggleCursor() {
     graphicsEngine.toggleCursor();
     if($('#mouselockcontrol').hasClass("on")){
         $('#mouselockcontrol').removeClass('on');
-        $('body').css('cursor', 'none');
+        $('body').css('cursor', 'crosshair');
     }
     else{
         $('#mouselockcontrol').addClass('on');

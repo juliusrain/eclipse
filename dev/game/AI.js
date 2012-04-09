@@ -45,7 +45,7 @@ AI.prototype.react = function() {
 					if (p2ai_distance <= (this.firing_range * this.firing_range)) {
 						
 						sceneElements.AIShips[i].fireLaser();
-						sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 12;
+						sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 20;
 					}
 					
 				} else if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout > 0 ){

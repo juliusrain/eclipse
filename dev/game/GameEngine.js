@@ -320,6 +320,16 @@ GameEngine.prototype.update = function () {
 			return;
 		}
 
+		// check if any network ships are invalid
+		for(var ns in sceneElements.netShips) {
+			if(sceneElements.netShips[ns].updated >= 5) {
+				graphicsEngine.removeSceneObject(sceneElements.netShips[ns].objectID);
+			}
+			else{
+				sceneElements.netShips[ns].updated++;
+			}
+		}
+
         // decrement waits
         if(this.timeouts.lasers > 0){
             this.timeouts.lasers--;
@@ -359,7 +369,7 @@ GameEngine.prototype.netUpdate = function (message) {
 			if(sceneElements.netShips[ns].gameParameters.nid === message.nid) {
 				found = true;
 				// update the ship
-				sceneElements.netShips[ns].updated = true;
+				sceneElements.netShips[ns].updated = 0;
 				sceneElements.netShips[ns].gameParameters.health = message.health;
 				sceneElements.netShips[ns].position.x = message.x;
 				sceneElements.netShips[ns].position.y = message.y;
