@@ -48,15 +48,6 @@ var playerShip = {  type: PLAYER_SHIP,
                             }
                         },
                         inventory: {},
-                        spheres:{
-                            outer:{
-                                x:0,
-                                y:0,
-                                z:0,
-                                r:15
-                            },
-                            inner:[]
-                        },
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
@@ -98,15 +89,6 @@ var AIShip = {  type: AI_SHIP,
                         }
                     },
                     inventory: {},
-                    spheres:{
-                        outer:{
-                            x:0,
-                            y:0,
-                            z:0,
-                            r:15
-                        },
-                        inner:[]
-                    },
                     origin: {
                         x:0,
                         y:0, 
@@ -150,15 +132,6 @@ var AIShip2 = { type: AI_SHIP,
                         }
                     },
                     inventory: {},
-                    spheres:{
-                        outer:{
-                            x:0,
-                            y:0,
-                            z:0,
-                            r:15
-                        },
-                        inner:[]
-                    },
                 },
                 drawParameters: {
                     shipID: 2,
@@ -239,15 +212,6 @@ var netShip = {  type: NET_SHIP,
                             }
                         },
                         inventory: {},
-                        spheres:{
-                            outer:{
-                                x:0,
-                                y:0,
-                                z:0,
-                                r:15
-                            },
-                            inner:[]
-                        },
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,

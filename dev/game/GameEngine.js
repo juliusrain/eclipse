@@ -461,22 +461,28 @@ GameEngine.prototype.netUpdate = function (message) {
                     //console.log('not me, not an unfired laser');
                     // check if there are spheres
                     var cspheres = undefined, ospheres = undefined;
-                    if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
-                        cspheres = objects[candidate].gameParameters.spheres;
-                    }
-                    else if(typeof objects[candidate].spheres == "object") {
+                    if(typeof objects[candidate].spheres == "object") {
                         cspheres = objects[candidate].spheres;
                     }
-                    if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
-                        ospheres = obj.gameParameters.spheres;
+                    else if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
+                        cspheres = objects[candidate].gameParameters.spheres;
                     }
-                    else if(typeof obj.spheres == "object") {
+                    if(typeof obj.spheres == "object") {
                         ospheres = obj.spheres;
+                    }
+                    else if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
+                        ospheres = obj.gameParameters.spheres;
                     }
                     if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
                         //console.log('spheres present');
                         // check outer.gameParameters.spheres
-                        var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
+						var crelative, ospheres, cfixed, ofixed;
+						crelative = cspheres.outer.hasOwnProperty('position') ? cspheres.outer.position : cspheres.outer;
+						orelative = ospheres.outer.hasOwnProperty('position') ? ospheres.outer.position : ospheres.outer;
+						cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
+						ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
+                        var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
+                        //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
                             //console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                             // check for inner.gameParameters.spheres
@@ -495,7 +501,10 @@ GameEngine.prototype.netUpdate = function (message) {
                             if(check){
                                 for(c in cand){
                                     for(s in subj){
-                                        var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
+										crelative = cand[c].hasOwnProperty('position') ? cand[c].position : cand[c];
+										orelative = subj[s].hasOwnProperty('position') ? subj[s].position : subj[s];
+                                        var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
+                                        //var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
                                         if(iHit){
                                             hits.push({where:iHit, obj:objects[candidate]});
                                         }
