@@ -78,8 +78,10 @@ $('#chatcompose').keydown(function (e){
     }
     else if (e.which == 13) {
         // if user pressed answer, send new msg
-        newMessage(chatbox.val());
-        chatbox.val("");
+        if(chatbox.val() != "") {
+            newMessage(chatbox.val());
+            chatbox.val("");
+        }
     } else {
         // stop propagation of event so it doesn't affect ship steering
         e.stopImmediatePropagation();

@@ -1059,7 +1059,7 @@ function GraphicsEngine(glow) {
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
-            sceneObject.translateZ(-90); //(distance from camera)
+            sceneObject.translateZ(-75); //(distance from camera)
 //            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 

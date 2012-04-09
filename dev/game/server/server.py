@@ -88,6 +88,7 @@ def main():
     app = Application()
     app.listen(options.PORT)
     tornado.ioloop.IOLoop.instance().start()
+    print "started."
 
 if __name__ == "__main__":
     main()

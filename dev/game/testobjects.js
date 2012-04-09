@@ -53,15 +53,15 @@ var playerShip = {  type: PLAYER_SHIP,
                                 x:0,
                                 y:0,
                                 z:0,
-                                r:25
+                                r:15
                             },
                             inner:[]
                         },
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
-//                        geometry: "models/ships/player_ship002_scaled_copy.js",
-                        geometry: "models/ships/player_ship003.js",
+                        geometry: "models/ships/player_ship002_scaled_copy.js",
+//                        geometry: "models/ships/player_ship003.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
@@ -83,7 +83,7 @@ var AIShip = {  type: AI_SHIP,
                                 turnFactor: 1.2
                     },
                     armor: {},
-                    health: 100,
+                    health: 1000,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
@@ -103,7 +103,7 @@ var AIShip = {  type: AI_SHIP,
                             x:0,
                             y:0,
                             z:0,
-                            r:25
+                            r:15
                         },
                         inner:[]
                     },
@@ -130,7 +130,7 @@ var AIShip2 = { type: AI_SHIP,
                                 turnFactor: 1.2
                     },
                     armor: {},
-                    health: 100,
+                    health: 1000,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
@@ -150,7 +150,7 @@ var AIShip2 = { type: AI_SHIP,
                             x:0,
                             y:0,
                             z:0,
-                            r:25
+                            r:15
                         },
                         inner:[]
                     },
@@ -181,11 +181,73 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                                 {x: -100, y: 100, z: -100}, 
                             ],
                             bounds: [
-                                {spheres: { x: 0, y: 0, z: 0, r: 40}},
-                                {spheres: { x: 0, y: 0, z: 0, r: 40}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 30}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 30}},
                             ],
                             count: 2,
                         },
                     };
 
 gameObjects.push(asteroid_field);
+
+
+
+var netShip = {  type: NET_SHIP,
+                    gameParameters: {   //game related parameters
+                        name: "netShip", //model number?
+                        engine: {   level: 0,
+                                    speed: 1,
+                                    turnFactor: 1.5, //also used by graphics engine
+                                    longJumpCost: 50,
+                                    medJumpCost: 20,
+                                    rechargeRate: 1,
+                                    rechargeCost: 1,
+                                    currentCharge: 0,
+                        },
+                        armor: {},
+                        health: 100,
+                        maxHealth: 10000,
+                        repairRate: 100,
+                        repairCost: {food:1, fuel: 1, metals:15},
+                        weapons: {
+                            lasers: {
+                                type: 0, //particle vs elongated?
+                                damage: 100,
+                                range: 300,
+                                speed: 70,
+                                amount: 50,
+                                maxCharge: 15400,
+                                currentCharge: 0,
+                                rechargeRate: 350,
+                                rechargeCost: 1,
+                                fireCost: 500,
+                            },
+                            missiles: {
+
+                            }
+                        },
+                        inventory: {},
+                        spheres:{
+                            outer:{
+                                x:0,
+                                y:0,
+                                z:0,
+                                r:15
+                            },
+                            inner:[]
+                        },
+                    },
+                    drawParameters: {   //graphics/drawing related parameters
+                        shipID: 0,
+                        geometry: "models/ships/player_ship002_scaled_copy.js",
+//                        geometry: "models/ships/player_ship003.js",
+                        laserModel: "models/lasers/laser.js",
+                        material: "", //not sure if this will be needed, still waiting on textured blender model
+                        crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
+
+                        tiltRotationCurrent: 0, //can make these specific to engine
+                        tiltRotationMax: 0.4, //radians
+
+                        position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
+                    }
+                };
