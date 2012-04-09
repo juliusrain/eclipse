@@ -399,7 +399,7 @@ function GraphicsEngine(glow) {
                 for(var j = 0; j < sceneElements.netShips.length; j++) {
                     if(sceneElements.netShips[j].objectID == target.objectID) {
                         delete sceneElements.netShips[j];
-                        sceneElements.AIShips.splice(j, 1);
+                        sceneElements.netShips.splice(j, 1);
                     }
                 }
             }

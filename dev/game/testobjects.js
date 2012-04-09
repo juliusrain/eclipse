@@ -28,7 +28,7 @@ var playerShip = {  type: PLAYER_SHIP,
                         armor: {},
                         health: 100,
                         maxHealth: 1000,
-                        repairRate: 1000,
+                        repairRate: 50,
                         repairCost: {food:1, fuel: 5, metals:15},
                         weapons: {
                             lasers: {

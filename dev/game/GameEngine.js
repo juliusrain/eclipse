@@ -47,6 +47,28 @@ GameEngine.prototype.first = function () {
 GameEngine.prototype.die = function (){
 	sceneElements.mainShip.gameParameters.health = 0;
 	this.logicwait = -1;
+	// transmit message to network
+	if(network.ws.readyState === 1) {
+		var message = {action:'pos', body:{}};
+		// net id
+		message.body.nid = this.nid;
+		// health
+		message.body.health = sceneElements.mainShip.gameParameters.health;
+		// positon
+		message.body.x = round2(sceneElements.mainShip.position.x);
+		message.body.y = round2(sceneElements.mainShip.position.y);
+		message.body.z = round2(sceneElements.mainShip.position.z);
+		// rotation
+		message.body.quat = {};
+		message.body.quat.w = sceneElements.mainShip.quaternion.w;
+		message.body.quat.x = sceneElements.mainShip.quaternion.x;
+		message.body.quat.y = sceneElements.mainShip.quaternion.y;
+		message.body.quat.z = sceneElements.mainShip.quaternion.z;
+		// shooting
+		message.body.dead = true;
+    	//console.log(JSON.stringify(message));
+		network.send(message);
+	}
 	alert("YOU HAVE DIED.");
 };
 
@@ -361,39 +383,47 @@ GameEngine.prototype.fireWeapon = function () {
 // Receive Network Update
 // triggered when network module receives a position update
 GameEngine.prototype.netUpdate = function (message) {
-	// makes sure it's not the player's ship
-	if(message.nid !== this.nid) {
-		// go through each net ship
-		var found = false;
-		for(var ns in sceneElements.netShips) {
-			if(sceneElements.netShips[ns].gameParameters.nid === message.nid) {
-				found = true;
-				// update the ship
-				sceneElements.netShips[ns].updated = 0;
-				sceneElements.netShips[ns].gameParameters.health = message.health;
-				sceneElements.netShips[ns].position.x = message.x;
-				sceneElements.netShips[ns].position.y = message.y;
-				sceneElements.netShips[ns].position.z = message.z;
-				sceneElements.netShips[ns].quaternion.w = message.quat.w;
-				sceneElements.netShips[ns].quaternion.x = message.quat.x;
-				sceneElements.netShips[ns].quaternion.y = message.quat.y;
-				sceneElements.netShips[ns].quaternion.z = message.quat.z;
-				if(message.hasOwnProperty('firing') && message.firing) {
-					sceneElements.netShips[ns].fireLaser();
+	try {
+		// makes sure it's not the player's ship
+		if(message.nid !== this.nid) {
+			// go through each net ship
+			var found = false;
+			for(var ns in sceneElements.netShips) {
+				if(sceneElements.netShips[ns].gameParameters.nid === message.nid) {
+					found = true;
+					// update the ship
+					sceneElements.netShips[ns].updated = 0;
+					sceneElements.netShips[ns].gameParameters.health = message.health;
+					sceneElements.netShips[ns].position.x = message.x;
+					sceneElements.netShips[ns].position.y = message.y;
+					sceneElements.netShips[ns].position.z = message.z;
+					sceneElements.netShips[ns].quaternion.w = message.quat.w;
+					sceneElements.netShips[ns].quaternion.x = message.quat.x;
+					sceneElements.netShips[ns].quaternion.y = message.quat.y;
+					sceneElements.netShips[ns].quaternion.z = message.quat.z;
+					if(message.hasOwnProperty('firing') && message.firing) {
+						sceneElements.netShips[ns].fireLaser();
+					}
+					if(message.hasOwnProperty('dead') && message.dead) {
+						this.kill(sceneElements.netShips[ns]);
+					}
+					break;
 				}
-				break;
+			}
+			//if the ship was not found, create it
+			if(!found && this.netShipsAdded.indexOf(message.nid) === -1) {
+				var nets = $.extend(true, {}, netShip);
+				nets.gameParameters.nid = message.nid;
+				nets.drawParameters.position.x = message.x;
+				nets.drawParameters.position.y = message.y;
+				nets.drawParameters.position.z = message.z;
+				graphicsEngine.addGameObject(nets);
+				this.netShipsAdded.push(message.nid);
 			}
 		}
-		//if the ship was not found, create it
-		if(!found && this.netShipsAdded.indexOf(message.nid) === -1) {
-			var nets = $.extend(true, {}, netShip);
-			nets.gameParameters.nid = message.nid;
-			nets.drawParameters.position.x = message.x;
-			nets.drawParameters.position.y = message.y;
-			nets.drawParameters.position.z = message.z;
-			graphicsEngine.addGameObject(nets);
-			this.netShipsAdded.push(message.nid);
-		}
+	}
+	catch (e) {
+		
 	}
 };
 

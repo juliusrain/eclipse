@@ -237,7 +237,7 @@ function Minimap(game_controls, game_camera) {
                         }
                     }
                 } else if(minimap_object.objectType == NET_SHIP) {
-                    for(var j = 0;j < sceneElements.netShips.length; j++) {
+                    for(j = 0; j < sceneElements.netShips.length; j++) {
                         ship = sceneElements.netShips[j];
                         if(ship.objectID == minimap_object.objectID) {
                             break;
@@ -246,6 +246,9 @@ function Minimap(game_controls, game_camera) {
                 }
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
+						if(typeof ship == 'undefined') {
+							console.log('huzzah!');
+						}
                         self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
