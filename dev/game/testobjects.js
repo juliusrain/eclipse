@@ -7,7 +7,7 @@ var skybox = {  type: SKYBOX,
                                 "skybox/starfield.png", "skybox/starfield.png",
                                 "skybox/starfield.png", "skybox/starfield.png"]*/
                     textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",
-                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy.jpg",
+                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_gasgiant.jpg",
                                 "skybox/testbox2/posz.jpg", "skybox/testbox2/negz.jpg"]
                 }
             };
