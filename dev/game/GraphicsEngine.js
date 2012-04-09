@@ -318,6 +318,10 @@ function GraphicsEngine(glow) {
             delete sceneElements.AIShips[i];
             sceneElements.AIShips.length--;
         }
+        for(i = sceneElements.netShips.length - 1; i >= 0; i--) {
+            delete sceneElements.netShips[i];
+            sceneElements.netShips.length--;
+        }
         for(i = sceneElements.env_objects.length - 1; i >= 0; i--) {
             delete sceneElements.env_objects[i];
             sceneElements.env_objects.length--;
