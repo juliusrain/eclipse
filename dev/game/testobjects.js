@@ -91,7 +91,7 @@ var AIShip = {  type: AI_SHIP,
                             range: 300,
                             speed: 70,
                             amount: 30,
-							timeout: 12
+                            timeout: 12
                         },
                         missiles: {
 
@@ -106,6 +106,11 @@ var AIShip = {  type: AI_SHIP,
                             r:15
                         },
                         inner:[]
+                    },
+                    origin: {
+                        x:0,
+                        y:0, 
+                        z:0,
                     },
                 },
                 drawParameters: {
@@ -138,7 +143,7 @@ var AIShip2 = { type: AI_SHIP,
                             range: 300,
                             speed: 70,
                             amount: 30,
-							timeout:12
+                            timeout:12
                         },
                         missiles: {
 
