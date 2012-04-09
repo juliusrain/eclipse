@@ -1075,6 +1075,7 @@ function GraphicsEngine(glow) {
                         HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
                         HUDObject.translateZ(-91);
+                        HUDObject.translateY(-2);
                         break;
                     }
                     case MINIMAP: {
