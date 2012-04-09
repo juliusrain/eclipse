@@ -88,6 +88,7 @@ var AIShip = {  type: AI_SHIP,
 
                         }
                     },
+          
                     inventory: {},
                     origin: {
                         x:0,
@@ -131,6 +132,7 @@ var AIShip2 = { type: AI_SHIP,
 
                         }
                     },
+                   
                     inventory: {},
                 },
                 drawParameters: {
