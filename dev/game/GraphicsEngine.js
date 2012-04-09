@@ -371,9 +371,24 @@ function GraphicsEngine(glow) {
 
                     }
                 }
+
+                //remove spheres
+                if(target.spheres !== undefined) {
+                    this.renderer.deallocateObject(target.spheres);
+                    this.gameplay_scene.remove(target.spheres);
+                    if(target.spheres.inner !== undefined) {
+                        for(var j = 0; j < target.spheres.inner.length; j++) {
+                            delete target.spheres.inner[j];
+                            target.spheres.inner.splice(j, 1);
+                        }
+                    }
+                    target.spheres = null;
+                }
+
                 //remove ship from scene
                 this.renderer.deallocateObject(target);
                 this.gameplay_scene.remove(target);
+
                 //remove ship from array
                 for(var j = 0; j < sceneElements.AIShips.length; j++) {
                     if(sceneElements.AIShips[j].objectID == target.objectID) {
@@ -693,9 +708,6 @@ function GraphicsEngine(glow) {
                     s.outer = s0;
                     s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
 
-
-
-
                     self.gameplay_scene.add(s);
 
 
@@ -858,6 +870,10 @@ function GraphicsEngine(glow) {
                     s8.material.wireframe = true;
                     s.add(s8);
 
+                    modelMesh.spheres = s;
+                    s.outer = s0;
+                    s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
+
                     self.gameplay_scene.add(s);
                     break;
                 }
@@ -975,6 +991,10 @@ function GraphicsEngine(glow) {
                     s8.translateZ(-16);
                     s8.material.wireframe = true;
                     s.add(s8);
+
+                    modelMesh.spheres = s;
+                    s.outer = s0;
+                    s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
 
                     self.gameplay_scene.add(s);
                     break;
