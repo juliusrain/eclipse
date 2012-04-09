@@ -60,8 +60,8 @@ var playerShip = {  type: PLAYER_SHIP,
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
-//                        geometry: "models/ships/player_ship002_scaled_copy.js",
-                        geometry: "models/ships/player_ship003.js",
+                        geometry: "models/ships/player_ship002_scaled_copy.js",
+//                        geometry: "models/ships/player_ship003.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
@@ -157,7 +157,8 @@ var AIShip2 = { type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 2,
-                    geometry: "models/ships/player_ship002_scaled_copy.js",
+//                    geometry: "models/ships/player_ship002_scaled_copy.js",
+                    geometry: "models/ships/AIship001.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
@@ -179,12 +180,18 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                             positions: [    
                                 {x: 100, y: 100, z: -100},
                                 {x: -100, y: 100, z: -100}, 
+                                {x: -200, y: 110, z: -100}, 
+                                {x: -0, y: 80, z: -100}, 
+                                {x: -200, y: 90, z: -100}, 
                             ],
                             bounds: [
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 40}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 40}},
+                                {spheres: { x: 0, y: 0, z: 0, r: 40}},
                             ],
-                            count: 2,
+                            count: 5,
                         },
                     };
 

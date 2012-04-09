@@ -362,7 +362,7 @@ GameEngine.prototype.netUpdate = function (message) {
                         // check outer.gameParameters.spheres
                         var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
-                            console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                            //console.log('hit!');
                             // check for inner.gameParameters.spheres
                             var check = false,
                                 cand = [cspheres.outer],
