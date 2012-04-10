@@ -69,7 +69,7 @@ AI.prototype.react = function() {
 					
 					sceneElements.AIShips[i].fireLaser();
 					sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 12;
-				
+				}
 
 				//sceneElements.AIShips[i].turn((ai_dir.x + player_dir.x), ai_dir.y + player_dir.y, ai_dir.z + player_dir.z);
 				sceneElements.AIShips[i].turn(player.x, player.y, player.z);
