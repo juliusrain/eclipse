@@ -17,7 +17,7 @@ var playerShip = {  type: PLAYER_SHIP,
                     gameParameters: {   //game related parameters
                         name: "mainShip", //model number?
                         engine: {   level: 0,
-                                    speed: 1,
+                                    speed: 2,
                                     turnFactor: 1.5, //also used by graphics engine
                                     longJumpCost: 50,
                                     medJumpCost: 20,
@@ -35,7 +35,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                 type: 0, //particle vs elongated?
                                 damage: 100,
                                 range: 300,
-                                speed: 70,
+                                speed: 50,
                                 amount: 50,
                                 maxCharge: 15400,
                                 currentCharge: 0,
@@ -80,7 +80,7 @@ var AIShip = {  type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 100,
                             range: 300,
-                            speed: 70,
+                            speed: 50,
                             amount: 30,
                             timeout: 12
                         },
@@ -128,7 +128,7 @@ var AIShip2 = { type: AI_SHIP,
                             type: 0, //particle vs elongated?
                             damage: 100,
                             range: 300,
-                            speed: 70,
+                            speed: 50,
                             amount: 30,
                             timeout:12
                         },
@@ -213,7 +213,7 @@ var netShip = {  type: NET_SHIP,
                                 type: 0, //particle vs elongated?
                                 damage: 100,
                                 range: 300,
-                                speed: 70,
+                                speed: 50,
                                 amount: 50,
                                 maxCharge: 15400,
                                 currentCharge: 0,
