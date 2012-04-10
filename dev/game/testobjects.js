@@ -102,7 +102,7 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-                    geometry: "models/ships/player_ship002_scaled_copy.js",
+                    geometry: "models/ships/player_ship001w.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine
@@ -150,8 +150,7 @@ var AIShip2 = { type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 2,
-//                    geometry: "models/ships/player_ship002_scaled_copy.js",
-                    geometry: "models/ships/AIship001.js",
+                    geometry: "models/ships/player_ship001w.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine

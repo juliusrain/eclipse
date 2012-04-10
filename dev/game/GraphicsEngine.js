@@ -642,25 +642,25 @@ function GraphicsEngine(glow) {
 
                     //middle inner
                     var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s1.translateZ(18);
+                    s1.translateZ(10);
                     s1.position.r = 10;
                     s1.material.wireframe = true;
                     s.add(s1);
 
                     //left inner
                     var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s2.scale.set(0.5, 0.5, 0.5);
+                    s2.scale.set(0.4, 0.4, 0.4);
                     s2.position.r = 5;
-                    s2.translateZ(22);
+                    s2.translateZ(15);
                     s2.translateX(-15);
                     s2.material.wireframe = true;
                     s.add(s2);
 
                     //right inner
                     var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s3.scale.set(0.5, 0.5, 0.5);
+                    s3.scale.set(0.4, 0.4, 0.4);
                     s3.position.r = 5;
-                    s3.translateZ(22);
+                    s3.translateZ(15);
                     s3.translateX(15);
                     s3.material.wireframe = true;
                     s.add(s3);
@@ -669,7 +669,7 @@ function GraphicsEngine(glow) {
                     var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s4.scale.set(0.3, 0.3, 0.3);
                     s4.position.r = 3;
-                    s4.translateZ(25);
+                    s4.translateZ(17);
                     s4.translateX(-22);
                     s4.material.wireframe = true;
                     s.add(s4);
@@ -678,7 +678,7 @@ function GraphicsEngine(glow) {
                     var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s5.scale.set(0.3, 0.3, 0.3);
                     s5.position.r = 3;
-                    s5.translateZ(25);
+                    s5.translateZ(17);
                     s5.translateX(22);
                     s5.material.wireframe = true;
                     s.add(s5);
@@ -687,7 +687,7 @@ function GraphicsEngine(glow) {
                     var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s6.scale.set(0.6, 0.6, 0.6);
                     s6.position.r = 6;
-                    s6.translateZ(2);
+                    s6.translateZ(-3);
                     s6.material.wireframe = true;
                     s.add(s6);
 
@@ -695,7 +695,7 @@ function GraphicsEngine(glow) {
                     var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s7.scale.set(0.4, 0.4, 0.4);
                     s7.position.r = 4;
-                    s7.translateZ(-8);
+                    s7.translateZ(-3);
                     s7.material.wireframe = true;
                     s.add(s7);
                     self.gameplay_scene.add(s);
@@ -704,7 +704,7 @@ function GraphicsEngine(glow) {
                     var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s8.scale.set(0.3, 0.3, 0.3);
                     s8.position.r = 3;
-                    s8.translateZ(-16);
+                    s8.translateZ(-11);
                     s8.material.wireframe = true;
                     s.add(s8);
 
@@ -802,31 +802,31 @@ function GraphicsEngine(glow) {
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s0.scale.set(3, 3, 3);
                     s0.position.r = 30;
-                    s0.translateZ(10);
+                    s0.translateZ(5);
                     s0.material.wireframe = true;
                     s.add(s0);
 
                     //middle inner
                     var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s1.translateZ(18);
+                    s1.translateZ(10);
                     s1.position.r = 10;
                     s1.material.wireframe = true;
                     s.add(s1);
 
                     //left inner
                     var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s2.scale.set(0.5, 0.5, 0.5);
+                    s2.scale.set(0.6, 0.6, 0.6);
                     s2.position.r = 5;
-                    s2.translateZ(22);
+                    s2.translateZ(12);
                     s2.translateX(-15);
                     s2.material.wireframe = true;
                     s.add(s2);
 
                     //right inner
                     var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
-                    s3.scale.set(0.5, 0.5, 0.5);
+                    s3.scale.set(0.6, 0.6, 0.6);
                     s3.position.r = 5;
-                    s3.translateZ(22);
+                    s3.translateZ(12);
                     s3.translateX(15);
                     s3.material.wireframe = true;
                     s.add(s3);
@@ -835,7 +835,7 @@ function GraphicsEngine(glow) {
                     var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s4.scale.set(0.3, 0.3, 0.3);
                     s4.position.r = 3;
-                    s4.translateZ(25);
+                    s4.translateZ(14);
                     s4.translateX(-22);
                     s4.material.wireframe = true;
                     s.add(s4);
@@ -844,7 +844,7 @@ function GraphicsEngine(glow) {
                     var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s5.scale.set(0.3, 0.3, 0.3);
                     s5.position.r = 3;
-                    s5.translateZ(25);
+                    s5.translateZ(14);
                     s5.translateX(22);
                     s5.material.wireframe = true;
                     s.add(s5);
@@ -853,7 +853,7 @@ function GraphicsEngine(glow) {
                     var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s6.scale.set(0.6, 0.6, 0.6);
                     s6.position.r = 6;
-                    s6.translateZ(2);
+                    s6.translateZ(-3);
                     s6.material.wireframe = true;
                     s.add(s6);
 
@@ -861,7 +861,7 @@ function GraphicsEngine(glow) {
                     var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s7.scale.set(0.4, 0.4, 0.4);
                     s7.position.r = 4;
-                    s7.translateZ(-8);
+                    s7.translateZ(-12);
                     s7.material.wireframe = true;
                     s.add(s7);
                     self.gameplay_scene.add(s);
@@ -870,7 +870,7 @@ function GraphicsEngine(glow) {
                     var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s8.scale.set(0.3, 0.3, 0.3);
                     s8.position.r = 3;
-                    s8.translateZ(-16);
+                    s8.translateZ(-20);
                     s8.material.wireframe = true;
                     s.add(s8);
 

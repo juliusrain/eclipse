@@ -18,15 +18,15 @@ function GameEngine() {
     };
     this.logicwait = 0;
 
-	this.nid = Math.floor(Math.random() * 99999);
+    this.nid = Math.floor(Math.random() * 99999);
 
-	ai = new AI();
+    ai = new AI();
 
     //start network client
     network = new Network();
     network.connect();
-	this.netShipsAdded = [];
-	this.firing = false;
+    this.netShipsAdded = [];
+    this.firing = false;
 
     // new game portion - NO NEED FOR THIS!
        // call database, create new game(?)
@@ -38,45 +38,45 @@ function GameEngine() {
 }
 
 GameEngine.prototype.first = function () {
-    var glow = true;
+    var glow = false;
     graphicsEngine = new GraphicsEngine(glow);
     this.load(this.solarSystem, this.planet);
 };
 
 // Death Clause for Player Ship
 GameEngine.prototype.die = function (){
-	sceneElements.mainShip.gameParameters.health = 0;
-	this.logicwait = -1;
-	// transmit message to network
-	if(network.ws.readyState === 1) {
-		var message = {action:'pos', body:{}};
-		// net id
-		message.body.nid = this.nid;
-		// health
-		message.body.health = sceneElements.mainShip.gameParameters.health;
-		// positon
-		message.body.x = round2(sceneElements.mainShip.position.x);
-		message.body.y = round2(sceneElements.mainShip.position.y);
-		message.body.z = round2(sceneElements.mainShip.position.z);
-		// rotation
-		message.body.quat = {};
-		message.body.quat.w = sceneElements.mainShip.quaternion.w;
-		message.body.quat.x = sceneElements.mainShip.quaternion.x;
-		message.body.quat.y = sceneElements.mainShip.quaternion.y;
-		message.body.quat.z = sceneElements.mainShip.quaternion.z;
-		// shooting
-		message.body.dead = true;
-    	//console.log(JSON.stringify(message));
-		network.send(message);
-	}
-	alert("YOU HAVE DIED.");
+    sceneElements.mainShip.gameParameters.health = 0;
+    this.logicwait = -1;
+    // transmit message to network
+    if(network.ws.readyState === 1) {
+        var message = {action:'pos', body:{}};
+        // net id
+        message.body.nid = this.nid;
+        // health
+        message.body.health = sceneElements.mainShip.gameParameters.health;
+        // positon
+        message.body.x = round2(sceneElements.mainShip.position.x);
+        message.body.y = round2(sceneElements.mainShip.position.y);
+        message.body.z = round2(sceneElements.mainShip.position.z);
+        // rotation
+        message.body.quat = {};
+        message.body.quat.w = sceneElements.mainShip.quaternion.w;
+        message.body.quat.x = sceneElements.mainShip.quaternion.x;
+        message.body.quat.y = sceneElements.mainShip.quaternion.y;
+        message.body.quat.z = sceneElements.mainShip.quaternion.z;
+        // shooting
+        message.body.dead = true;
+        //console.log(JSON.stringify(message));
+        network.send(message);
+    }
+    alert("YOU HAVE DIED.");
 };
 
 // Death Clause for AI Ships
 GameEngine.prototype.kill = function (victim){
-	victim.gameParameters.health = 0;
-	graphicsEngine.addExplosionLarge(victim.position.x, victim.position.y, victim.position.z);
-	graphicsEngine.removeSceneObject(victim.objectID);
+    victim.gameParameters.health = 0;
+    graphicsEngine.addExplosionLarge(victim.position.x, victim.position.y, victim.position.z);
+    graphicsEngine.removeSceneObject(victim.objectID);
 };
 
 
@@ -116,7 +116,7 @@ GameEngine.prototype.load = function (ssid, pid) {
     graphicsEngine.startEngine();
     // remove loader screen
     $('#loader').hide();
-	//console.log('hey this is really where I am! ' + sceneElements.mainShip.position);
+    //console.log('hey this is really where I am! ' + sceneElements.mainShip.position);
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
@@ -189,9 +189,9 @@ GameEngine.prototype.updateResources = function () {
         if(this.resources.food > 0) {
             this.resources.food--;
         }
-		else {
-			ship.health--;
-		}
+        else {
+            ship.health--;
+        }
         this.timeouts.food = EATING;
     }
     else{
@@ -223,18 +223,18 @@ GameEngine.prototype.laserHit = function(target, hit) {
     graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
     // reset lasers
     hit.obj.hit = true;
-	if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
-		target.gameParameters.health -= hit.obj.damage;
-		if(target.gameParameters.health < 0) {
-			//alert("~~~~~~~DEATH~~~~~~~~");
-			if(target === sceneElements.mainShip) {
-				this.die();
-			}
-			else if(sceneElements.AIShips.indexOf(target) !== -1) {
-				this.kill(target);
-			}
-		}
-	}
+    if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
+        target.gameParameters.health -= hit.obj.damage;
+        if(target.gameParameters.health < 0) {
+            //alert("~~~~~~~DEATH~~~~~~~~");
+            if(target === sceneElements.mainShip) {
+                this.die();
+            }
+            else if(sceneElements.AIShips.indexOf(target) !== -1) {
+                this.kill(target);
+            }
+        }
+    }
 };
 
 GameEngine.prototype.updateCollisions = function() {
@@ -248,7 +248,7 @@ GameEngine.prototype.updateCollisions = function() {
             this.laserHit(sceneElements.mainShip, colls[c]);
         }
     }
-	// collisions with AI ships
+    // collisions with AI ships
     for(var s in sceneElements.AIShips) {
         colls = collision(sceneElements.AIShips[s]);
         // process
@@ -259,7 +259,7 @@ GameEngine.prototype.updateCollisions = function() {
             }
         }
     }
-	// collisions with net ships
+    // collisions with net ships
     for(var s in sceneElements.netShips) {
         colls = collision(sceneElements.netShips[s]);
         // process
@@ -270,62 +270,62 @@ GameEngine.prototype.updateCollisions = function() {
             }
         }
     }
-	// collisions with asteroids and other environment objects
+    // collisions with asteroids and other environment objects
     for(var eo in sceneElements.env_objects) {
-		if(!sceneElements.env_objects[eo].hasOwnProperty('children')) {
-			continue;
-		}
-    	for(var ec in sceneElements.env_objects[eo].children) {
-	        colls = collision(sceneElements.env_objects[eo].children[ec]);
-	        // process
-	        for(var c in colls) {
-	            if(colls[c].obj.hasOwnProperty('fired')) {
-	                // hit by a laser!
-	                this.laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
-	            }
-	        }
-		}
+        if(!sceneElements.env_objects[eo].hasOwnProperty('children')) {
+            continue;
+        }
+        for(var ec in sceneElements.env_objects[eo].children) {
+            colls = collision(sceneElements.env_objects[eo].children[ec]);
+            // process
+            for(var c in colls) {
+                if(colls[c].obj.hasOwnProperty('fired')) {
+                    // hit by a laser!
+                    this.laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
+                }
+            }
+        }
     }
 };
 
 function round2(n) {
-	n *= 100;
-	n = Math.round(n);
-	n /= 100;
-	return n;
+    n *= 100;
+    n = Math.round(n);
+    n /= 100;
+    return n;
 }
 
 // GameEngine update function
 // called each frame
 GameEngine.prototype.update = function () {
-	// transmit message to network
-	if(network.ws.readyState === 1) {
-		var message = {action:'pos', body:{}};
-		// net id
-		message.body.nid = this.nid;
-		// health
-		message.body.health = sceneElements.mainShip.gameParameters.health;
-		// positon
-		message.body.x = round2(sceneElements.mainShip.position.x);
-		message.body.y = round2(sceneElements.mainShip.position.y);
-		message.body.z = round2(sceneElements.mainShip.position.z);
-		//message.body.x = round2(graphicsEngine.gameplay_camera.position.x);
-		//message.body.y = round2(graphicsEngine.gameplay_camera.position.y);
-		//message.body.z = round2(graphicsEngine.gameplay_camera.position.z);
-		// rotation
-		message.body.quat = {};
-		message.body.quat.w = sceneElements.mainShip.quaternion.w;
-		message.body.quat.x = sceneElements.mainShip.quaternion.x;
-		message.body.quat.y = sceneElements.mainShip.quaternion.y;
-		message.body.quat.z = sceneElements.mainShip.quaternion.z;
-		// shooting
-		if(this.firing) {
-			message.body.firing = true;
-			this.firing = false;
-		}
-    	//console.log(JSON.stringify(message));
-		network.send(message);
-	}
+    // transmit message to network
+    if(network.ws.readyState === 1) {
+        var message = {action:'pos', body:{}};
+        // net id
+        message.body.nid = this.nid;
+        // health
+        message.body.health = sceneElements.mainShip.gameParameters.health;
+        // positon
+        message.body.x = round2(sceneElements.mainShip.position.x);
+        message.body.y = round2(sceneElements.mainShip.position.y);
+        message.body.z = round2(sceneElements.mainShip.position.z);
+        //message.body.x = round2(graphicsEngine.gameplay_camera.position.x);
+        //message.body.y = round2(graphicsEngine.gameplay_camera.position.y);
+        //message.body.z = round2(graphicsEngine.gameplay_camera.position.z);
+        // rotation
+        message.body.quat = {};
+        message.body.quat.w = sceneElements.mainShip.quaternion.w;
+        message.body.quat.x = sceneElements.mainShip.quaternion.x;
+        message.body.quat.y = sceneElements.mainShip.quaternion.y;
+        message.body.quat.z = sceneElements.mainShip.quaternion.z;
+        // shooting
+        if(this.firing) {
+            message.body.firing = true;
+            this.firing = false;
+        }
+        //console.log(JSON.stringify(message));
+        network.send(message);
+    }
     if(this.logicwait === 0) {
         //update things that don't need to be done strictly each frame
 
@@ -336,21 +336,21 @@ GameEngine.prototype.update = function () {
         // update vital stats
         this.updateVitalsInfo();
 
-		// check if the player is dead
-		if(sceneElements.mainShip.gameParameters.health <= 0){
-			this.die();
-			return;
-		}
+        // check if the player is dead
+        if(sceneElements.mainShip.gameParameters.health <= 0){
+            this.die();
+            return;
+        }
 
-		// check if any network ships are invalid
-		for(var ns in sceneElements.netShips) {
-			if(sceneElements.netShips[ns].updated >= 5) {
-				graphicsEngine.removeSceneObject(sceneElements.netShips[ns].objectID);
-			}
-			else{
-				sceneElements.netShips[ns].updated++;
-			}
-		}
+        // check if any network ships are invalid
+        for(var ns in sceneElements.netShips) {
+            if(sceneElements.netShips[ns].updated >= 5) {
+                graphicsEngine.removeSceneObject(sceneElements.netShips[ns].objectID);
+            }
+            else{
+                sceneElements.netShips[ns].updated++;
+            }
+        }
 
         // decrement waits
         if(this.timeouts.lasers > 0){
@@ -376,55 +376,55 @@ GameEngine.prototype.fireWeapon = function () {
         sceneElements.mainShip.fireLaser();
         sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
         this.timeouts.lasers = 3;
-		this.firing = true;
+        this.firing = true;
     }
 };
 
 // Receive Network Update
 // triggered when network module receives a position update
 GameEngine.prototype.netUpdate = function (message) {
-	try {
-		// makes sure it's not the player's ship
-		if(message.nid !== this.nid) {
-			// go through each net ship
-			var found = false;
-			for(var ns in sceneElements.netShips) {
-				if(sceneElements.netShips[ns].gameParameters.nid === message.nid) {
-					found = true;
-					// update the ship
-					sceneElements.netShips[ns].updated = 0;
-					sceneElements.netShips[ns].gameParameters.health = message.health;
-					sceneElements.netShips[ns].position.x = message.x;
-					sceneElements.netShips[ns].position.y = message.y;
-					sceneElements.netShips[ns].position.z = message.z;
-					sceneElements.netShips[ns].quaternion.w = message.quat.w;
-					sceneElements.netShips[ns].quaternion.x = message.quat.x;
-					sceneElements.netShips[ns].quaternion.y = message.quat.y;
-					sceneElements.netShips[ns].quaternion.z = message.quat.z;
-					if(message.hasOwnProperty('firing') && message.firing) {
-						sceneElements.netShips[ns].fireLaser();
-					}
-					if(message.hasOwnProperty('dead') && message.dead) {
-						this.kill(sceneElements.netShips[ns]);
-					}
-					break;
-				}
-			}
-			//if the ship was not found, create it
-			if(!found && this.netShipsAdded.indexOf(message.nid) === -1) {
-				var nets = $.extend(true, {}, netShip);
-				nets.gameParameters.nid = message.nid;
-				nets.drawParameters.position.x = message.x;
-				nets.drawParameters.position.y = message.y;
-				nets.drawParameters.position.z = message.z;
-				graphicsEngine.addGameObject(nets);
-				this.netShipsAdded.push(message.nid);
-			}
-		}
-	}
-	catch (e) {
-		
-	}
+    try {
+        // makes sure it's not the player's ship
+        if(message.nid !== this.nid) {
+            // go through each net ship
+            var found = false;
+            for(var ns in sceneElements.netShips) {
+                if(sceneElements.netShips[ns].gameParameters.nid === message.nid) {
+                    found = true;
+                    // update the ship
+                    sceneElements.netShips[ns].updated = 0;
+                    sceneElements.netShips[ns].gameParameters.health = message.health;
+                    sceneElements.netShips[ns].position.x = message.x;
+                    sceneElements.netShips[ns].position.y = message.y;
+                    sceneElements.netShips[ns].position.z = message.z;
+                    sceneElements.netShips[ns].quaternion.w = message.quat.w;
+                    sceneElements.netShips[ns].quaternion.x = message.quat.x;
+                    sceneElements.netShips[ns].quaternion.y = message.quat.y;
+                    sceneElements.netShips[ns].quaternion.z = message.quat.z;
+                    if(message.hasOwnProperty('firing') && message.firing) {
+                        sceneElements.netShips[ns].fireLaser();
+                    }
+                    if(message.hasOwnProperty('dead') && message.dead) {
+                        this.kill(sceneElements.netShips[ns]);
+                    }
+                    break;
+                }
+            }
+            //if the ship was not found, create it
+            if(!found && this.netShipsAdded.indexOf(message.nid) === -1) {
+                var nets = $.extend(true, {}, netShip);
+                nets.gameParameters.nid = message.nid;
+                nets.drawParameters.position.x = message.x;
+                nets.drawParameters.position.y = message.y;
+                nets.drawParameters.position.z = message.z;
+                graphicsEngine.addGameObject(nets);
+                this.netShipsAdded.push(message.nid);
+            }
+        }
+    }
+    catch (e) {
+        
+    }
 };
 
 
@@ -470,18 +470,18 @@ GameEngine.prototype.netUpdate = function (message) {
                 //console.log(objects.length);
             }
             if(sceneElements.hasOwnProperty('missiles')) {
-            	objects = objects.concat(sceneElements.missiles);
-			}
+                objects = objects.concat(sceneElements.missiles);
+            }
             if(sceneElements.hasOwnProperty('netShips')) {
-            	objects = objects.concat(sceneElements.netShips);
-			}
+                objects = objects.concat(sceneElements.netShips);
+            }
             if(sceneElements.hasOwnProperty('env_objects')) {
-				for(var env in sceneElements.env_objects) {
-					if(sceneElements.env_objects[env].hasOwnProperty('children')) {
-            			objects = objects.concat(sceneElements.env_objects[env].children);
-					}
-				}
-			}
+                for(var env in sceneElements.env_objects) {
+                    if(sceneElements.env_objects[env].hasOwnProperty('children')) {
+                        objects = objects.concat(sceneElements.env_objects[env].children);
+                    }
+                }
+            }
             //console.log(objects.length);
             // go through each object in the scene
             for(candidate in objects){
@@ -506,11 +506,11 @@ GameEngine.prototype.netUpdate = function (message) {
                     if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
                         //console.log('spheres present');
                         // check outer.gameParameters.spheres
-						var crelative, ospheres, cfixed, ofixed;
-						crelative = cspheres.outer.hasOwnProperty('position') ? cspheres.outer.position : cspheres.outer;
-						orelative = ospheres.outer.hasOwnProperty('position') ? ospheres.outer.position : ospheres.outer;
-						cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
-						ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
+                        var crelative, ospheres, cfixed, ofixed;
+                        crelative = cspheres.outer.hasOwnProperty('position') ? cspheres.outer.position : cspheres.outer;
+                        orelative = ospheres.outer.hasOwnProperty('position') ? ospheres.outer.position : ospheres.outer;
+                        cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
+                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
@@ -531,8 +531,8 @@ GameEngine.prototype.netUpdate = function (message) {
                             if(check){
                                 for(c in cand){
                                     for(s in subj){
-										crelative = cand[c].hasOwnProperty('position') ? cand[c].position : cand[c];
-										orelative = subj[s].hasOwnProperty('position') ? subj[s].position : subj[s];
+                                        crelative = cand[c].hasOwnProperty('position') ? cand[c].position : cand[c];
+                                        orelative = subj[s].hasOwnProperty('position') ? subj[s].position : subj[s];
                                         var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                                         //var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
                                         if(iHit){
