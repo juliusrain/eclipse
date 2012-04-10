@@ -511,6 +511,7 @@ GameEngine.prototype.netUpdate = function (message) {
                         orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
                         cfixed = cspheres.hasOwnProperty('tposition') ? cspheres.tposition : objects[candidate].position;
                         ofixed = ospheres.hasOwnProperty('tposition') ? ospheres.tposition : ofixed = obj.position;
+
                         if(cspheres.outer.hasOwnProperty('tposition')) {
                             if(cspheres.useQuaternion == true) {
                                 cspheres.quaternion.multiplyVector3(cspheres.outer.position, cspheres.outer.tposition);
@@ -534,7 +535,7 @@ GameEngine.prototype.netUpdate = function (message) {
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
-                            //console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                            console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                             // check for inner.gameParameters.spheres
                             var check = false,
                                 cand = [cspheres.outer],
@@ -549,10 +550,17 @@ GameEngine.prototype.netUpdate = function (message) {
                             }
                             // check inner spheres
                             if(check){
+                                console.log("made it inside");
                                 for(c in cand){
                                     for(s in subj){
-                                        crelative = cand[c].hasOwnProperty('position') ? cand[c].position : cand[c];
-                                        orelative = subj[s].hasOwnProperty('position') ? subj[s].position : subj[s];
+                                        crelative = cand[c].hasOwnProperty('tposition') ? cand[c].tposition : cand[c];
+                                        orelative = subj[s].hasOwnProperty('tposition') ? subj[s].tposition : subj[s];
+                                        if(cand[c].hasOwnProperty('tposition')) {
+                                            cspheres.quaternion.multiplyVector3(cand[c].position, cand[c].tposition);
+                                        }
+                                        if(subj[s].hasOwnProperty('tposition')) {
+                                            ospheres.quaternion.multiplyVector3(subj[s].position, subj[s].tposition);
+                                        }
                                         var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                                         //var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
                                         if(iHit){

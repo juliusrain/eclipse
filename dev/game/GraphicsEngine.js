@@ -832,6 +832,7 @@ function GraphicsEngine(glow) {
                     s0.tposition.r = 30;
                     s0.translateZ(5);
                     s0.material.wireframe = true;
+                    s0.useQuaternion = true;
                     s.add(s0);
 
                     //middle inner
@@ -842,6 +843,7 @@ function GraphicsEngine(glow) {
                     s1.position.r = 10;
                     s1.tposition.r = 10;
                     s1.material.wireframe = true;
+                    s1.useQuaternion = true;
                     s.add(s1);
 
                     //left inner
@@ -854,6 +856,7 @@ function GraphicsEngine(glow) {
                     s2.translateZ(12);
                     s2.translateX(-15);
                     s2.material.wireframe = true;
+                    s2.useQuaternion = true;
                     s.add(s2);
 
                     //right inner
@@ -866,6 +869,7 @@ function GraphicsEngine(glow) {
                     s3.translateZ(12);
                     s3.translateX(15);
                     s3.material.wireframe = true;
+                    s3.useQuaternion = true;
                     s.add(s3);
 
                     //left inner far
@@ -878,6 +882,7 @@ function GraphicsEngine(glow) {
                     s4.translateZ(14);
                     s4.translateX(-22);
                     s4.material.wireframe = true;
+                    s4.useQuaternion = true;
                     s.add(s4);
 
                     //right inner far
@@ -890,6 +895,7 @@ function GraphicsEngine(glow) {
                     s5.translateZ(14);
                     s5.translateX(22);
                     s5.material.wireframe = true;
+                    s5.useQuaternion = true;
                     s.add(s5);
 
                     //inner middle close
@@ -901,6 +907,7 @@ function GraphicsEngine(glow) {
                     s6.tposition.r = 6;
                     s6.translateZ(-3);
                     s6.material.wireframe = true;
+                    s6.useQuaternion = true;
                     s.add(s6);
 
                     //inner middle mid
@@ -912,6 +919,7 @@ function GraphicsEngine(glow) {
                     s7.tposition.r = 4;
                     s7.translateZ(-12);
                     s7.material.wireframe = true;
+                    s7.useQuaternion = true;
                     s.add(s7);
 
                     //inner middle far
@@ -923,6 +931,7 @@ function GraphicsEngine(glow) {
                     s8.tposition.r = 3;
                     s8.translateZ(-20);
                     s8.material.wireframe = true;
+                    s8.useQuaternion = true;
                     s.add(s8);
 
                     modelMesh.spheres = s;
@@ -981,8 +990,10 @@ function GraphicsEngine(glow) {
                     s0.tposition.copy(s0.position);
                     s0.scale.set(3, 3, 3);
                     s0.position.r = 30;
+                    s0.tposition.r = 30;
                     s0.translateZ(5);
                     s0.material.wireframe = true;
+                    s0.useQuaternion = true;
                     s.add(s0);
 
                     //middle inner
@@ -993,6 +1004,7 @@ function GraphicsEngine(glow) {
                     s1.position.r = 10;
                     s1.tposition.r = 10;
                     s1.material.wireframe = true;
+                    s1.useQuaternion = true;
                     s.add(s1);
 
                     //left inner
@@ -1005,6 +1017,7 @@ function GraphicsEngine(glow) {
                     s2.translateZ(12);
                     s2.translateX(-15);
                     s2.material.wireframe = true;
+                    s2.useQuaternion = true;
                     s.add(s2);
 
                     //right inner
@@ -1017,6 +1030,7 @@ function GraphicsEngine(glow) {
                     s3.translateZ(12);
                     s3.translateX(15);
                     s3.material.wireframe = true;
+                    s3.useQuaternion = true;
                     s.add(s3);
 
                     //left inner far
@@ -1029,6 +1043,7 @@ function GraphicsEngine(glow) {
                     s4.translateZ(14);
                     s4.translateX(-22);
                     s4.material.wireframe = true;
+                    s4.useQuaternion = true;
                     s.add(s4);
 
                     //right inner far
@@ -1041,6 +1056,7 @@ function GraphicsEngine(glow) {
                     s5.translateZ(14);
                     s5.translateX(22);
                     s5.material.wireframe = true;
+                    s5.useQuaternion = true;
                     s.add(s5);
 
                     //inner middle close
@@ -1052,6 +1068,7 @@ function GraphicsEngine(glow) {
                     s6.tposition.r = 6;
                     s6.translateZ(-3);
                     s6.material.wireframe = true;
+                    s6.useQuaternion = true;
                     s.add(s6);
 
                     //inner middle mid
@@ -1063,6 +1080,7 @@ function GraphicsEngine(glow) {
                     s7.tposition.r = 4;
                     s7.translateZ(-12);
                     s7.material.wireframe = true;
+                    s7.useQuaternion = true;
                     s.add(s7);
 
                     //inner middle far
@@ -1074,6 +1092,7 @@ function GraphicsEngine(glow) {
                     s8.tposition.r = 3;
                     s8.translateZ(-20);
                     s8.material.wireframe = true;
+                    s8.useQuaternion = true;
                     s.add(s8);
 
                     modelMesh.spheres = s;
@@ -1082,7 +1101,7 @@ function GraphicsEngine(glow) {
 
                     s.outer.visible = false;
                     for(var i = 0; i < s.inner.length; i++) {
-                        s.inner[i].visible = false;
+//                        s.inner[i].visible = false;
                     }
 
                     self.gameplay_scene.add(s);
@@ -1122,23 +1141,23 @@ function GraphicsEngine(glow) {
                         s0.translateZ(10);
                         s0.material.wireframe = true;
                         s0.visible = false;
+                        s0.useQuaternion = true;
                         s.add(s0);
 
-                        //middle inner
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s1.tposition = new THREE.Vector3();
                         s1.tposition.copy(s1.position);
-                        s1.scale.set(2.75, 2.75, 2.75);
-                        s1.position.r = 28;
-                        s1.tposition.r = 28;
+                        s1.scale.set(3, 3, 3);
+                        s1.position.r = 30;
+                        s1.tposition.r = 30;
                         s1.translateX(10);
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-                        s1.visible = false;
+//                        s1.visible = false;
+                        s1.useQuaternion = true;
                         s.add(s1);
 
-                        //left inner
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s2.tposition = new THREE.Vector3();
                         s2.tposition.copy(s2.position);
@@ -1149,7 +1168,8 @@ function GraphicsEngine(glow) {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-                        s2.visible = false;
+//                        s2.visible = false;
+                        s2.useQuaternion = true;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
@@ -1210,7 +1230,7 @@ function GraphicsEngine(glow) {
                 laserMesh.spheres = {outer: {x: 0,
                                              y: 0,
                                              z: 0,
-                                             r: 8},
+                                             r: 10},
                                      inner: []
                 }
 

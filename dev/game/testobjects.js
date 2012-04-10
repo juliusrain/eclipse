@@ -370,7 +370,7 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
                             ],
-                            count: 20, // max 100
+                            count: 10, // max 100
                         },
                     };
 
@@ -416,8 +416,7 @@ var netShip = {  type: NET_SHIP,
                     },
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
-                        geometry: "models/ships/player_ship002_scaled_copy.js",
-//                        geometry: "models/ships/player_ship003.js",
+                        geometry: "models/ships/player_ship001w.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
