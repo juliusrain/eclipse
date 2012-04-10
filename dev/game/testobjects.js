@@ -52,7 +52,7 @@ var playerShip = {  type: PLAYER_SHIP,
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
 //                        geometry: "models/ships/player_ship002_scaled_copy.js",
-                        geometry: "models/ships/player_ship001.1.js",
+                        geometry: "models/ships/player_ship001w.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships

@@ -3,13 +3,11 @@
 //git clone https://tooocoool@github.com/juliusrain/361project.git
 function AI() {
 
-    this.radar_range = 1000;
-    this.firing_range = 1;
-    this.limit = 400;
-
 	this.radar_range = 600;
-	this.firing_range = 400;
-	this.limit = 400;
+//	this.firing_range = 400;
+//	this.limit = 400;
+    this.radar_range = 1;
+    this.firing_range = 1;
 	this.flying_range = 1000;
 	this.max_speed = 2;
 
@@ -72,7 +70,7 @@ AI.prototype.react = function() {
 				}
 
 				//sceneElements.AIShips[i].turn((ai_dir.x + player_dir.x), ai_dir.y + player_dir.y, ai_dir.z + player_dir.z);
-				sceneElements.AIShips[i].turn(player.x, player.y, player.z);
+				sceneElements.AIShips[i].turn(player_pos.x, player_pos.y, player_pos.z);
 				//sceneElements.AIShips[i].translateZ(-2);
 			//}
 				//fire at the player if it's in firing range

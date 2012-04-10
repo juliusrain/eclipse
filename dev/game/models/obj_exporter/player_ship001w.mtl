@@ -1,0 +1,23 @@
+# Blender MTL File: 'player_ship001w.blend'
+# Material Count: 2
+newmtl MATER_shiphull002.png
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.335443 0.335443 0.335443
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd player_ship001w.blend/Models/texture/shiphull002.png
+
+
+newmtl None_shiphull002.png
+Ns 0
+Ka 0.000000 0.000000 0.000000
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+map_Kd player_ship001w.blend/Models/texture/shiphull002.png
+
+

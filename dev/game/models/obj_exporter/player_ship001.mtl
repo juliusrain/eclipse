@@ -1,0 +1,13 @@
+# Blender MTL File: 'player_ship001.blend'
+# Material Count: 1
+newmtl Material_MetalAircraft0061_1_S.jpg
+Ns 164.705882
+Ka 0.000000 0.000000 0.000000
+Kd 0.567788 0.567339 0.462615
+Ks 0.368421 0.368421 0.368421
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Models\player_ship001.blend\texture\MetalAircraft0061_1_S.jpg
+
+
