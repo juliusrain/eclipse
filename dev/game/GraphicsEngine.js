@@ -453,7 +453,7 @@ function GraphicsEngine(glow) {
                 //set camera turning and movement speed based on main ship's parameters
                 this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                 this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
-                this.gameplay_controls.autoForward = true;
+//                this.gameplay_controls.autoForward = true;
                 break;
             }
 
@@ -587,8 +587,8 @@ function GraphicsEngine(glow) {
         *
         *  (used only for gameObjects)
         */
+        var sg = new THREE.SphereGeometry(10, 10, 10);
         function loadJSON(geometry, gameObject, scene) {
-
             switch(gameObject.type) {
                 case PLAYER_SHIP: {
                     var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
@@ -630,7 +630,6 @@ function GraphicsEngine(glow) {
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
                     s.quaternion = modelMesh.quaternion;
-                    var sg = new THREE.SphereGeometry(10, 10, 10);
 
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -712,7 +711,7 @@ function GraphicsEngine(glow) {
                     s.outer = s0;
                     s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
 
-                    s.outer.visible = false;
+                    //s.outer.visible = false;
                     for(var i = 0; i < s.inner.length; i++) {
                         s.inner[i].visible = false;
                     }
@@ -797,7 +796,6 @@ function GraphicsEngine(glow) {
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
                     s.quaternion = modelMesh.quaternion;
-                    var sg = new THREE.SphereGeometry(10, 10, 10);
 
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -924,7 +922,6 @@ function GraphicsEngine(glow) {
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
                     s.quaternion = modelMesh.quaternion;
-                    var sg = new THREE.SphereGeometry(10, 10, 10);
 
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1021,6 +1018,7 @@ function GraphicsEngine(glow) {
                     asteroid_container.objectType = gameObject.type;
 
                     var asteroid_mesh;
+                    var s, s0, s1, s2, s3;
                     for(var i = 0; i < asteroid_container.num_asteroids; i++) {
                         asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
                         asteroid_mesh.receiveShadow = true;
@@ -1029,9 +1027,69 @@ function GraphicsEngine(glow) {
 
                         asteroid_mesh.spheres = {outer: {}, inner:[]};
                         asteroid_mesh.spheres.outer = gameObject.drawParameters.bounds[i].spheres;
-                        asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
+//                        asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
+//                        asteroid_mesh.rotation.set(gameObject.drawParameters.positions[i].rx, gameObject.drawParameters.positions[i].ry, gameObject.drawParameters.positions[i].rz);
 
+
+                        var s = new THREE.Object3D();
+                        s.position = asteroid_mesh.position;
+                        s.rotation = asteroid_mesh.rotation;
+
+                        //outer
+                        var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                        s0.scale.set(5, 5, 5);
+                        s0.position.r = 30;
+                        s0.translateZ(5);
+                        s0.material.wireframe = true;
+                        s.add(s0);
+
+                        //middle inner
+                        var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                        s1.scale.set(3, 3, 3);
+                        s1.translateZ(10);
+                        s1.position.r = 10;
+                        s1.material.wireframe = true;
+                        s.add(s1);
+
+                        //left inner
+                        var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                        s2.scale.set(0.6, 0.6, 0.6);
+                        s2.position.r = 5;
+                        s2.translateZ(12);
+                        s2.translateX(-15);
+                        s2.material.wireframe = true;
+                        s.add(s2);
+
+                        //right inner
+                        var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                        s3.scale.set(0.6, 0.6, 0.6);
+                        s3.position.r = 5;
+                        s3.translateZ(12);
+                        s3.translateX(15);
+                        s3.material.wireframe = true;
+                        s.add(s3);
+
+                        //left inner far
+                        var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
+                        s4.scale.set(0.3, 0.3, 0.3);
+                        s4.position.r = 3;
+                        s4.translateZ(14);
+                        s4.translateX(-22);
+                        s4.material.wireframe = true;
+                        s.add(s4);
+
+//                        asteroid_mesh.spheres = s;
+//                        s.outer = s0;
+//                        s.inner = [s1, s2, s3, s4];
+//
+//                        s.outer.visible = false;
+//                        for(var i = 0; i < s.inner.length; i++) {
+//                        //    s.inner[i].visible = false;
+//                        }
+
+                        self.gameplay_scene.add(s);
                         asteroid_container.add(asteroid_mesh);
+
                     }
 
                     sceneElements.env_objects.push(asteroid_container);
@@ -1082,7 +1140,7 @@ function GraphicsEngine(glow) {
                 laserMesh.spheres = {outer: {x: 0,
                                              y: 0,
                                              z: 0,
-                                             r: 10},
+                                             r: 8},
                                      inner: []
                 }
 
@@ -1249,7 +1307,6 @@ function GraphicsEngine(glow) {
 //               }
                 updateLasers();
                 updateExplosions();
-                updateEnvObjects();
 
                 //check if map is hidden or not before rendering
                 self.jumpmap.updateJumpmap();
@@ -1417,18 +1474,6 @@ function GraphicsEngine(glow) {
                 if(sceneElements.explosions[i].done) {
                     delete sceneElements.explosions[i];
                     sceneElements.explosions.splice(i, 1);
-                }
-            }
-        }
-
-        function updateEnvObjects() {
-            for(var i = 0; i < sceneElements.env_objects.length; i++) {
-                sceneObject = sceneElements.env_objects[i];
-                switch(sceneObject.type) {
-                    case ASTEROID_FIELD: {
-
-                        break;
-                    }
                 }
             }
         }

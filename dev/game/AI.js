@@ -9,7 +9,7 @@ function AI() {
     this.radar_range = 100;
     this.firing_range = 50;
     this.flying_range = 1000;
-    this.max_speed = 4;
+    this.max_speed = 3;
 
 }
 
