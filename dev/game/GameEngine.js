@@ -69,7 +69,7 @@ GameEngine.prototype.die = function (){
         //console.log(JSON.stringify(message));
         network.send(message);
     }
-    alert("YOU HAVE DIED.");
+//    alert("YOU HAVE DIED.");
 };
 
 // Death Clause for AI Ships
@@ -507,10 +507,30 @@ GameEngine.prototype.netUpdate = function (message) {
                         //console.log('spheres present');
                         // check outer.gameParameters.spheres
                         var crelative, ospheres, cfixed, ofixed;
-                        crelative = cspheres.outer.hasOwnProperty('position') ? cspheres.outer.position : cspheres.outer;
-                        orelative = ospheres.outer.hasOwnProperty('position') ? ospheres.outer.position : ospheres.outer;
-                        cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
-                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
+                        crelative = cspheres.outer.hasOwnProperty('tposition') ? cspheres.outer.tposition : cspheres.outer;
+                        orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
+                        cfixed = cspheres.hasOwnProperty('tposition') ? cspheres.tposition : objects[candidate].position;
+                        ofixed = ospheres.hasOwnProperty('tposition') ? ospheres.tposition : ofixed = obj.position;
+                        if(cspheres.outer.hasOwnProperty('tposition')) {
+                            if(cspheres.useQuaternion == true) {
+                                cspheres.quaternion.multiplyVector3(cspheres.outer.position, cspheres.outer.tposition);
+                            } else {
+
+                            }
+                        }
+                        if(ospheres.outer.hasOwnProperty('tposition')) {
+                            if(ospheres.useQuaternion == true) {
+                                ospheres.quaternion.multiplyVector3(ospheres.outer.position, ospheres.outer.tposition);
+                            } else {
+
+                            }
+                        }
+                        if(cspheres.hasOwnProperty('tposition')) {
+                                cfixed.quaternion.multiplyVector3(cfixed.position, cfixed.tposition); 
+                        }
+                        if(ospheres.hasOwnProperty('tposition')) {
+                                ofixed.quaternion.multiplyVector3(ofixed.position, ofixed.tposition); 
+                        }
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
