@@ -228,8 +228,8 @@ function GraphicsEngine() {
 /////////////////////////////
 //        this.gameplay_glow_scene.add(tempSphere1);
 //        this.gameplay_glow_scene.add(tempSphere2);
-        this.gameplay_scene.add(tempSphere1);
-        this.gameplay_scene.add(tempSphere2);
+//        this.gameplay_scene.add(tempSphere1);
+//        this.gameplay_scene.add(tempSphere2);
 
 ////////////////////////////
 
@@ -1114,7 +1114,7 @@ function GraphicsEngine() {
                         s0.translateX(10);
                         s0.translateZ(10);
                         s0.material.wireframe = true;
-//                        s0.visible = false;
+                        s0.visible = false;
                         s.add(s0);
 
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1126,7 +1126,7 @@ function GraphicsEngine() {
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-//                        s1.visible = false;
+                        s1.visible = false;
                         s.add(s1);
 
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1138,7 +1138,7 @@ function GraphicsEngine() {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-//                        s2.visible = false;
+                        s2.visible = false;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
@@ -1402,7 +1402,7 @@ function GraphicsEngine() {
             sceneObject = sceneElements.mainShip;
             speed = sceneObject.gameParameters.engine.speed;
             if(self.gameplay_controls.moveState.forward == 1) {
-                self.gameplay_controls.movementSpeed = speed * 1.25;
+                self.gameplay_controls.movementSpeed = speed * 1.5;
             } else {
                 self.gameplay_controls.movementSpeed = speed;
             }

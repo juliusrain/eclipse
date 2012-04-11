@@ -88,7 +88,7 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             var pCount, particle_geometry, particle_position;
 
             //small particles
-            pCount = 700;
+            pCount = 400;
             radius = 250;
             particle_geometry = new THREE.Geometry();
             for(var i = 0; i < pCount; i++) {
