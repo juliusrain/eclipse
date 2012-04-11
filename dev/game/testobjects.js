@@ -88,15 +88,16 @@ var AIShip = {  type: AI_SHIP,
 
                         }
                     },
+                    orbit_radius: 8000,                                         
                     dummy_target: {
                         x: 0,
                         y: 0,
-                        z: 0,
+                        z: 500,
                     },
                     origin: {
                         x: 0,
                         y: 0,
-                        z: 0,
+                        z: 300,
                     },
                     inventory: {},
                 },
@@ -137,15 +138,16 @@ var AIShip2 = { type: AI_SHIP,
 
                         }
                     },
+                    orbit_radius: 8000,
                     dummy_target: {
                         x: 0,
                         y: 0,
-                        z: 0,
+                        z: 500,
                     },
                     origin: {
                         x: 0,
                         y: 0,
-                        z: 0,
+                        z: -300,
                     },
                     inventory: {},
                 },
