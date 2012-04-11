@@ -453,7 +453,7 @@ function GraphicsEngine(glow) {
                 //set camera turning and movement speed based on main ship's parameters
                 this.gameplay_controls_factor = gameObject.gameParameters.engine.turnFactor;
                 this.gameplay_controls.movementSpeed = gameObject.gameParameters.engine.speed;
-//                this.gameplay_controls.autoForward = true;
+                this.gameplay_controls.autoForward = true;
                 break;
             }
 
@@ -587,7 +587,7 @@ function GraphicsEngine(glow) {
         *
         *  (used only for gameObjects)
         */
-        var sg = new THREE.SphereGeometry(10, 10, 10);
+        var sg = new THREE.SphereGeometry(10, 3, 2);
         function loadJSON(geometry, gameObject, scene) {
             switch(gameObject.type) {
                 case PLAYER_SHIP: {
@@ -634,7 +634,6 @@ function GraphicsEngine(glow) {
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s0.tposition = new THREE.Vector3();
-                    s0.tposition.copy(s0.position);
                     s0.scale.set(3, 3, 3);
                     s0.position.r = 30;
                     s0.tposition.r = 30;
@@ -645,7 +644,6 @@ function GraphicsEngine(glow) {
                     //middle inner
                     var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s1.tposition = new THREE.Vector3();
-                    s1.tposition.copy(s1.position);
                     s1.translateZ(10);
                     s1.position.r = 10;
                     s1.tposition.r = 10;
@@ -655,7 +653,6 @@ function GraphicsEngine(glow) {
                     //left inner
                     var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s2.tposition = new THREE.Vector3();
-                    s2.tposition.copy(s2.position);
                     s2.scale.set(0.6, 0.6, 0.6);
                     s2.position.r = 6;
                     s2.tposition.r = 6;
@@ -667,7 +664,6 @@ function GraphicsEngine(glow) {
                     //right inner
                     var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s3.tposition = new THREE.Vector3();
-                    s3.tposition.copy(s3.position);
                     s3.scale.set(0.6, 0.6, 0.6);
                     s3.position.r = 6;
                     s3.tposition.r = 6;
@@ -679,7 +675,6 @@ function GraphicsEngine(glow) {
                     //left inner far
                     var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s4.tposition = new THREE.Vector3();
-                    s4.tposition.copy(s4.position);
                     s4.scale.set(0.3, 0.3, 0.3);
                     s4.position.r = 3;
                     s4.tposition.r = 3;
@@ -691,7 +686,6 @@ function GraphicsEngine(glow) {
                     //right inner far
                     var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s5.tposition = new THREE.Vector3();
-                    s5.tposition.copy(s5.position);
                     s5.scale.set(0.3, 0.3, 0.3);
                     s5.position.r = 3;
                     s5.tposition.r = 3;
@@ -703,7 +697,6 @@ function GraphicsEngine(glow) {
                     //inner middle close
                     var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s6.tposition = new THREE.Vector3();
-                    s6.tposition.copy(s6.position);
                     s6.scale.set(0.6, 0.6, 0.6);
                     s6.position.r = 6;
                     s6.tposition.r = 6;
@@ -714,7 +707,6 @@ function GraphicsEngine(glow) {
                     //inner middle mid
                     var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s7.tposition = new THREE.Vector3();
-                    s7.tposition.copy(s7.position);
                     s7.scale.set(0.4, 0.4, 0.4);
                     s7.position.r = 4;
                     s7.tposition.r = 4;
@@ -725,7 +717,6 @@ function GraphicsEngine(glow) {
                     //inner middle far
                     var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s8.tposition = new THREE.Vector3();
-                    s8.tposition.copy(s8.position);
                     s8.scale.set(0.3, 0.3, 0.3);
                     s8.position.r = 3;
                     s8.tposition.r = 3;
@@ -737,7 +728,7 @@ function GraphicsEngine(glow) {
                     s.outer = s0;
                     s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
 
-                    //s.outer.visible = false;
+                    s.outer.visible = false;
                     for(var i = 0; i < s.inner.length; i++) {
                         s.inner[i].visible = false;
                     }
@@ -826,7 +817,6 @@ function GraphicsEngine(glow) {
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s0.tposition = new THREE.Vector3();
-                    s0.tposition.copy(s0.position);
                     s0.scale.set(3, 3, 3);
                     s0.position.r = 30;
                     s0.tposition.r = 30;
@@ -838,7 +828,6 @@ function GraphicsEngine(glow) {
                     //middle inner
                     var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s1.tposition = new THREE.Vector3();
-                    s1.tposition.copy(s1.position);
                     s1.translateZ(10);
                     s1.position.r = 10;
                     s1.tposition.r = 10;
@@ -849,7 +838,6 @@ function GraphicsEngine(glow) {
                     //left inner
                     var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s2.tposition = new THREE.Vector3();
-                    s2.tposition.copy(s2.position);
                     s2.scale.set(0.6, 0.6, 0.6);
                     s2.position.r = 6;
                     s2.tposition.r = 6;
@@ -862,7 +850,6 @@ function GraphicsEngine(glow) {
                     //right inner
                     var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s3.tposition = new THREE.Vector3();
-                    s3.tposition.copy(s3.position);
                     s3.scale.set(0.6, 0.6, 0.6);
                     s3.position.r = 6;
                     s3.tposition.r = 6;
@@ -875,7 +862,6 @@ function GraphicsEngine(glow) {
                     //left inner far
                     var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s4.tposition = new THREE.Vector3();
-                    s4.tposition.copy(s4.position);
                     s4.scale.set(0.3, 0.3, 0.3);
                     s4.position.r = 3;
                     s4.tposition.r = 3;
@@ -888,7 +874,6 @@ function GraphicsEngine(glow) {
                     //right inner far
                     var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s5.tposition = new THREE.Vector3();
-                    s5.tposition.copy(s5.position);
                     s5.scale.set(0.3, 0.3, 0.3);
                     s5.position.r = 3;
                     s5.tposition.r = 3;
@@ -901,7 +886,6 @@ function GraphicsEngine(glow) {
                     //inner middle close
                     var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s6.tposition = new THREE.Vector3();
-                    s6.tposition.copy(s6.position);
                     s6.scale.set(0.6, 0.6, 0.6);
                     s6.position.r = 6;
                     s6.tposition.r = 6;
@@ -913,7 +897,6 @@ function GraphicsEngine(glow) {
                     //inner middle mid
                     var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s7.tposition = new THREE.Vector3();
-                    s7.tposition.copy(s7.position);
                     s7.scale.set(0.4, 0.4, 0.4);
                     s7.position.r = 4;
                     s7.tposition.r = 4;
@@ -925,7 +908,6 @@ function GraphicsEngine(glow) {
                     //inner middle far
                     var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s8.tposition = new THREE.Vector3();
-                    s8.tposition.copy(s8.position);
                     s8.scale.set(0.3, 0.3, 0.3);
                     s8.position.r = 3;
                     s8.tposition.r = 3;
@@ -987,7 +969,6 @@ function GraphicsEngine(glow) {
                     //outer
                     var s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s0.tposition = new THREE.Vector3();
-                    s0.tposition.copy(s0.position);
                     s0.scale.set(3, 3, 3);
                     s0.position.r = 30;
                     s0.tposition.r = 30;
@@ -999,7 +980,6 @@ function GraphicsEngine(glow) {
                     //middle inner
                     var s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s1.tposition = new THREE.Vector3();
-                    s1.tposition.copy(s1.position);
                     s1.translateZ(10);
                     s1.position.r = 10;
                     s1.tposition.r = 10;
@@ -1010,7 +990,6 @@ function GraphicsEngine(glow) {
                     //left inner
                     var s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s2.tposition = new THREE.Vector3();
-                    s2.tposition.copy(s2.position);
                     s2.scale.set(0.6, 0.6, 0.6);
                     s2.position.r = 6;
                     s2.tposition.r = 6;
@@ -1023,7 +1002,6 @@ function GraphicsEngine(glow) {
                     //right inner
                     var s3 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s3.tposition = new THREE.Vector3();
-                    s3.tposition.copy(s3.position);
                     s3.scale.set(0.6, 0.6, 0.6);
                     s3.position.r = 6;
                     s3.tposition.r = 6;
@@ -1036,7 +1014,6 @@ function GraphicsEngine(glow) {
                     //left inner far
                     var s4 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s4.tposition = new THREE.Vector3();
-                    s4.tposition.copy(s4.position);
                     s4.scale.set(0.3, 0.3, 0.3);
                     s4.position.r = 3;
                     s4.tposition.r = 3;
@@ -1049,7 +1026,6 @@ function GraphicsEngine(glow) {
                     //right inner far
                     var s5 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s5.tposition = new THREE.Vector3();
-                    s5.tposition.copy(s5.position);
                     s5.scale.set(0.3, 0.3, 0.3);
                     s5.position.r = 3;
                     s5.tposition.r = 3;
@@ -1062,7 +1038,6 @@ function GraphicsEngine(glow) {
                     //inner middle close
                     var s6 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s6.tposition = new THREE.Vector3();
-                    s6.tposition.copy(s6.position);
                     s6.scale.set(0.6, 0.6, 0.6);
                     s6.position.r = 6;
                     s6.tposition.r = 6;
@@ -1074,7 +1049,6 @@ function GraphicsEngine(glow) {
                     //inner middle mid
                     var s7 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s7.tposition = new THREE.Vector3();
-                    s7.tposition.copy(s7.position);
                     s7.scale.set(0.4, 0.4, 0.4);
                     s7.position.r = 4;
                     s7.tposition.r = 4;
@@ -1086,7 +1060,6 @@ function GraphicsEngine(glow) {
                     //inner middle far
                     var s8 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                     s8.tposition = new THREE.Vector3();
-                    s8.tposition.copy(s8.position);
                     s8.scale.set(0.3, 0.3, 0.3);
                     s8.position.r = 3;
                     s8.tposition.r = 3;
@@ -1101,7 +1074,7 @@ function GraphicsEngine(glow) {
 
                     s.outer.visible = false;
                     for(var i = 0; i < s.inner.length; i++) {
-//                        s.inner[i].visible = false;
+                        s.inner[i].visible = false;
                     }
 
                     self.gameplay_scene.add(s);
@@ -1125,6 +1098,7 @@ function GraphicsEngine(glow) {
                         asteroid_mesh.spheres = {outer: {}, inner:[]};
                         asteroid_mesh.spheres.outer = gameObject.drawParameters.bounds[i].spheres;
                         asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
+                        asteroid_mesh.quaternion.setFromEuler({x:gameObject.drawParameters.positions[i].rx, y:gameObject.drawParameters.positions[i].ry, z:gameObject.drawParameters.positions[i].rz});
 
                         s = new THREE.Object3D();
                         s.useQuaternion = true;
@@ -1134,7 +1108,6 @@ function GraphicsEngine(glow) {
                         //outer
                         s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s0.tposition = new THREE.Vector3();
-                        s0.tposition.copy(s0.position);
                         s0.scale.set(4, 4, 4);
                         s0.position.r = 40;
                         s0.tposition.r = 40;
@@ -1142,12 +1115,10 @@ function GraphicsEngine(glow) {
                         s0.translateZ(10);
                         s0.material.wireframe = true;
                         s0.visible = false;
-                        s0.useQuaternion = true;
                         s.add(s0);
 
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s1.tposition = new THREE.Vector3();
-                        s1.tposition.copy(s1.position);
                         s1.scale.set(3, 3, 3);
                         s1.position.r = 30;
                         s1.tposition.r = 30;
@@ -1155,13 +1126,11 @@ function GraphicsEngine(glow) {
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-//                        s1.visible = false;
-                        s1.useQuaternion = true;
+                        s1.visible = false;
                         s.add(s1);
 
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s2.tposition = new THREE.Vector3();
-                        s2.tposition.copy(s2.position);
                         s2.scale.set(3, 3, 3);
                         s2.position.r = 30;
                         s2.tposition.r = 30;
@@ -1169,8 +1138,7 @@ function GraphicsEngine(glow) {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-//                        s2.visible = false;
-                        s2.useQuaternion = true;
+                        s2.visible = false;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
@@ -1434,7 +1402,7 @@ function GraphicsEngine(glow) {
             sceneObject = sceneElements.mainShip;
             speed = sceneObject.gameParameters.engine.speed;
             if(self.gameplay_controls.moveState.forward == 1) {
-                self.gameplay_controls.movementSpeed = speed * 1.5;
+                self.gameplay_controls.movementSpeed = speed * 1.25;
             } else {
                 self.gameplay_controls.movementSpeed = speed;
             }
@@ -1523,7 +1491,7 @@ function GraphicsEngine(glow) {
             }
             sceneObject.translateY(sceneObject.currentYOffset);
 
-            sceneObject.translateZ(-75); //(distance from camera)
+            sceneObject.translateZ(-95); //(distance from camera)
 //            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 
@@ -1538,7 +1506,7 @@ function GraphicsEngine(glow) {
                         HUDObject.quaternion.copy(self.gameplay_camera.quaternion);
                         HUDObject.translateX(-self.gameplay_controls.rotationVector.y * 10);
                         HUDObject.translateY(self.gameplay_controls.rotationVector.x * 10);
-                        HUDObject.translateZ(-91);
+                        HUDObject.translateZ(-100);
                         HUDObject.translateY(-2);
                         break;
                     }

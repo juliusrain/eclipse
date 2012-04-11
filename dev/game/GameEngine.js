@@ -38,7 +38,7 @@ function GameEngine() {
 }
 
 GameEngine.prototype.first = function () {
-    var glow = false;
+    var glow = true;
     graphicsEngine = new GraphicsEngine(glow);
     this.load(this.solarSystem, this.planet);
 };
@@ -558,10 +558,10 @@ GameEngine.prototype.netUpdate = function (message) {
                             }
                         }
                         if(cspheres.hasOwnProperty('tposition')) {
-                                cfixed.quaternion.multiplyVector3(cfixed.position, cfixed.tposition); 
+                            cfixed.quaternion.multiplyVector3(cfixed.position, cfixed.tposition); 
                         }
                         if(ospheres.hasOwnProperty('tposition')) {
-                                ofixed.quaternion.multiplyVector3(ofixed.position, ofixed.tposition); 
+                            ofixed.quaternion.multiplyVector3(ofixed.position, ofixed.tposition); 
                         }
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
