@@ -26,14 +26,14 @@ var playerShip = {  type: PLAYER_SHIP,
                                     currentCharge: 0,
                         },
                         armor: {},
-                        health: 100,
+                        health: 1000,
                         maxHealth: 1000,
                         repairRate: 50,
                         repairCost: {food:1, fuel: 5, metals:15},
                         weapons: {
                             lasers: {
                                 type: 0, //particle vs elongated?
-                                damage: 100,
+                                damage: 50,
                                 range: 300,
                                 speed: 40,
                                 amount: 50,
@@ -78,7 +78,7 @@ var AIShip = {  type: AI_SHIP,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
-                            damage: 100,
+                            damage: 50,
                             range: 300,
                             speed: 40,
                             amount: 30,
@@ -128,7 +128,7 @@ var AIShip2 = { type: AI_SHIP,
                     weapons: {
                         lasers: {
                             type: 0, //particle vs elongated?
-                            damage: 100,
+                            damage: 50,
                             range: 300,
                             speed: 40,
                             amount: 30,
@@ -142,7 +142,7 @@ var AIShip2 = { type: AI_SHIP,
                     dummy_target: {
                         x: 0,
                         y: 0,
-                        z: 500,
+                        z: -500,
                     },
                     origin: {
                         x: 0,
@@ -153,7 +153,7 @@ var AIShip2 = { type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 2,
-                    geometry: "models/ships/player_ship001w.js",
+                    geometry: "models/ships/AIship002.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
                     tiltRotationCurrent: 0, //can make these specific to engine

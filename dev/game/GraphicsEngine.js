@@ -2,65 +2,6 @@
 
 //contains HUD elements, updated by graphics engine (crosshairs, etc...)
 var HUDElements = [];
-
-var ship_template = 
-    {   type: NET_SHIP, 
-        gameParameters: {   //game related parameters
-            name: "net_ship", //model number?
-            engine: {   level: 0,
-                        speed: 1,
-                        turnFactor: 1.5, //also used by graphics engine
-                        longJumpCost: 50,
-                        medJumpCost: 20,
-                        rechargeRate: 1,
-                        rechargeCost: 1,
-                        currentCharge: 0,
-            },
-            armor: {},
-            health: 100,
-            maxHealth: 10000,
-            repairRate: 100,
-            repairCost: {food:1, fuel: 1, metals:15},
-            weapons: {
-                lasers: {
-                    type: 0, //particle vs elongated?
-                    damage: 0,
-                    range: 300,
-                    speed: 70,
-                    amount: 50,
-                    maxCharge: 15400,
-                    currentCharge: 0,
-                    rechargeRate: 350,
-                    rechargeCost: 1,
-                    fireCost: 500,
-                },
-                missiles: {
-
-                }
-            },
-            inventory: {},
-            spheres:{
-                outer:{
-                    x:0,
-                    y:0,
-                    z:0,
-                    r:25
-                },
-                inner:[]
-            },
-        },
-        drawParameters: {   //graphics/drawing related parameters
-            geometry: "models/ships/player_ship002_scaled_copy.js",
-            laserModel: "models/lasers/laser.js",
-
-            tiltRotationCurrent: 0, //can make these specific to engine
-            tiltRotationMax: 0.4, //radians
-
-            position: {x: 0, y: 0, z: 0} //starting position in scene when not main ship
-        }
-    };
-
-
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
@@ -138,7 +79,7 @@ function GraphicsEngine() {
         this.blend_composer.addPass(blend_pass);
     }
 
-////////////
+
 
     //create minimap
     this.minimap = new Minimap(this.gameplay_controls, this.gameplay_camera);
@@ -163,38 +104,10 @@ function GraphicsEngine() {
     ///////////////////////////////////
 
 
-///////////////////////////////////
-
-//TEMPORARY event listenrs
-    var self = this;
-    var removed = false;
-    document.addEventListener('mousedown', onMouseDown, false);
-    function onMouseDown(event) {
-        if(!removed) {
-        } else {
-        }
-        removed = !removed;
-    }
-///////////////////////////////////////
 }
 
 
 ////////////////////////////////
-
-//TEMPORARY
-                //for testing purposes, remove for final
-                var tempMaterial = new THREE.MeshNormalMaterial({
-                });
-
-                var sphereGeometry = new THREE.SphereGeometry(10,10,10);
-                var tempSphere1 = new THREE.Mesh(sphereGeometry, tempMaterial);
-                    tempSphere2 = new THREE.Mesh(sphereGeometry, tempMaterial);
-                tempSphere1.name = "sphere1";
-                tempSphere2.name = "sphere2"
-
-//////////////////////////////
-
-
 
     //resizing function for index.html
     GraphicsEngine.prototype.resizePlayWindow = function() {
@@ -225,14 +138,6 @@ function GraphicsEngine() {
      *   Input: Array of gameObjects following specified format.
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
-/////////////////////////////
-//        this.gameplay_glow_scene.add(tempSphere1);
-//        this.gameplay_glow_scene.add(tempSphere2);
-        this.gameplay_scene.add(tempSphere1);
-        this.gameplay_scene.add(tempSphere2);
-
-////////////////////////////
-
         this.scene_loaded = true;
 
         //for loading models
@@ -268,10 +173,6 @@ function GraphicsEngine() {
         var dirlight6 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight6.position.set(0, 0, 500).normalize();
         this.gameplay_scene.add(dirlight6);
-
-        var dirlight7 = new THREE.DirectionalLight(0xaaaaaa);
-        dirlight7.position.set(500, 500, 500).normalize();
-        this.gameplay_scene.add(dirlight7);
 
         var amblight = new THREE.AmbientLight(0xffffff);
         this.gameplay_scene.add(amblight);
@@ -1114,7 +1015,7 @@ function GraphicsEngine() {
                         s0.translateX(10);
                         s0.translateZ(10);
                         s0.material.wireframe = true;
-//                        s0.visible = false;
+                        s0.visible = false;
                         s.add(s0);
 
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1126,7 +1027,7 @@ function GraphicsEngine() {
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-//                        s1.visible = false;
+                        s1.visible = false;
                         s.add(s1);
 
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1138,7 +1039,7 @@ function GraphicsEngine() {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-//                        s2.visible = false;
+                        s2.visible = false;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
@@ -1402,7 +1303,7 @@ function GraphicsEngine() {
             sceneObject = sceneElements.mainShip;
             speed = sceneObject.gameParameters.engine.speed;
             if(self.gameplay_controls.moveState.forward == 1) {
-                self.gameplay_controls.movementSpeed = speed * 1.25;
+                self.gameplay_controls.movementSpeed = speed * 1.5;
             } else {
                 self.gameplay_controls.movementSpeed = speed;
             }
@@ -1628,19 +1529,6 @@ function GraphicsEngine() {
                         break;
                     }
                 }
-
-                var t = Date.now() * 0.0008;
-                tempSphere1.position.x = 2000*Math.cos(t)
-                tempSphere1.position.y = 2000*Math.sin(t)
-                tempSphere1.position.z = 800*Math.sin(t);
-
-                tempSphere2.position.x = 2000*Math.sin(t);
-                tempSphere2.position.y = 500*Math.cos(t) + 150;
-                tempSphere2.position.z = 600*Math.cos(t);
-                
-
-
-
             }
         }
 ////////////////////////////////////////////////////////////////////////////////////////
