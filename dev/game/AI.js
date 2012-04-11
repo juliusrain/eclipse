@@ -3,14 +3,12 @@
 //git clone https://tooocoool@github.com/juliusrain/361project.git
 function AI() {
 
-    this.radar_range = 600;
-//  this.firing_range = 400;
-//  this.limit = 400;
-    this.radar_range = 100;
-    this.firing_range = 50;
-    this.flying_range = 1000;
+    this.radar_range = 700;
+    this.firing_range = 320;
+    //this.limit = 400;
+    this.flying_range = 1200;
     this.max_speed = 3;
-
+	this.safe_range = 300;
 }
 
 AI.prototype.react = function() {
@@ -23,15 +21,15 @@ AI.prototype.react = function() {
     var double_flying = this.flying_range * this.flying_range;
     
     var i;
-    var seed = Date.now() * 0.0008;
+    
     
     //loop through each ship 
     for (i in sceneElements.AIShips) {
-    
+		var seed = Date.now() * 0.0008;
         //get AI ship position
         var AIship_pos = sceneElements.AIShips[i].position;
         var AIship_speed = sceneElements.AIShips[i].gameParameters.engine.speed;
-        var dummy = sceneElements.AIShips[i].gameParameters.dummy_target;
+        
         
         //compute the vector from player ship to 
         var dx = player_pos.x - AIship_pos.x;
@@ -48,7 +46,7 @@ AI.prototype.react = function() {
         var cur_range = dx*dx + dy*dy + dz*dz;
         
         
-        //if the player ship is in the radar range, hunt the player ship 
+        //if the player ship is in the radar range and flying range, hunt the player ship 
         if (p2ai_distance <= double_radar && p2ai_distance && cur_range < double_flying) {
                         
             //vector from player to aiship
@@ -63,8 +61,7 @@ AI.prototype.react = function() {
             //fire at the player if it's in firing range
             if (p2ai_distance <= double_firing) {
                 if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout === 0) {
-                
-                    
+                                  
                     sceneElements.AIShips[i].fireLaser();
                     sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout = 12;
                 }
@@ -74,7 +71,7 @@ AI.prototype.react = function() {
                 //sceneElements.AIShips[i].translateZ(-2);
             //}
                 //fire at the player if it's in firing range
-                if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout == 0) {
+                if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout === 0) {
                     if (p2ai_distance <= (this.firing_range * this.firing_range)) {
                         
                         sceneElements.AIShips[i].fireLaser();
@@ -82,29 +79,42 @@ AI.prototype.react = function() {
                     }
 
                     
-                } else if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout > 0 ){
+                } else if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout > 0 ) {
                     sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout--;
                 }
+                //if the AI gets too close, it decelerates 
+                if (p2ai_distance <= this.safe_range && sceneElements.AIShips[i].gameParameters.engine.speed > 1) {
+                    sceneElements.AIShips[i].gameParameters.engine.speed -= 0.05;
+                }
+                
             }
             //increase the speed to chase the player
             else {
                 if (AIship_speed < this.max_speed )
                     sceneElements.AIShips[i].gameParameters.engine.speed += 0.002;
             }
+            
                 
         }
         //otherwise AIships just follow a certain path 
         else {
-            dummy.x = 2000*Math.cos(seed);              
-            dummy.y = 2000*Math.sin(seed);
-            dummy.z = 800*Math.sin(seed);
-            sceneElements.AIShips[i].turn(dummy.x, dummy.y, dummy.z);
-            sceneElements.AIShips[i].translateZ(-AIship_speed);
-            //sceneElements.AIShips[i].gameParameters.dummy_target.x = dummy.x;
-            //sceneElements.AIShips[i].gameParameters.dummy_target.y = dummy.y;
-            //sceneElements.AIShips[i].gameParameters.dummy_target.z = dummy.z;
+            
+            var dummy = sceneElements.AIShips[i].gameParameters.dummy_target;
+            var ox, oy;
+            if (AIship_pos.z <= (dummy.z + 200)){
+                ox = dummy.x + sceneElements.AIShips[i].gameParameters.orbit_radius * 2 * Math.cos(seed);              
+                oy = dummy.y + sceneElements.AIShips[i].gameParameters.orbit_radius * 0.5 * Math.sin(seed);
+                //dummy.z = 2000*Math.sin(seed);
+                sceneElements.AIShips[i].turn(ox, oy, dummy.z);
+                sceneElements.AIShips[i].translateZ(-AIship_speed);
+            }
+            else {
+                sceneElements.AIShips[i].turn(sceneElements.AIShips[i].gameParameters.origin.x, sceneElements.AIShips[i].gameParameters.y, sceneElements.AIShips[i].gameParameters.z);
+                sceneElements.AIShips[i].translateZ(-AIship_speed);
+            }
         }
                         
     }
 };
+
 

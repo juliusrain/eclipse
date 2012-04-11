@@ -7,7 +7,7 @@ var skybox = {  type: SKYBOX,
                                 "skybox/starfield.png", "skybox/starfield.png",
                                 "skybox/starfield.png", "skybox/starfield.png"]*/
                     textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",
-                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_gasgiant.jpg",
+                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_planet.jpg",
                                 "skybox/testbox2/posz.jpg", "skybox/testbox2/negz.jpg"]
                 }
             };
@@ -88,6 +88,7 @@ var AIShip = {  type: AI_SHIP,
 
                         }
                     },
+                    orbit_radius: 8000,                                         
                     dummy_target: {
                         x: 0,
                         y: 0,
@@ -137,6 +138,7 @@ var AIShip2 = { type: AI_SHIP,
 
                         }
                     },
+                    orbit_radius: 8000,
                     dummy_target: {
                         x: 0,
                         y: 0,
