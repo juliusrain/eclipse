@@ -1118,17 +1118,18 @@ function GraphicsEngine(glow) {
                     for(var i = 0; i < asteroid_container.num_asteroids; i++) {
                         asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
                         asteroid_mesh.receiveShadow = true;
+                        asteroid_mesh.useQuaternion = true;
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
 
                         asteroid_mesh.spheres = {outer: {}, inner:[]};
                         asteroid_mesh.spheres.outer = gameObject.drawParameters.bounds[i].spheres;
                         asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
-                        asteroid_mesh.rotation.set(gameObject.drawParameters.positions[i].rx, gameObject.drawParameters.positions[i].ry, gameObject.drawParameters.positions[i].rz);
 
                         s = new THREE.Object3D();
+                        s.useQuaternion = true;
                         s.position = asteroid_mesh.position;
-                        s.rotation = asteroid_mesh.rotation;
+                        s.quaternion = asteroid_mesh.quaternion;
 
                         //outer
                         s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());

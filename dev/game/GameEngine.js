@@ -550,15 +550,11 @@ GameEngine.prototype.netUpdate = function (message) {
                         if(cspheres.outer.hasOwnProperty('tposition')) {
                             if(cspheres.useQuaternion == true) {
                                 cspheres.quaternion.multiplyVector3(cspheres.outer.position, cspheres.outer.tposition);
-                            } else {
-
                             }
                         }
                         if(ospheres.outer.hasOwnProperty('tposition')) {
                             if(ospheres.useQuaternion == true) {
                                 ospheres.quaternion.multiplyVector3(ospheres.outer.position, ospheres.outer.tposition);
-                            } else {
-
                             }
                         }
                         if(cspheres.hasOwnProperty('tposition')) {
