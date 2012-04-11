@@ -69,7 +69,32 @@ GameEngine.prototype.die = function (){
         //console.log(JSON.stringify(message));
         network.send(message);
     }
-//    alert("YOU HAVE DIED.");
+    alert("YOU HAVE DIED.");
+    // reset everything
+    graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
+    graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
+    graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
+    if(network.ws.readyState === 1) {
+        var message = {action:'pos', body:{}};
+        // net id
+        message.body.nid = this.nid;
+        // health
+        message.body.health = sceneElements.mainShip.gameParameters.health;
+        // positon
+        message.body.x = round2(sceneElements.mainShip.position.x);
+        message.body.y = round2(sceneElements.mainShip.position.y);
+        message.body.z = round2(sceneElements.mainShip.position.z);
+        // rotation
+        message.body.quat = {};
+        message.body.quat.w = sceneElements.mainShip.quaternion.w;
+        message.body.quat.x = sceneElements.mainShip.quaternion.x;
+        message.body.quat.y = sceneElements.mainShip.quaternion.y;
+        message.body.quat.z = sceneElements.mainShip.quaternion.z;
+        // shooting
+        message.body.respawn = true;
+        //console.log(JSON.stringify(message));
+        network.send(message);
+    }
 };
 
 // Death Clause for AI Ships
@@ -345,6 +370,10 @@ GameEngine.prototype.update = function () {
         // check if any network ships are invalid
         for(var ns in sceneElements.netShips) {
             if(sceneElements.netShips[ns].updated >= 5) {
+                var rem = this.netShipsAdded.indexOf(sceneElements.netShips[ns].objectID);
+                if(rem != -1) {
+                    this.netShipsAdded.splice(rem, 1);
+                }
                 graphicsEngine.removeSceneObject(sceneElements.netShips[ns].objectID);
             }
             else{
@@ -406,6 +435,12 @@ GameEngine.prototype.netUpdate = function (message) {
                     }
                     if(message.hasOwnProperty('dead') && message.dead) {
                         this.kill(sceneElements.netShips[ns]);
+                    }
+                    if(message.hasOwnProperty('respawn') && message.respawn) {
+                        var rem = this.netShipsAdded.indexOf(message.nid);
+                        if(rem != -1) {
+                            this.netShipsAdded.splice(rem, 1);
+                        }
                     }
                     break;
                 }
@@ -535,7 +570,7 @@ GameEngine.prototype.netUpdate = function (message) {
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
-                            console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                            //console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                             // check for inner.gameParameters.spheres
                             var check = false,
                                 cand = [cspheres.outer],
@@ -550,7 +585,6 @@ GameEngine.prototype.netUpdate = function (message) {
                             }
                             // check inner spheres
                             if(check){
-                                console.log("made it inside");
                                 for(c in cand){
                                     for(s in subj){
                                         crelative = cand[c].hasOwnProperty('tposition') ? cand[c].tposition : cand[c];
