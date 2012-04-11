@@ -70,9 +70,15 @@ GameEngine.prototype.die = function (){
     }
     alert("YOU HAVE DIED.");
     // reset everything
+	// health + game parameters
+	$.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
+	// new position
     graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
+	// resume
+	this.logicwait = 0;
+	// send the respawn signal
     if(network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
         // net id
@@ -96,11 +102,17 @@ GameEngine.prototype.die = function (){
     }
 };
 
-// Death Clause for AI Ships
+// Death Clause for AI or net Ships
 GameEngine.prototype.kill = function (victim){
     victim.gameParameters.health = 0;
     graphicsEngine.addExplosionLarge(victim.position.x, victim.position.y, victim.position.z);
     graphicsEngine.removeSceneObject(victim.objectID);
+	if(victim.gameParameters.hasOwnProperty('nid')) {
+		var vic = this.netShipsAdded.indexOf(victim.gameParameters.nid);
+		if(vic !== -1) {
+			this.netShipsAdded.splice(vic, 1);
+		}
+	}
 };
 
 
