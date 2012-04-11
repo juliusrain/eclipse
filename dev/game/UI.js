@@ -10,13 +10,15 @@ $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 $('#chatcontrol').click(switchToChat);
 $('#chatcompose').focus(function (){
-    console.log('true');
     $('#chatcontrol span').html('Esc');
+    $('#chatcontrol').addClass('on');
     chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-    console.log('false');
-    $('#chatcontrol span').html('C');
+	console.log('leave them kids alone!');
+	//document.getElementById('chatcompose').blur();
+    $('#chatcontrol span').html('Ent');
+    $('#chatcontrol').removeClass('on');
     chatfocus = false;
 });
 
@@ -47,12 +49,10 @@ $(window).keypress(function (e){
                 toggleAutoRepair();
                 break;
             }
-            // c = chat box
-            case 99: {
-                if (!chatfocus){
-                    switchToChat();
-                    return false;
-                }
+            // enter = chat box
+            case 13: {
+				$('#chatcompose').focus();
+                return false;
                 break;
             }
             //create explosion (for testing) p
@@ -72,18 +72,20 @@ $(window).keypress(function (e){
 });
 
 $('#chatcompose').keydown(function (e){
-    console.log(e);
+    //console.log(e);
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
         // if user pressed esc, leave chat mode
         $('#chatcompose').blur();
     }
     else if (e.which == 13) {
-        // if user pressed answer, send new msg
+        // if user pressed answer, send new msg and leave chat mode
+        $('#chatcompose').blur();
         if(chatbox.val() != "") {
             newMessage(chatbox.val());
             chatbox.val("");
         }
+		console.log("teacher!");
     } else {
         // stop propagation of event so it doesn't affect ship steering
         e.stopImmediatePropagation();
