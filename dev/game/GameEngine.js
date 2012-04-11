@@ -17,6 +17,7 @@ function GameEngine() {
         food:0,
     };
     this.logicwait = 0;
+	this.playerDead = false;
 
     this.nid = Math.floor(Math.random() * 99999);
 
@@ -68,7 +69,10 @@ GameEngine.prototype.die = function (){
         //console.log(JSON.stringify(message));
         network.send(message);
     }
-    alert("YOU HAVE DIED.");
+	if(!this.playerDead) {
+		this.playerDead = true;
+    	alert("YOU HAVE DIED.");
+	}
     // reset everything
 	// health + game parameters
 	$.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
@@ -100,6 +104,7 @@ GameEngine.prototype.die = function (){
         //console.log(JSON.stringify(message));
         network.send(message);
     }
+	this.playerDead = false;
 };
 
 // Death Clause for AI or net Ships
