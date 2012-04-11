@@ -38,8 +38,7 @@ function GameEngine() {
 }
 
 GameEngine.prototype.first = function () {
-    var glow = true;
-    graphicsEngine = new GraphicsEngine(glow);
+    graphicsEngine = new GraphicsEngine();
     this.load(this.solarSystem, this.planet);
 };
 
@@ -544,25 +543,21 @@ GameEngine.prototype.netUpdate = function (message) {
                         var crelative, ospheres, cfixed, ofixed;
                         crelative = cspheres.outer.hasOwnProperty('tposition') ? cspheres.outer.tposition : cspheres.outer;
                         orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
-                        cfixed = cspheres.hasOwnProperty('tposition') ? cspheres.tposition : objects[candidate].position;
-                        ofixed = ospheres.hasOwnProperty('tposition') ? ospheres.tposition : ofixed = obj.position;
+                        cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
+                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
 
                         if(cspheres.outer.hasOwnProperty('tposition')) {
-                            if(cspheres.useQuaternion == true) {
-                                cspheres.quaternion.multiplyVector3(cspheres.outer.position, cspheres.outer.tposition);
-                            }
+                            cspheres.quaternion.multiplyVector3(cspheres.outer.position, crelative);
                         }
                         if(ospheres.outer.hasOwnProperty('tposition')) {
-                            if(ospheres.useQuaternion == true) {
-                                ospheres.quaternion.multiplyVector3(ospheres.outer.position, ospheres.outer.tposition);
-                            }
+                            ospheres.quaternion.multiplyVector3(ospheres.outer.position, orelative);
                         }
-                        if(cspheres.hasOwnProperty('tposition')) {
-                            cfixed.quaternion.multiplyVector3(cfixed.position, cfixed.tposition); 
-                        }
-                        if(ospheres.hasOwnProperty('tposition')) {
-                            ofixed.quaternion.multiplyVector3(ofixed.position, ofixed.tposition); 
-                        }
+//                        if(cspheres.hasOwnProperty('tposition')) {
+//                            cspheres.quaternion.multiplyVector3(cfixed.position, cfixed); 
+//                        }
+//                        if(ospheres.hasOwnProperty('tposition')) {
+//                            ospheres.quaternion.multiplyVector3(ofixed.position, ofixed); 
+//                        }
                         var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                         //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
                         if(oHit){
@@ -586,10 +581,10 @@ GameEngine.prototype.netUpdate = function (message) {
                                         crelative = cand[c].hasOwnProperty('tposition') ? cand[c].tposition : cand[c];
                                         orelative = subj[s].hasOwnProperty('tposition') ? subj[s].tposition : subj[s];
                                         if(cand[c].hasOwnProperty('tposition')) {
-                                            cspheres.quaternion.multiplyVector3(cand[c].position, cand[c].tposition);
+                                            cspheres.quaternion.multiplyVector3(cand[c].position, crelative);
                                         }
                                         if(subj[s].hasOwnProperty('tposition')) {
-                                            ospheres.quaternion.multiplyVector3(subj[s].position, subj[s].tposition);
+                                            ospheres.quaternion.multiplyVector3(subj[s].position, orelative);
                                         }
                                         var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
                                         //var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));

@@ -64,7 +64,7 @@ var ship_template =
 /* Create and initialize Threejs elements.
  * Rendering will take place through this object (singleton?)
  */
-function GraphicsEngine(glow) {
+function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
@@ -72,7 +72,7 @@ function GraphicsEngine(glow) {
     this.scene_loaded = false;
     this.isRunning = false;
 
-    this.glow = glow || null;
+    this.glow = false;
 
     this.container = document.getElementById('main');
     //container
@@ -1114,7 +1114,7 @@ function GraphicsEngine(glow) {
                         s0.translateX(10);
                         s0.translateZ(10);
                         s0.material.wireframe = true;
-                        s0.visible = false;
+//                        s0.visible = false;
                         s.add(s0);
 
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1126,7 +1126,7 @@ function GraphicsEngine(glow) {
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-                        s1.visible = false;
+//                        s1.visible = false;
                         s.add(s1);
 
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1138,7 +1138,7 @@ function GraphicsEngine(glow) {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-                        s2.visible = false;
+//                        s2.visible = false;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
