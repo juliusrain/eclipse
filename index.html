@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Eclipse by juliusrain</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Eclipse</h1>
+        <p>Lost in space behind enemy lines</p>
+        <p class="view"><a href="https://github.com/juliusrain/361project">View the Project on GitHub <small>juliusrain/361project</small></a></p>
+        <ul>
+          <li><a href="https://github.com/juliusrain/361project/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/juliusrain/361project/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/juliusrain/361project">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>WALDO</h1>
+
+<h2>Introduction</h2>
+
+<p>Hello visitor! This is the home of WALDO, a browser-based game written for COMP 361, a software engineering course at McGill University.</p>
+
+<h2>Dependencies</h2>
+
+<ul>
+<li><a href="https://github.com/mrdoob/three.js/">THREE.js</a></li>
+<li><a href="https://github.com/facebook/tornado/">Tornado</a></li>
+<li><a href="http://www.sqlite.org/">SQLite</a></li>
+<li><a href="http://jquery.com/">jQuery</a></li>
+</ul><h2>Play (on Chromium)</h2>
+
+<ol>
+<li>Clone a copy of the repository into your public_html</li>
+<li>
+<p>Set up configuration:</p>
+
+<pre><code>$ edit dev/game/server/server.conf  
+
+$ edit dev/game/GameConstants.js  
+</code></pre>
+</li>
+<li>
+<p>Start the server:</p>
+
+<pre><code>$ python dev/game/server/server.py  
+</code></pre>
+</li>
+<li>
+<p>Configure Chromium 
+ Enable the following (in about:flags)</p>
+
+<ul>
+<li>Override software rendering list</li>
+<li>GPU Accelerated Drawing</li>
+<li>GPU Accelerated Canvas 2D</li>
+</ul>
+</li>
+<li>
+<p>Start the game:</p>
+
+<pre><code>$ chromium-browser --allow-file-access-from-files dev/game/index.html
+</code></pre>
+</li>
+</ol>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/juliusrain">juliusrain</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
