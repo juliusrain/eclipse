@@ -539,6 +539,9 @@ GameEngine.prototype.netUpdate = function (message) {
             }
             if(sceneElements.hasOwnProperty('env_objects')) {
                 for(var env in sceneElements.env_objects) {
+                    if(sceneElements.env_objects[env].objectType == ASTEROID_FIELD) {
+                        continue;
+                    }
                     if(sceneElements.env_objects[env].hasOwnProperty('children')) {
                         objects = objects.concat(sceneElements.env_objects[env].children);
                     }
