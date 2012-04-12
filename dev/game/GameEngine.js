@@ -111,13 +111,13 @@ GameEngine.prototype.die = function (){
 GameEngine.prototype.kill = function (victim){
     victim.gameParameters.health = 0;
     graphicsEngine.addExplosionLarge(victim.position.x, victim.position.y, victim.position.z);
-    graphicsEngine.removeSceneObject(victim.objectID);
 	if(victim.gameParameters.hasOwnProperty('nid')) {
 		var vic = this.netShipsAdded.indexOf(victim.gameParameters.nid);
 		if(vic !== -1) {
 			this.netShipsAdded.splice(vic, 1);
 		}
 	}
+    graphicsEngine.removeSceneObject(victim.objectID);
 };
 
 

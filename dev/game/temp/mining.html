@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>mining</title>
+	<style type="text/css">
+		body {background-color:#222;color:white;}
+		#miningprogress {width:50%;position:absolute;left:25%;bottom:20%;}
+		#miningnumbers {width:100%;padding:0px auto;}
+		.miningvalue {font-size:x-small;text-align:center;float:left;margin:5px;}
+		.miningvalue div {font-size:large;}
+		#miningbarouter {clear:both;width:100%;height:30px;border:thick solid purple;}
+		#miningbarinner {height:30px;background-color:purple;width:50%;}
+	</style>
+</head>
+<body>
+	<div id="miningprogress">
+		<div id="miningnumbers">
+			<div id="miningfood" class="miningvalue"><div>20%</div>food</div>
+			<div id="miningfuel" class="miningvalue"><div>30%</div>fuel</div>
+			<div id="miningmetal" class="miningvalue"><div>50%</div>metal</div>
+		</div>
+		<div id="miningbarouter">
+			<div id="miningbarinner">&nbsp;</div>
+		</div>
+	</div>
+	<script>
+		function scanvals(type) {
+			var type = typeof type == "undefined" ? 0 : type;
+			var weights = {food:20, fuel:30};
+			switch(type) {
+				case 1:
+					weights = {food:50, fuel:10};
+					break;
+				case 2:
+					weights = {food:10, fuel:60};
+					break;
+			}
+			var vals = {};
+			vals.food = Math.round(Math.random()*10 - 5) + weights.food;
+			vals.fuel = Math.round(Math.random()*10 - 5) + weights.fuel;
+			vals.metal = 100 - (vals.food + vals.fuel);
+			return vals;
+		}
+		function scan(type) {
+			var w = scanvals();
+			document.getElementById('miningbarinner').style.width = prog+'%';
+			document.getElementById('miningfood').innerHTML = '<div>'+w.food+'%</div>food';
+			document.getElementById('miningfuel').innerHTML = '<div>'+w.fuel+'%</div>fuel';
+			document.getElementById('miningmetal').innerHTML = '<div>'+w.metal+'%</div>metal';
+		}
+		var resources = {food:1293, fuel:4092, metal:983};
+		var prog = 0;
+		var miningmode = 0;
+		var weights = {food:0, fuel:0, metal:0};
+		function update(){
+			if(miningmode === 0){
+				prog++;
+				weights = scan(0);
+				if(prog >= 100){
+					miningmode = 1;
+					prog = 0;
+				}
+			}
+			else if(miningmode === 1){
+				prog++;
+				mine();
+			}
+		}
+		var interv = setInterval(update, 1000);
+	</script>
+</body>
+</html>
+
