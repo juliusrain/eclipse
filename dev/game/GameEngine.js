@@ -3,6 +3,22 @@ function GameEngine() {
     this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
     this.solarSystem = 0;
     this.planet = 0;
+
+	this.playerName = "";
+	this.playerMode = "single";
+	if(window.location.hash) {
+		var amper = window.location.hash.indexOf("&");
+		if(amper !== -1) {
+			var portions = window.location.hash.split("&");
+			if(portions[0] === "#multi") {
+				this.playerMode = "multi";
+			}
+			if(portions.length > 1) {
+				this.playerName = portions[1];
+			}
+		}
+	}
+
     //this.resources = {};//load from game constants!
     // TEMPORARY ***************************************
     this.resources = {
@@ -26,6 +42,9 @@ function GameEngine() {
     //start network client
     network = new Network();
     network.connect();
+	if(this.playerMode === "single") {
+    	network.disconnect();
+	}
     this.netShipsAdded = [];
     this.firing = false;
 
@@ -48,7 +67,7 @@ GameEngine.prototype.die = function (){
     sceneElements.mainShip.gameParameters.health = 0;
     this.logicwait = -1;
     // transmit message to network
-    if(network.ws.readyState === 1) {
+    if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
         // net id
         message.body.nid = this.nid;
@@ -83,7 +102,7 @@ GameEngine.prototype.die = function (){
     // resume
     this.logicwait = 0;
     // send the respawn signal
-    if(network.ws.readyState === 1) {
+    if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
         // net id
         message.body.nid = this.nid;
@@ -346,7 +365,7 @@ function round2(n) {
 // called each frame
 GameEngine.prototype.update = function () {
     // transmit message to network
-    if(network.ws.readyState === 1) {
+    if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
         // net id
         message.body.nid = this.nid;
