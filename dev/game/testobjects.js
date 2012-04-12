@@ -12,6 +12,14 @@ var skybox = {  type: SKYBOX,
                 }
             };
 gameObjects.push(skybox);
+var skybox2 = {  type: SKYBOX,
+                parameters: {
+                    name: "skybox",
+                    textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",
+                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_planet.jpg",
+                                "skybox/testbox2/posz.jpg", "skybox/testbox2/negz.jpg"]
+                }
+            };
 
 var playerShip = {  type: PLAYER_SHIP,
                     gameParameters: {   //game related parameters

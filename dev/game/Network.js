@@ -6,10 +6,13 @@ function Network() {
 }
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
-	var received = {};
+	var received = [];
 	/*
-	if(gameEngine.playerMode === "single") {
-		received;
+	if(gameEngine.playerMode === "multi") {
+		received.push(skybox);
+		received.push(playerShip);
+		received.push(asteroid_field);
+		return received;
 	}
 	*/
 	received = gameObjects;
@@ -17,7 +20,6 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 		if(received[e].type === SKYBOX){
 			for(var i = 0; i < 6; i++){
 				received[e].parameters.textures[i] = "textures/" + received[e].parameters.textures[i];
-				console.log(received[e].parameters.textures[i]);
 			}
 		}
 		else if(received[e].type === PLAYER_SHIP || received[e].type === AI_SHIP) {
