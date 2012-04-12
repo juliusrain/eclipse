@@ -1,10 +1,21 @@
+/* Webfonts */
+
+ @font-face {font-family: 'Museo-700';src: url('webfonts/215447_0_0.eot');src: url('webfonts/215447_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/215447_0_0.woff') format('woff'),url('webfonts/215447_0_0.ttf') format('truetype');}
+  
+    
+     @font-face {font-family: 'Museo-300';src: url('webfonts/215447_1_0.eot');src: url('webfonts/215447_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/215447_1_0.woff') format('woff'),url('webfonts/215447_1_0.ttf') format('truetype');}
+      
+        
+         @font-face {font-family: 'MuseoSans-500';src: url('webfonts/215447_2_0.eot');src: url('webfonts/215447_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/215447_2_0.woff') format('woff'),url('webfonts/215447_2_0.ttf') format('truetype');}
+
+
 * {
     margin:0px;
 }
 body {
     margin:0px;
     padding:0px;
-    font-family:"arial bold",sans-serif;
+    font-family:"Museo-300",sans-serif;
     -moz-user-select: none;
     -webkit-user-select: none;
     background-color:#222;
@@ -146,7 +157,7 @@ body {
     background-color:rgba(10,10,10,0.5);
     width:99%;
     padding-left:5px;
-    font-family:"arial",sans-serif;
+    font-family:"Museo-300",sans-serif;
     position:absolute;
     bottom:40px;
     height:30%;
