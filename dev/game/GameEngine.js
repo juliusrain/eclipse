@@ -288,6 +288,12 @@ GameEngine.prototype.updateCollisions = function() {
             // hit by a laser!
             this.laserHit(sceneElements.mainShip, colls[c]);
         }
+		else {
+			console.log('hit by something else!!!');
+			//graphicsEngine.gameplay_camera.quaternion.setFromEuler();
+			graphicsEngine.gameplay_camera.translate(100);
+			sceneElements.mainShip.gameParameters.health -= 200;
+		}
     }
     // collisions with AI ships
     for(var s in sceneElements.AIShips) {
