@@ -42,6 +42,17 @@ body {
 	background-color:#ddd;
 	cursor:pointer;
 }
+.signinbutton {
+	display:block;
+	margin:5px;
+	padding:10px;
+	text-align:center;
+	border:thin solid black;
+	font-weight:bold;
+	border-radius:5px;
+	background-color:#ddd;
+	cursor:pointer;
+}
 .signinoption {
 	float:left;
 	margin-right:10px;
