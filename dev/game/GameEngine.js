@@ -260,16 +260,21 @@ GameEngine.prototype.laserHit = function(target, hit) {
     // reset lasers
     hit.obj.hit = true;
     if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
-        target.gameParameters.health -= hit.obj.damage;
-        if(target.gameParameters.health < 0) {
+        var damage = hit.obj.damage;
+        if(target.gameParameters.health - damage < 0) {
             //alert("~~~~~~~DEATH~~~~~~~~");
             if(target === sceneElements.mainShip) {
-                this.die();
+                var killer="an AI ship.";
+                var victim=this.nid;
+                sceneElements.netShips.forEach(function (ship) {if (ship.objectID==hit.obj.parentID) killer = hit.obj.parent.parentShip.gameParameters.nid});
+                network.send({"sender":victim, "action":"broad", body:{"message":"Player "+victim+" was killed by player"+killer}});
+                console.log(hit);
             }
             else if(sceneElements.AIShips.indexOf(target) !== -1) {
                 this.kill(target);
             }
         }
+        target.gameParameters.health -= hit.obj.damage;
     }
 };
 

@@ -39,6 +39,8 @@ Network.prototype.connect = function () {
             nw.displayChat(sender, body);
         } else if (action == "pos") {
             gameEngine.netUpdate(body);
+        } else if (action == "broad") {
+            nw.broadcast(body);
         }
     }
 }
@@ -59,4 +61,14 @@ Network.prototype.displayChat = function (sender, body) {
     node.hide();
     $("#chatmessages").append(node);
     node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
+}
+
+Network.prototype.broadcast = function (body) {
+    var broadcastBox = $("#broadcastBox");
+    var node = $("<div>");
+    node.text(body.message);
+    broadcastBox.append(node);
+    node.fadeOut(2000, function () {
+        node.remove()
+    });
 }

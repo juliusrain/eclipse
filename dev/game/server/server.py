@@ -53,7 +53,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         logging.info("listener removed: %d listener(s)" % len(WSHandler.listeners))
         
     def on_message(self, message):
-        logging.info("got message %r", message)
         try:
             parsed = tornado.escape.json_decode(message)
             try:
@@ -62,21 +61,23 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 if action == "chat":
                     for listener in WSHandler.listeners:
                         listener.write_message(message)
-                    logging.info("You want to chat")
                 elif action == "pos":
                     for listener in WSHandler.listeners:
                         listener.write_message(message)
-                    logging.info("You want to pos")
+                elif action == "broad":
+                    for listener in WSHandler.listeners:
+                        listener.write_message(message)
                 elif action == "new":
-                    logging.info("You want to new")
+                    pass
                 elif action == "retr":
-                    logging.info("You want to retr")
+                    pass
                 elif action == "save":
-                    logging.info("You want to save")
+                    pass
                 elif action == "over":
-                    logging.info("You want to over")
+                    pass
                 else:
                     logging.info("unknown action %r" % action)
+                    logging.info(message)
             except KeyError:
                 logging.error("No action found in parsed JSON string.")
         except ValueError:
