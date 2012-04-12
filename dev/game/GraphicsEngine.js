@@ -978,8 +978,13 @@ function GraphicsEngine() {
                     asteroid_container.name = gameObject.gameParameters.name;
                     asteroid_container.objectType = gameObject.type;
 
+//                    var container = {children: []};
+//                    var mesh = { };
+
                     var asteroid_mesh;
                     var s, s0, s1, s2, s3;
+                    var merged_asteroids_geometry = new THREE.Geometry();
+                    var merged_asteroids_mesh = new THREE.Object3D();
                     for(var i = 0; i < asteroid_container.num_asteroids; i++) {
                         asteroid_mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
                         asteroid_mesh.receiveShadow = true;
@@ -987,10 +992,17 @@ function GraphicsEngine() {
                         asteroid_mesh.type = asteroid_container.objectType;
                         asteroid_mesh.objectID = self.assignID();
 
-                        asteroid_mesh.spheres = {outer: {}, inner:[]};
-                        asteroid_mesh.spheres.outer = gameObject.drawParameters.bounds[i].spheres;
                         asteroid_mesh.position.set(gameObject.drawParameters.positions[i].x, gameObject.drawParameters.positions[i].y, gameObject.drawParameters.positions[i].z);
                         asteroid_mesh.quaternion.setFromEuler({x:gameObject.drawParameters.positions[i].rx, y:gameObject.drawParameters.positions[i].ry, z:gameObject.drawParameters.positions[i].rz});
+
+
+
+
+                        THREE.GeometryUtils.merge(merged_asteroids_geometry, asteroid_mesh);
+                        merged_asteroids_geometry.computeFaceNormals();
+
+
+
 
                         s = new THREE.Object3D();
                         s.useQuaternion = true;
@@ -1006,7 +1018,7 @@ function GraphicsEngine() {
                         s0.translateX(10);
                         s0.translateZ(10);
                         s0.material.wireframe = true;
-                        s0.visible = false;
+//                        s0.visible = false;
                         s.add(s0);
 
                         s1 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1018,7 +1030,7 @@ function GraphicsEngine() {
                         s1.translateY(5);
                         s1.translateZ(25);
                         s1.material.wireframe = true;
-                        s1.visible = false;
+//                        s1.visible = false;
                         s.add(s1);
 
                         s2 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
@@ -1030,28 +1042,36 @@ function GraphicsEngine() {
                         s2.translateY(-5);
                         s2.translateZ(-5);
                         s2.material.wireframe = true;
-                        s2.visible = false;
+//                        s2.visible = false;
                         s.add(s2);
 
                         asteroid_mesh.spheres = s;
                         s.outer = s0;
                         s.inner = [s1, s2];
 
+                        asteroid_container.add(asteroid_mesh);
                         self.gameplay_scene.add(s);
 
-                        asteroid_container.add(asteroid_mesh);
+
+//                        mesh.spheres = s;
+//                        container.children.push(mesh);
+
 
                     }
 
+
+                    merged_asteroid_mesh = new THREE.Mesh(merged_asteroids_geometry, new THREE.MeshNormalMaterial());
+                    scene.add(merged_asteroid_mesh);
+//                    sceneElements.env_objects.push(container);
+
                     sceneElements.env_objects.push(asteroid_container);
-                    scene.add(asteroid_container);
+//                    scene.add(asteroid_container);
 
                     break;
                 }
             }
 
         }
-
 
         /*
          *  Creates lasers for a given ship (sceneObject).

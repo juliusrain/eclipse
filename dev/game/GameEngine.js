@@ -74,15 +74,15 @@ GameEngine.prototype.die = function (){
     	alert("YOU HAVE DIED.");
 	}
     // reset everything
-	// health + game parameters
-	$.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
-	// new position
+    // health + game parameters
+    $.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
+    // new position
     graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
-	// resume
-	this.logicwait = 0;
-	// send the respawn signal
+    // resume
+    this.logicwait = 0;
+    // send the respawn signal
     if(network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
         // net id
@@ -567,7 +567,7 @@ GameEngine.prototype.netUpdate = function (message) {
                         crelative = cspheres.outer.hasOwnProperty('tposition') ? cspheres.outer.tposition : cspheres.outer;
                         orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
                         cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
-                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : ofixed = obj.position;
+                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : obj.position;
 
                         if(cspheres.outer.hasOwnProperty('tposition')) {
                             cspheres.quaternion.multiplyVector3(cspheres.outer.position, crelative);
