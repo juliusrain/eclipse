@@ -65,6 +65,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                     for listener in WSHandler.listeners:
                         listener.write_message(message)
                 elif action == "broad":
+                    logging.info("broadcasting to %d listeners" % len(WSHandler.listeners))
+                    logging.info(message)
                     for listener in WSHandler.listeners:
                         listener.write_message(message)
                 elif action == "new":

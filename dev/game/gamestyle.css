@@ -36,9 +36,9 @@ body {
     margin:0px;
 }
 .resourcenumber {
-    margin:0px 40px;
+    margin:4px 40px;
     float:left;
-    font-size:25px;
+    font-size:17px;
 }
 .resourcenumber img {
     height:32px;
@@ -69,15 +69,15 @@ body {
     margin-top:10px;
 }
 .baroutside {
-    border:2.5px solid green;
-    height:20px;
+    border:2.5px solid rgba(142, 201, 230, 0.5);
+    height:10px;
     width:90%;
     margin:0px auto;
 }
 .barinside {
     height:100%;
     width:95%;
-    background-color:rgba(0, 100, 0, 0.75);
+    background-color:rgba(142, 201, 230, 0.5);
 }
 .barcaption {
     font-size:x-small;
@@ -89,27 +89,28 @@ body {
 .barcaption .value {
     float:right;
 }
+/**
 #healthbaroutside {
     border-width:3px;
     height:25px;
-    border-color:rgba(0, 100, 0, 0.75);
+    border-color:rgba(142, 201, 230, 0.75);
 }
 #healthbarcaption {
     font-size:small;
 }
 #jumpbaroutside {
-    border-color:rgba(0, 0, 100, 0.75);
+    border-color:rgba(142, 201, 230, 0.75);
 }
 #jumpbar {
-    background-color:rgba(0, 0, 100, 0.75);
+    background-color:rgba(142, 201, 230, 0.75);
 }
 #laserbaroutside {
-    border-color:rgba(100, 0, 0, 0.75);
+    border-color:rgba(142, 201, 230, 0.75);
 }
 #laserbar {
-    background-color:rgba(100, 0, 0, 0.75);
+    background-color:rgba(142, 201, 230, 0.75);
 }
-
+**/
 
 /* MIDDLE section */
 #middle {
@@ -192,16 +193,16 @@ body {
 .control {
     margin:0px 10px;
     float:left;
-    border:thin solid white;
+/*    border:thin solid white;
     border-radius:5px;
-	margin-top:3px;
+*/	margin-top:3px;
     padding:7px;
 	cursor:pointer;
 }
 .control span {
-    border:thin solid cyan;
+    border:thin solid #8ec9e6;
     border-radius:3px;
-    color:cyan;
+    color:#8ec9e6;
     font-size:small;
     margin-right:5px;
     padding:3px;
