@@ -34,28 +34,30 @@
 			<div id="playnowbutton">PLAY NOW!</div>
 			<div id="signinbox">
 				<div id="singleplaysignin" class="signinoption">
-					<h4>Create a New Single-Player Game</h4>
-					<div class="">
+					<h4>Create a New<br />Single-Player Game</h4>
+					<div class="signinuser">
 						<div>username</div>
 						<input type="text" name="uname" />
 					</div>
-					<div class="">
+					<div class="signinpass">
 						<div>password</div>
 						<input type="password" name="password" />
 					</div>
-					<input type="submit" name="submit" value="Sign In" />
+					<a href="game#single" class="signinbutton">Sign In</a>
+					<!--<input type="submit" name="submit" value="Sign In" />-->
 				</div>
 				<div id="multiplaysignin" class="signinoption">
-					<h4>Join the Multiplayer Game</h4>
-					<div class="">
+					<h4>Join the<br />Multiplayer Game</h4>
+					<div class="signinuser">
 						<div>username</div>
 						<input type="text" name="uname" />
 					</div>
-					<div class="">
+					<div class="signinpass">
 						<div>password</div>
 						<input type="password" name="password" />
 					</div>
-					<input type="submit" name="submit" value="Sign In" />
+					<a href="game#multi" class="signinbutton">Sign In</a>
+					<!--<input type="submit" name="submit" value="Sign In" />-->
 				</div>
 				<br style="clear:both;" />
 				<!--
@@ -136,6 +138,21 @@
 						$(this).next().slideDown();
 					}
 					return false;
+				});
+				$('#singleplaysignin .signinuser input').keyup(function (e){
+					if(e.keycode != 13) {
+						$(this).parent().next().next('a')[0].href = "game#single&" + $(this).val();
+					}
+				});
+				$('#multiplaysignin .signinuser input').keyup(function (e){
+					if(e.keycode != 13) {
+						$(this).parent().next().next('a')[0].href = "game#multi&" + $(this).val();
+					}
+				});
+				$('#signinbox input').keyup(function(e){
+					if(e.keycode === 13) {
+						window.location.assign($(this).parent().next('a')[0].href);
+					}
 				});
 			});
 		</script>

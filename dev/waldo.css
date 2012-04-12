@@ -41,6 +41,7 @@ body {
 }
 .signinoption {
 	float:left;
+	margin-right:10px;
 }
 #regbox {
 	margin-top:10px;
