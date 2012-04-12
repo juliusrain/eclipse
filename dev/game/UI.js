@@ -1,5 +1,6 @@
 
 var chatfocus = false;
+var shooting = false;
 
 // window resize events
 $(window).load(sizeGame);
@@ -39,11 +40,13 @@ $(window).keypress(function (e){
                 } 
                 break;
             }
+			/*
             // space = fire weapon
             case 32: {
                 gameEngine.fireWeapon();
                 break;
             }
+			*/
             // t = auto repair
             case 116:{
                 toggleAutoRepair();
@@ -69,6 +72,22 @@ $(window).keypress(function (e){
             }
         }
     }
+});
+$(window).keydown(function (e){
+	if(!chatfocus) {
+		if(e.keyCode === 32) {
+			shooting = true;
+			return false;
+		}
+	}
+});
+$(window).keyup(function (e){
+	if(!chatfocus) {
+		if(e.keyCode === 32) {
+			shooting = false;
+			return false;
+		}
+	}
 });
 
 $('#chatcompose').keydown(function (e){

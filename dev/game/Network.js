@@ -7,14 +7,16 @@ function Network() {
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
 	var received = [];
-	/*
+	var box = $.extend(true, {}, skybox);
 	if(gameEngine.playerMode === "multi") {
-		received.push(skybox);
+		for(var i = 0; i < 6; i++){
+			box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
+		}
+		received.push(box);
 		received.push(playerShip);
 		received.push(asteroid_field);
 		return received;
 	}
-	*/
 	received = gameObjects;
 	for(e in received){
 		if(received[e].type === SKYBOX){

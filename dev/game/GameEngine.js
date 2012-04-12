@@ -38,6 +38,8 @@ function GameEngine() {
     this.nid = Math.floor(Math.random() * 99999);
 
     ai = new AI();
+	this.numAI = 2;
+	this.nextWaveWait = 20;
 
     //start network client
     network = new Network();
@@ -65,6 +67,7 @@ GameEngine.prototype.first = function () {
 // Death Clause for Player Ship
 GameEngine.prototype.die = function (){
     sceneElements.mainShip.gameParameters.health = 0;
+    graphicsEngine.addExplosionLarge(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
     this.logicwait = -1;
     // transmit message to network
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
@@ -119,6 +122,7 @@ GameEngine.prototype.die = function (){
         message.body.quat.y = sceneElements.mainShip.quaternion.y;
         message.body.quat.z = sceneElements.mainShip.quaternion.z;
         // shooting
+		shooting = false;
         message.body.respawn = true;
         //console.log(JSON.stringify(message));
         network.send(message);
@@ -137,6 +141,35 @@ GameEngine.prototype.kill = function (victim){
 		}
 	}
     graphicsEngine.removeSceneObject(victim.objectID);
+};
+
+// Check for remaining AIs, spawn more
+GameEngine.prototype.nextWave = function () {
+	// if there are no more AIs
+	if(!sceneElements.AIShips.length) {
+		if(!this.nextWaveWait) {
+			//respawn more AIs
+			this.numAI++;
+			for(var i = 0; i < this.numAI; i++) {
+				var newAI = {};
+				if(Math.round(Math.random())) {
+					newAI = $.extend(true, {}, AIShip);
+				}
+				else {
+					newAI = $.extend(true, {}, AIShip2);
+				}
+				newAI.gameParameters.health = 1000;
+				newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
+				newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
+				newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
+				graphicsEngine.addGameObject(newAI);
+			}
+			this.nextWaveWait = 20;
+		}
+		else{
+			this.nextWaveWait--;
+		}
+	}
 };
 
 
@@ -426,6 +459,15 @@ GameEngine.prototype.update = function () {
                 sceneElements.netShips[ns].updated++;
             }
         }
+
+		// shoot weapon
+		if(shooting) {
+			this.fireWeapon();
+		}
+
+		if(this.playerMode === "single") {
+			this.nextWave();
+		}
 
         // decrement waits
         if(this.timeouts.lasers > 0){

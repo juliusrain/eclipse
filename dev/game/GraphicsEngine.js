@@ -512,7 +512,7 @@ function GraphicsEngine() {
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh
 
-                    modelMesh.position.set((Math.random()*3000+2500)*(1-Math.round(Math.random())*2), (Math.random()*3000+2500)*(1-Math.round(Math.random())*2), (Math.random()*3000+2500)*(1-Math.round(Math.random())*2));
+                    modelMesh.position.set((Math.random()*3000+8000)*(1-Math.round(Math.random())*2), (Math.random()*3000+8000)*(1-Math.round(Math.random())*2), (Math.random()*3000+8000)*(1-Math.round(Math.random())*2));
                     scene.add(modelMesh);
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
