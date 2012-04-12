@@ -33,16 +33,34 @@
 			</p>
 			<div id="playnowbutton">PLAY NOW!</div>
 			<div id="signinbox">
-				<div class="">
-					<div>username</div>
-					<input type="text" name="uname" />
+				<div id="singleplaysignin" class="signinoption">
+					<h4>Create a New Single-Player Game</h4>
+					<div class="">
+						<div>username</div>
+						<input type="text" name="uname" />
+					</div>
+					<div class="">
+						<div>password</div>
+						<input type="password" name="password" />
+					</div>
+					<input type="submit" name="submit" value="Sign In" />
 				</div>
-				<div class="">
-					<div>password</div>
-					<input type="password" name="password" />
+				<div id="multiplaysignin" class="signinoption">
+					<h4>Join the Multiplayer Game</h4>
+					<div class="">
+						<div>username</div>
+						<input type="text" name="uname" />
+					</div>
+					<div class="">
+						<div>password</div>
+						<input type="password" name="password" />
+					</div>
+					<input type="submit" name="submit" value="Sign In" />
 				</div>
-				<input type="submit" name="submit" value="Sign In" />
+				<br style="clear:both;" />
+				<!--
 				<a href="game">temporary bypass</a><br />
+				-->
 				<div id="regoffer">Not registered? <a href="#" id="clicktoreg">Click here to sign up for free!</a></div>
 			</div>
 		</div>
@@ -65,7 +83,9 @@
 			<h2>How to Play</h2>
 			<div class="expandframe"><div class="expandtrigger"><span>+</span> First, make sure that WebGL is enabled in your browser.</div>
 			<div class="expandbox">
-			<img src="flags.png" /><br />
+				Make sure that "Override software rendering list" is enabled.<br />
+				Having "GPU Accelerated Drawing" enabled is a good idea, too.
+				<img src="flags.png" /><br />
 			
 			</div>
 			</div>

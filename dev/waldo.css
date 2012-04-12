@@ -39,6 +39,9 @@ body {
 	background-color:#ddd;
 	cursor:pointer;
 }
+.signinoption {
+	float:left;
+}
 #regbox {
 	margin-top:10px;
 }
