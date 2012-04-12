@@ -6,7 +6,13 @@ function Network() {
 }
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
-	var received = gameObjects;
+	var received = {};
+	/*
+	if(gameEngine.playerMode === "single") {
+		received;
+	}
+	*/
+	received = gameObjects;
 	for(e in received){
 		if(received[e].type === SKYBOX){
 			for(var i = 0; i < 6; i++){
