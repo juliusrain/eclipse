@@ -9,6 +9,9 @@ body {
 	vertical-align:middle;
 	font-size:40pt;
 }
+#logo {
+    margin-top:20px;
+}
 #pagefooter {
 	text-align:center;
 	margin:30px 50px;
