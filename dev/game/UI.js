@@ -29,7 +29,7 @@ $(window).keypress(function (e){
         switch(e.keyCode){
             // j = toggle jump map
             case 106: {
-                toggleJumpMap();
+            //    toggleJumpMap();
                 break;
             }
             // l = bind/unbind cursor

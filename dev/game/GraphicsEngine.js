@@ -313,15 +313,6 @@ function GraphicsEngine() {
 
 
 
-//        var target;
-//        for(var i = 0; i < this.gameplay_scene.children.length; i++) {
-//            target = this.gameplay_scene.children[i];
-//            if(target.objectID == OID) {
-//                this.renderer.deallocateObject(target);
-//                this.gameplay_scene.remove(target);
-//            }
-//        }
-//
 //        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
 //            target = this.gameplay_glow_scene.children[i];
 //            if(target.objectID == OID) {
@@ -1244,12 +1235,12 @@ function GraphicsEngine() {
                 return;
             }
 
-//            try {
+            try {
                 render();
-//            } catch(err) {
-//                console.warn("CAUGHT: " + err);
-//                return;
-//            }
+            } catch(err) {
+                console.warn("CAUGHT: " + err);
+                return;
+            }
         }
 
 
@@ -1261,10 +1252,9 @@ function GraphicsEngine() {
                 updateMainShip();
                 updateHUD(); //includes minimap
                 ai.react();
-                //ai.updateScene(); //decides direction
-//               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
                    gameEngine.update(); //increment laser and ship position
-//               }
+               }
                 updateLasers();
                 updateExplosions();
 
