@@ -373,7 +373,7 @@ var asteroid_field = {  type: ASTEROID_FIELD,
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
                                 {spheres: { x: 0, y: 0, z: 0, r: 40}},
                             ],
-                            count: 10, // max 100
+                            count: 30, // max 100
                         },
                     };
 

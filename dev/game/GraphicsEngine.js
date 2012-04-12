@@ -998,8 +998,8 @@ function GraphicsEngine() {
 
 
 
-//                        THREE.GeometryUtils.merge(merged_asteroids_geometry, asteroid_mesh);
-//                        merged_asteroids_geometry.computeFaceNormals();
+                        THREE.GeometryUtils.merge(merged_asteroids_geometry, asteroid_mesh);
+                        merged_asteroids_geometry.computeFaceNormals();
 
 
 
@@ -1060,12 +1060,12 @@ function GraphicsEngine() {
                     }
 
 
-//                    merged_asteroid_mesh = new THREE.Mesh(merged_asteroids_geometry, new THREE.MeshNormalMaterial());
-//                    scene.add(merged_asteroid_mesh);
+                    merged_asteroid_mesh = new THREE.Mesh(merged_asteroids_geometry, new THREE.MeshNormalMaterial());
+                    scene.add(merged_asteroid_mesh);
 //                    sceneElements.env_objects.push(container);
 
                     sceneElements.env_objects.push(asteroid_container);
-                    scene.add(asteroid_container);
+//                    scene.add(asteroid_container);
 
                     break;
                 }
