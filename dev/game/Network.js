@@ -1,36 +1,49 @@
 // Network Component
 
 function Network() {
-	//this part will hold the network connection
-	this.ws=null;
+    //this part will hold the network connection
+    this.ws=null;
 }
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
-	var received = [];
-	var box = $.extend(true, {}, skybox);
-	if(gameEngine.playerMode === "multi") {
-		for(var i = 0; i < 6; i++){
-			box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
-		}
-		received.push(box);
-		received.push(playerShip);
-		received.push(asteroid_field);
-		return received;
-	}
-	received = gameObjects;
-	for(e in received){
-		if(received[e].type === SKYBOX){
-			for(var i = 0; i < 6; i++){
-				received[e].parameters.textures[i] = "textures/" + received[e].parameters.textures[i];
-			}
-		}
-		else if(received[e].type === PLAYER_SHIP || received[e].type === AI_SHIP) {
-			received[e].drawParameters.position.x = Math.random() * 1000 - 500;
-			received[e].drawParameters.position.y = Math.random() * 1000 - 500;
-			received[e].drawParameters.position.z = Math.random() * 1000 - 500;
-		}
-	}
-	return received;
+    var received = [];
+//    var box = $.extend(true, {}, skybox);
+    var box;
+
+    switch(pid) {
+        case GAS_GIANT: {
+            box = $.extend(true, {}, skybox_gas);
+            break;
+        }
+        case ROCK_PLANET: {
+            box = $.extend(true, {}, skybox_rock);
+            break;
+        }
+    }
+
+    if(gameEngine.playerMode === "multi") {
+        for(var i = 0; i < 6; i++){
+            box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
+        }
+        received.push(box);
+        received.push(playerShip);
+        received.push(asteroid_field);
+        return received;
+    }
+    received = gameObjects;
+    for(e in received){
+        if(received[e].type === SKYBOX){
+            for(var i = 0; i < 6; i++){
+                received[e].parameters.textures[i] = "textures/" + received[e].parameters.textures[i];
+            }
+        }
+        else if(received[e].type === AI_SHIP) {
+            received[e].drawParameters.position.x = Math.random() * 1000 - 500;
+            received[e].drawParameters.position.y = Math.random() * 1000 - 500;
+            received[e].drawParameters.position.z = Math.random() * 1000 - 500;
+        }
+    }
+    return received;
 }
 
 Network.prototype.connect = function () {
@@ -66,7 +79,7 @@ Network.prototype.disconnect = function () {
 }
 
 Network.prototype.displayChat = function (sender, body) {
-    var wrapped = '<div class="chatmessage">'+sender+' at <span>'+body.time+':</span><div>'+body.message+'</div></div>';
+    var wrapped = '<div class="chatmessage">'+sender+' at <span>'+body.time+'</span><div>'+body.message+'</div></div>';
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);

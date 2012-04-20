@@ -1,18 +1,14 @@
 var gameObjects = []
-
-var skybox = {  type: SKYBOX,
+var skybox_gas = {  type: SKYBOX,
                 parameters: {
                     name: "skybox",
-                    /*textures: [ "skybox/starfield.png", "skybox/starfield.png",
-                                "skybox/starfield.png", "skybox/starfield.png",
-                                "skybox/starfield.png", "skybox/starfield.png"]*/
                     textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",
-                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_planet.jpg",
+                                "skybox/testbox2/posy.jpg", "skybox/testbox2/negy_gasgiant.jpg",
                                 "skybox/testbox2/posz.jpg", "skybox/testbox2/negz.jpg"]
                 }
             };
-gameObjects.push(skybox);
-var skybox2 = {  type: SKYBOX,
+gameObjects.push(skybox_gas);
+var skybox_rock = { type: SKYBOX,
                 parameters: {
                     name: "skybox",
                     textures: [ "skybox/testbox2/posx.jpg", "skybox/testbox2/negx.jpg",

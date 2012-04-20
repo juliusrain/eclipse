@@ -1,4 +1,3 @@
-
 var chatfocus = false;
 var shooting = false;
 
@@ -12,13 +11,10 @@ $('#mouselockcontrol').click(toggleCursor);
 $('#medjumpcontrol').click(medJump);
 $('#chatcontrol').click(switchToChat);
 $('#chatcompose').focus(function (){
-    $('#chatcontrol span').html('Esc');
     $('#chatcontrol').addClass('on');
     chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-	//document.getElementById('chatcompose').blur();
-    $('#chatcontrol span').html('Ent');
     $('#chatcontrol').removeClass('on');
     chatfocus = false;
 });
@@ -26,73 +22,74 @@ $('#chatcompose').blur(function (){
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
-    if(!chatfocus) {
-        switch(e.keyCode){
-            // j = toggle jump map
-            case 106: {
+    switch(e.keyCode) {
+        // j = toggle jump map
+        case 106: {
+            if(!chatfocus) {
             //    toggleJumpMap();
-                break;
             }
-            // l = bind/unbind cursor
-            case 108: {
-                if(!$('#jumpamapbox:visible').length) {
-                    toggleCursor();
-                } 
-                break;
-            }
+            break;
+        }
 			// m = medium jump
-			case 109: {
+		case 109: {
+			if(!chatfocus) {
 				medJump();
-				break;
 			}
-			/*
-            // space = fire weapon
-            case 32: {
-                gameEngine.fireWeapon();
-                break;
-            }
-			*/
-            // t = auto repair
-            case 116:{
+			break;
+		}
+        // l = bind/unbind cursor
+        case 108: {
+            if(!$('#jumpamapbox:visible').length && !chatfocus) {
+                toggleCursor();
+            } 
+            break;
+        }
+        // t = auto repair
+        case 116:{
+            if(!chatfocus) {
                 toggleAutoRepair();
-                break;
             }
-            // enter = chat box
-            case 13: {
-				$('#chatcompose').focus();
-                return false;
-                break;
-            }
-            //create explosion (for testing) p
-            case 112: {
+            break;
+        }
+        // enter = chat box
+        case 13: {
+            toggleChat();
+            return false;
+            break;
+        }
+        //create explosion (for testing) p
+        case 112: {
+            if(!chatfocus) {
                 //graphicsEngine.addExplosionLarge(50, 0, -100);
                 sceneElements.AIShips[0].fireLaser();
-                break;
             }
-            case 111: {
+            break;
+        }
+        case 111: {
+            if(!chatfocus) {
                 var new_ship = jQuery.extend(true, {}, ship_template);
                 console.log(new_ship);
                 //graphicsEngine.addGameObject(new_ship);
-                break;
             }
+            break;
         }
     }
 });
 $(window).keydown(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = true;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = true;
+            return false;
+        }
+    }
 });
 $(window).keyup(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = false;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = false;
+            return false;
+        }
+    }
 });
 
 $('#chatcompose').keydown(function (e){
@@ -100,19 +97,23 @@ $('#chatcompose').keydown(function (e){
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
         // if user pressed esc, leave chat mode
-        $('#chatcompose').blur();
+        toggleChat();
     }
     else if (e.which == 13) {
         // if user pressed answer, send new msg and leave chat mode
-        $('#chatcompose').blur();
         if(chatbox.val() != "") {
             newMessage(chatbox.val());
             chatbox.val("");
         }
+<<<<<<< HEAD
     } else {
         // stop propagation of event so it doesn't affect ship steering
         e.stopImmediatePropagation();
+=======
+>>>>>>> e8933cfa16e03e1ba883a5f99125934657cc986e
     }
+    // stop propagation of event so it doesn't affect ship steering
+    e.stopImmediatePropagation();
 });
 
 function toggleJumpMap() {
@@ -120,10 +121,12 @@ function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
+        graphicsEngine.jumpmap.setVisible(false);
         $('#jumpmapcontrol').removeClass('on');
     } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
+        graphicsEngine.jumpmap.setVisible(true);
         $('#jumpmapcontrol').addClass('on');
     }
 }
@@ -152,12 +155,16 @@ function toggleCursor() {
     }
 }
 
+<<<<<<< HEAD
 function medJump() {
 	gameEngine.mediumJump();
 }
 
 function switchToChat() {
     console.log('chat?');
+=======
+function toggleChat() {
+>>>>>>> e8933cfa16e03e1ba883a5f99125934657cc986e
     if(chatfocus){
         $('#chatcompose').blur();
     }
