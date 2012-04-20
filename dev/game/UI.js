@@ -9,6 +9,7 @@ $(window).resize(sizeGame);
 // click events
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
+$('#medjumpcontrol').click(medJump);
 $('#chatcontrol').click(switchToChat);
 $('#chatcompose').focus(function (){
     $('#chatcontrol span').html('Esc');
@@ -40,6 +41,11 @@ $(window).keypress(function (e){
                 } 
                 break;
             }
+			// m = medium jump
+			case 109: {
+				medJump();
+				break;
+			}
 			/*
             // space = fire weapon
             case 32: {
@@ -146,6 +152,10 @@ function toggleCursor() {
         $('#mouselockcontrol').addClass('on');
         $('body').css('cursor', 'auto');
     }
+}
+
+function medJump() {
+	gameEngine.mediumJump();
 }
 
 function switchToChat() {

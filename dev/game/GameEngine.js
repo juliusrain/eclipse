@@ -162,6 +162,9 @@ GameEngine.prototype.nextWave = function () {
 				newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
 				newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
 				newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
+				newAI.gameParameters.origin.x = Math.random() * 3000 - 1500;
+				newAI.gameParameters.origin.y = Math.random() * 3000 - 1500;
+				newAI.gameParameters.origin.z = Math.random() * 3000 - 1500;
 				graphicsEngine.addGameObject(newAI);
 			}
 			this.nextWaveWait = 20;
@@ -345,12 +348,6 @@ GameEngine.prototype.updateCollisions = function() {
             // hit by a laser!
             this.laserHit(sceneElements.mainShip, colls[c]);
         }
-		else {
-			console.log('hit by something else!!!');
-			//graphicsEngine.gameplay_camera.quaternion.setFromEuler();
-			graphicsEngine.gameplay_camera.translate(100);
-			sceneElements.mainShip.gameParameters.health -= 200;
-		}
     }
     // collisions with AI ships
     for(var s in sceneElements.AIShips) {
@@ -361,6 +358,13 @@ GameEngine.prototype.updateCollisions = function() {
                 // hit by a laser!
                 this.laserHit(sceneElements.AIShips[s], colls[c]);
             }
+			else {
+				graphicsEngine.gameplay_camera.translateZ(10);
+				var q = new THREE.Quaternion();
+				q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
+				graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
+				sceneElements.mainShip.gameParameters.health -= 500;
+			}
         }
     }
     // collisions with net ships
@@ -387,6 +391,14 @@ GameEngine.prototype.updateCollisions = function() {
                     // hit by a laser!
                     this.laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
                 }
+				else if(colls[c].obj === sceneElements.mainShip) {
+					console.log('asteroid bump');
+					graphicsEngine.gameplay_camera.translateZ(10);
+					var q = new THREE.Quaternion();
+					q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
+					graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
+					sceneElements.mainShip.gameParameters.health -= 500;
+				}
             }
         }
     }
@@ -495,6 +507,17 @@ GameEngine.prototype.fireWeapon = function () {
         this.timeouts.lasers = 3;
         this.firing = true;
     }
+};
+
+// Medium Jump
+// called upon user command
+// verifies that a jump can be made, then jumps forward
+GameEngine.prototype.mediumJump = function () {
+	if(sceneElements.mainShip.gameParameters.engine.currentCharge > sceneElements.mainShip.gameParameters.engine.medJumpCost) {
+		console.log('med. jump success');
+		graphicsEngine.gameplay_camera.translateZ(-5000);
+		sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.medJumpCost;
+	}
 };
 
 // Receive Network Update
