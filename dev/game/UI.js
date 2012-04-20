@@ -53,7 +53,6 @@ $(window).keypress(function (e){
         // enter = chat box
         case 13: {
             toggleChat();
-            console.log("you're in the case/switch");
             return false;
             break;
         }
