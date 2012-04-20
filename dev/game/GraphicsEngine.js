@@ -88,6 +88,7 @@ function GraphicsEngine() {
     HUDElements.push(this.minimap);
 
     this.jumpmap = new Jumpmap();
+    this.jumpmap.loadJumpmap();
 
 
     this.assignID = function() {
@@ -148,9 +149,7 @@ function GraphicsEngine() {
             self.addGameObject(objects[i]);
         }
 
-        //add lighting
         this.minimap.loadMinimap();
-        this.jumpmap.loadJumpmap();
 
 
         var dirlight2 = new THREE.DirectionalLight(0xaaaaaa);
@@ -212,6 +211,8 @@ function GraphicsEngine() {
             }
         }
 
+        this.minimap.deleteMinimap();
+
         //clean sceneElements object
         sceneElements.mainShip = null;
         for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
@@ -230,7 +231,7 @@ function GraphicsEngine() {
             delete sceneElements.explosions[i];
             sceneElements.explosions.length--;
         }
-        for(i = sceneElements.env_objects.length - 1; i >=0; i--) {
+        for(i = sceneElements.env_objects.length - 1; i >= 0; i--) {
             delete sceneElements.env_objects[i];
             sceneElements.env_objects.length--;
         }
@@ -1199,9 +1200,9 @@ function GraphicsEngine() {
                 updateMainShip();
                 updateHUD(); //includes minimap
                 ai.react();
-               if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
-                   gameEngine.update(); //increment laser and ship position
-               }
+                if(typeof gameEngine == "object" && typeof gameEngine.update == "function"){
+                    gameEngine.update(); //increment laser and ship position
+                }
                 updateLasers();
                 updateExplosions();
 

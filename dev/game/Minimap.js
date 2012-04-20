@@ -10,15 +10,9 @@
  *  draws based on contents of sceneElements array, uses graphics engine's renderer
  */
 
-/*
- *
- */
-
-
 function Minimap(game_controls, game_camera) {
 
     this.minimap_objects = [];
-    this.minimap_grid = new THREE.Object3D();
 
     this.container = document.getElementById('minimap');
 
@@ -33,6 +27,7 @@ function Minimap(game_controls, game_camera) {
     //this.minimap_camera = new THREE.PerspectiveCamera(60, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_scene.add(this.minimap_camera);
 
+
     this.minimap_texture_scene = new THREE.Scene(); //scene for texture
     this.minimap_texture_camera = new THREE.PerspectiveCamera(15, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_texture_scene.add(this.minimap_texture_camera);
@@ -41,6 +36,14 @@ function Minimap(game_controls, game_camera) {
         this.map_width, this.map_height,
         {minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat}
     );
+
+    //draw onto texture
+    var plane_geometry = new THREE.PlaneGeometry(this.map_width, this.map_height);
+    var sceneMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: this.minimap_texture});
+    var quad = new THREE.Mesh(plane_geometry, sceneMaterial);
+    quad.position.z = -500;
+
+    this.minimap_scene.add(quad);
 
     this.game_controls = game_controls;
     this.game_camera = game_camera;
@@ -96,13 +99,13 @@ function Minimap(game_controls, game_camera) {
         drawCircle(this.minimap_texture_scene);
 
 
-        //draw onto texture
-        var plane_geometry = new THREE.PlaneGeometry(this.map_width, this.map_height);
-        var sceneMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: this.minimap_texture});
-        var quad = new THREE.Mesh(plane_geometry, sceneMaterial);
-        quad.position.z = -500;
-
-        this.minimap_scene.add(quad);
+//        //draw onto texture
+//        var plane_geometry = new THREE.PlaneGeometry(this.map_width, this.map_height);
+//        var sceneMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: this.minimap_texture});
+//        var quad = new THREE.Mesh(plane_geometry, sceneMaterial);
+//        quad.position.z = -500;
+//
+//        this.minimap_scene.add(quad);
 
 
         function drawCircle(scene) { 
@@ -185,33 +188,33 @@ function Minimap(game_controls, game_camera) {
                 delete this.minimap_objects[i];
                 this.minimap_objects.splice(i, 1);
             }
+        }
+    }
 
+    Minimap.prototype.deleteMinimap = function() {
+        var i = 0;
+        var minimap_child;
+        while(i < this.minimap_texture_scene.children.length) {
+            minimap_child = this.minimap_texture_scene.children[i];
+            if(minimap_child instanceof THREE.Camera) {
+                i++;
+                continue;
+            }
+            this.minimap_texture_scene.remove(minimap_child);
+            this.renderer.deallocateObject(minimap_child);
+        }
+        
+        for(i = this.minimap_objects.length - 1; i >= 0; i--) {
+            delete this.minimap_objects[i];
+            this.minimap_objects.length--;
         }
 
     }
-
 
     //for each ship in sceneElements array, draw ship based on its position
     Minimap.prototype.updateMinimap = function() {
 
 //         this.stats.update();
-/*
-        //take current quaternion, transform to reference, determine added rotation based on mouse along reference, apply added rotation to current
-        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVecRight, this.tempVec);
-        this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.x*0.015);
-        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
-
-        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVecUp, this.tempVec);
-        this.tempQuat.setFromAxisAngle(this.tempVec, -this.game_controls.rotationVector.y*0.015);
-        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
-
-        this.tempQuat.copy(this.minimap_grid.quaternion).inverse();
-        this.tempQuat.multiplyVector3(this.tempVecBackward, this.tempVec);
-        this.tempQuat.setFromAxisAngle(this.tempVec, this.game_controls.rotationVector.z*0.015);
-        this.minimap_grid.quaternion.multiplySelf(this.tempQuat);
-*/
 
         var self = this;
         update();
@@ -222,7 +225,6 @@ function Minimap(game_controls, game_camera) {
 
         //render quad scene with texture applied
         this.renderer.render(this.minimap_scene, this.minimap_camera);
-
 
         function update() {
             var minimap_object, ship;
@@ -246,9 +248,6 @@ function Minimap(game_controls, game_camera) {
                 }
                 switch(minimap_object.objectType) {
                     case AI_SHIP: {
-						if(typeof ship == 'undefined') {
-							console.log('huzzah!');
-						}
                         self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
@@ -256,7 +255,6 @@ function Minimap(game_controls, game_camera) {
                         if(self.tempVec.z > 0) {
                             self.tempVec.z = 0;
                             self.tempVec.normalize();
-
                         }
                         minimap_object.position.set(self.tempVec.x, -self.tempVec.y, self.tempVec.z);
                     }

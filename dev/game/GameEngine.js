@@ -1,11 +1,11 @@
 // Game Engine
 function GameEngine() {
 
-    this.game_state  = {
-        gameID: 0,// = <?php echo $number; ?>;//get from game maker?
-        solarSystem: 0,
-        planet: 0,
-    };
+    this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
+    this.solarSystem = 0;
+    this.planet = 0;
+
+    this.pid = GAS_GIANT;
 
     this.player_state = null;
 
@@ -68,7 +68,7 @@ function GameEngine() {
 
 GameEngine.prototype.first = function () {
     graphicsEngine = new GraphicsEngine();
-    this.load(this.solarSystem, GAS_GIANT);
+    this.load(this.solarSystem, this.pid);
 };
 
 // Death Clause for Player Ship
@@ -194,9 +194,10 @@ GameEngine.prototype.nextWave = function () {
 GameEngine.prototype.jump = function (ssid, pid){
     this.solarSystem = ssid;
     this.planet = pid;
-    graphicsEngine.stopEngine();
-//    this.save();
+    network.disconnect();
     graphicsEngine.deleteScene();
+//    graphicsEngine.stopEngine();
+//    this.save();
     this.load(ssid, pid);
 };
 
@@ -211,17 +212,23 @@ GameEngine.prototype.save = function () {
 GameEngine.prototype.load = function (ssid, pid) {
     // wipe everything
     //     clear
-    $('#loader').show();
+    //$('#loader').show();
     // determine winning or losing state
 
     // get information from network
-    var received = network.retrievePlanet(this.game_state.gameID, ssid, pid);
+    console.log("preparing to load");
+    var received = network.retrievePlanet(this.gameID, ssid, pid);
+    console.log(received);
+    console.log("got stuff, pushing it in");
     graphicsEngine.loadGameplayObjects(received);
-    this.game_state.solarSystem = ssid;
-    this.game_state.planet = pid;
+    console.log("graphics engine has it now");
+    this.solarSystem = ssid;
+    this.planet = pid;
+    console.log("doing other stuff");
 
     // trigger GraphicsEngine
     graphicsEngine.startEngine();
+    network.connect();
     // remove loader screen
     $('#loader').hide();
     //console.log('hey this is really where I am! ' + sceneElements.mainShip.position);
