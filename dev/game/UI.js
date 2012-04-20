@@ -76,20 +76,20 @@ $(window).keypress(function (e){
     }
 });
 $(window).keydown(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = true;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = true;
+            return false;
+        }
+    }
 });
 $(window).keyup(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = false;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = false;
+            return false;
+        }
+    }
 });
 
 $('#chatcompose').keydown(function (e){
@@ -115,10 +115,12 @@ function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
+        graphicsEngine.jumpmap.setVisible(false);
         $('#jumpmapcontrol').removeClass('on');
     } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
+        graphicsEngine.jumpmap.setVisible(true);
         $('#jumpmapcontrol').addClass('on');
     }
 }
