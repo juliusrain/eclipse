@@ -79,6 +79,8 @@ GameEngine.prototype.die = function (){
     // transmit message to network
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
+		// pid
+		message.body.pid = this.pid;
         // net id
         message.body.nid = this.nid;
         // health
@@ -114,6 +116,8 @@ GameEngine.prototype.die = function (){
     // send the respawn signal
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
+		// pid
+		message.body.pid = this.pid;
         // net id
         message.body.nid = this.nid;
         // health
@@ -431,6 +435,8 @@ GameEngine.prototype.update = function () {
     // transmit message to network
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
+		// pid
+		message.body.pid = this.pid;
         // net id
         message.body.nid = this.nid;
         // health
@@ -650,7 +656,8 @@ GameEngine.prototype.mediumJump = function () {
 GameEngine.prototype.netUpdate = function (message) {
     try {
         // makes sure it's not the player's ship
-        if(message.nid !== this.nid) {
+		// but that is is the player's planet
+        if(this.playerMode == "multi" && message.nid !== this.nid && message.pid == this.pid) {
             // go through each net ship
             var found = false;
             for(var ns in sceneElements.netShips) {

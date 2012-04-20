@@ -9,7 +9,7 @@ $(window).resize(sizeGame);
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 $('#medjumpcontrol').click(medJump);
-$('#chatcontrol').click(switchToChat);
+$('#chatcontrol').click(toggleChat);
 $('#chatcompose').focus(function (){
     $('#chatcontrol').addClass('on');
     chatfocus = true;
@@ -26,11 +26,11 @@ $(window).keypress(function (e){
         // j = toggle jump map
         case 106: {
             if(!chatfocus) {
-            //    toggleJumpMap();
+                toggleJumpMap();
             }
             break;
         }
-			// m = medium jump
+		// m = medium jump
 		case 109: {
 			if(!chatfocus) {
 				medJump();
@@ -105,12 +105,6 @@ $('#chatcompose').keydown(function (e){
             newMessage(chatbox.val());
             chatbox.val("");
         }
-<<<<<<< HEAD
-    } else {
-        // stop propagation of event so it doesn't affect ship steering
-        e.stopImmediatePropagation();
-=======
->>>>>>> e8933cfa16e03e1ba883a5f99125934657cc986e
     }
     // stop propagation of event so it doesn't affect ship steering
     e.stopImmediatePropagation();
@@ -155,16 +149,12 @@ function toggleCursor() {
     }
 }
 
-<<<<<<< HEAD
 function medJump() {
 	gameEngine.mediumJump();
 }
 
-function switchToChat() {
-    console.log('chat?');
-=======
+
 function toggleChat() {
->>>>>>> e8933cfa16e03e1ba883a5f99125934657cc986e
     if(chatfocus){
         $('#chatcompose').blur();
     }
