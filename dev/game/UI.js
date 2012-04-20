@@ -1,4 +1,3 @@
-
 var chatfocus = false;
 var shooting = false;
 
@@ -9,16 +8,12 @@ $(window).resize(sizeGame);
 // click events
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
-$('#chatcontrol').click(switchToChat);
+$('#chatcontrol').click(toggleChat);
 $('#chatcompose').focus(function (){
-    $('#chatcontrol span').html('Esc');
     $('#chatcontrol').addClass('on');
     chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-	console.log('leave them kids alone!');
-	//document.getElementById('chatcompose').blur();
-    $('#chatcontrol span').html('Ent');
     $('#chatcontrol').removeClass('on');
     chatfocus = false;
 });
@@ -26,50 +21,57 @@ $('#chatcompose').blur(function (){
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
-    if(!chatfocus) {
-        switch(e.keyCode){
-            // j = toggle jump map
-            case 106: {
+    switch(e.keyCode) {
+        // j = toggle jump map
+        case 106: {
+            if(!chatfocus) {
             //    toggleJumpMap();
-                break;
             }
-            // l = bind/unbind cursor
-            case 108: {
-                if(!$('#jumpamapbox:visible').length) {
-                    toggleCursor();
-                } 
-                break;
-            }
-			/*
-            // space = fire weapon
-            case 32: {
-                gameEngine.fireWeapon();
-                break;
-            }
-			*/
-            // t = auto repair
-            case 116:{
+            break;
+        }
+        // l = bind/unbind cursor
+        case 108: {
+            if(!$('#jumpamapbox:visible').length && !chatfocus) {
+                toggleCursor();
+            } 
+            break;
+        }
+		/*
+        // space = fire weapon
+        case 32: {
+            gameEngine.fireWeapon();
+            break;
+        }
+		*/
+        // t = auto repair
+        case 116:{
+            if(!chatfocus) {
                 toggleAutoRepair();
-                break;
             }
-            // enter = chat box
-            case 13: {
-				$('#chatcompose').focus();
-                return false;
-                break;
-            }
-            //create explosion (for testing) p
-            case 112: {
+            break;
+        }
+        // enter = chat box
+        case 13: {
+            toggleChat();
+            console.log("you're in the case/switch");
+            return false;
+            break;
+        }
+        //create explosion (for testing) p
+        case 112: {
+            if(!chatfocus) {
                 //graphicsEngine.addExplosionLarge(50, 0, -100);
                 sceneElements.AIShips[0].fireLaser();
-                break;
             }
-            case 111: {
+            break;
+        }
+        case 111: {
+            if(!chatfocus) {
                 var new_ship = jQuery.extend(true, {}, ship_template);
                 console.log(new_ship);
                 //graphicsEngine.addGameObject(new_ship);
-                break;
             }
+            break;
         }
     }
 });
@@ -95,20 +97,17 @@ $('#chatcompose').keydown(function (e){
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
         // if user pressed esc, leave chat mode
-        $('#chatcompose').blur();
+        toggleChat();
     }
     else if (e.which == 13) {
         // if user pressed answer, send new msg and leave chat mode
-        $('#chatcompose').blur();
         if(chatbox.val() != "") {
             newMessage(chatbox.val());
             chatbox.val("");
         }
-		console.log("teacher!");
-    } else {
-        // stop propagation of event so it doesn't affect ship steering
-        e.stopImmediatePropagation();
     }
+    // stop propagation of event so it doesn't affect ship steering
+    e.stopImmediatePropagation();
 });
 
 function toggleJumpMap() {
@@ -148,8 +147,7 @@ function toggleCursor() {
     }
 }
 
-function switchToChat() {
-    console.log('chat?');
+function toggleChat() {
     if(chatfocus){
         $('#chatcompose').blur();
     }

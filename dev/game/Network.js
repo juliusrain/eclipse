@@ -66,7 +66,7 @@ Network.prototype.disconnect = function () {
 }
 
 Network.prototype.displayChat = function (sender, body) {
-    var wrapped = '<div class="chatmessage">'+sender+' at <span>'+body.time+':</span><div>'+body.message+'</div></div>';
+    var wrapped = '<div class="chatmessage">'+sender+' at <span>'+body.time+'</span><div>'+body.message+'</div></div>';
     var node = $(wrapped)
     node.hide();
     $("#chatmessages").append(node);
