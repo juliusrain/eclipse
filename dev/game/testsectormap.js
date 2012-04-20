@@ -1,6 +1,6 @@
 var sector = [
     {
-        name:'ss',
+        name:'The Saining System',
         x:-0,
         y: 0,
         z: 0,
@@ -14,17 +14,9 @@ var sector = [
                 type:ROCK_PLANET
             },
             {
-                name:'Huy Beta',
+                name:'Saining Beta',
                 x:100,
                 y:-120,
-                z: 0,
-                radius:1.5,
-                type:ROCK_PLANET
-            },
-            {
-                name:'Brandon Alpha',
-                x:100,
-                y:130,
                 z: 0,
                 radius:1.5,
                 type:GAS_GIANT

@@ -67,7 +67,7 @@ function Jumpmap() {
     this.container.addEventListener('mousedown', onMouseDown, false);
     this.container.addEventListener('mousemove', onMouseMove, false);
 
-    this.mouse = {x: 0, y: 0};
+        this.mouse = {x: 0, y: 0};
 
     var self = this;
     var mouseX, mouseY;
@@ -89,11 +89,11 @@ function Jumpmap() {
                 self.zoomed_in = !self.zoomed_in;
             } else if(!self.intersects[0].object.isParent && self.zoomed_in) { //else if is a regular planet, assign a function to it
                 if(self.intersects[0].object.type == GAS_GIANT) {
-                    console.log("gas");
-                    gameEngine.jump(0, 0, GAS_GIANT);
+//                    console.log("gas");
+                    gameEngine.jump(0, GAS_GIANT);
                 } else if(self.intersects[0].object.type == ROCK_PLANET) {
-                    console.log("rock");
-                    gameEngine.jump(0, 0, ROCK_PLANET);
+//                    console.log("rock");
+                    gameEngine.jump(0, ROCK_PLANET);
                 }
             }
 //            console.log(self.zoomed_in);

@@ -21,28 +21,25 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
         }
     }
 
+    for(var i = 0; i < 6; i++){
+        box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
+    }
+    received.push(box);
+    received.push(playerShip);
+    received.push(asteroid_field);
     if(gameEngine.playerMode === "multi") {
-        for(var i = 0; i < 6; i++){
-            box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
-        }
-        received.push(box);
-        received.push(playerShip);
-        received.push(asteroid_field);
         return received;
-    }
-    received = gameObjects;
-    for(e in received){
-        if(received[e].type === SKYBOX){
-            for(var i = 0; i < 6; i++){
-                received[e].parameters.textures[i] = "textures/" + received[e].parameters.textures[i];
-            }
-        }
-        else if(received[e].type === AI_SHIP) {
-            received[e].drawParameters.position.x = Math.random() * 1000 - 500;
-            received[e].drawParameters.position.y = Math.random() * 1000 - 500;
-            received[e].drawParameters.position.z = Math.random() * 1000 - 500;
-        }
-    }
+    } 
+    var ai1 = $.extend(true, {}, AIShip),
+        ai2 = $.extend(true, {}, AIShip2);
+    ai1.drawParameters.position.x = Math.random() * 1000 - 500;
+    ai1.drawParameters.position.y = Math.random() * 1000 - 500;
+    ai1.drawParameters.position.z = Math.random() * 1000 - 500;
+    ai2.drawParameters.position.x = Math.random() * 1000 - 500;
+    ai2.drawParameters.position.y = Math.random() * 1000 - 500;
+    ai2.drawParameters.position.z = Math.random() * 1000 - 500;
+    received.push(ai1);
+    received.push(ai2);
     return received;
 }
 
