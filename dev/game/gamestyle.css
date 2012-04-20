@@ -279,7 +279,7 @@ body {
     background-color: rgba(25, 25, 25, 0.8);
     display: none;
 }
-#miningprogress {width:50%;position:absolute;left:25%;bottom:20%;display:none;}
+#miningprogress {width:50%;position:absolute;left:25%;bottom:15%;display:none;}
 #miningnumbers {width:100%;padding:0px auto;}
 .miningvalue {font-size:x-small;text-align:center;float:left;margin:5px;}
 .miningvalue div {font-size:large;}

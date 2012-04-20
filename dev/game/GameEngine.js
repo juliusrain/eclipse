@@ -3,9 +3,7 @@ function GameEngine() {
 
     this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
     this.solarSystem = 0;
-    this.planet = 0;
-
-    this.pid = GAS_GIANT;
+    this.planet = GAS_GIANT;
 
     this.player_state = null;
 
@@ -68,7 +66,7 @@ function GameEngine() {
 
 GameEngine.prototype.first = function () {
     graphicsEngine = new GraphicsEngine();
-    this.load(this.solarSystem, this.pid);
+    this.load(this.solarSystem, this.planet);
 };
 
 // Death Clause for Player Ship
@@ -80,9 +78,11 @@ GameEngine.prototype.die = function (){
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
 		// pid
-		message.body.pid = this.pid;
+		message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
+		// name
+		message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -117,9 +117,11 @@ GameEngine.prototype.die = function (){
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
 		// pid
-		message.body.pid = this.pid;
+		message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
+		// name
+		message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -192,13 +194,20 @@ GameEngine.prototype.nextWave = function () {
 
 //Jump function
 GameEngine.prototype.jump = function (ssid, pid){
-    this.solarSystem = ssid;
-    this.planet = pid;
-    network.disconnect();
-    graphicsEngine.deleteScene();
-//    graphicsEngine.stopEngine();
-//    this.save();
-    this.load(ssid, pid);
+	if(sceneElements.mainShip.gameParameters.engine.currentCharge >= sceneElements.mainShip.gameParameters.engine.longJumpCost) {
+		sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.longJumpCost;
+	    this.solarSystem = ssid;
+	    this.planet = pid;
+	    network.disconnect();
+	    graphicsEngine.deleteScene();
+	//    graphicsEngine.stopEngine();
+	//    this.save();
+	    this.load(ssid, pid);
+	}
+	else {
+		network.broadcast({body: "Not enough engine charge to make the jump."});
+	}
+	toggleJumpMap();
 };
 
 // GameEngine save function
@@ -343,10 +352,25 @@ GameEngine.prototype.laserHit = function(target, hit) {
         if(target.gameParameters.health - damage < 0) {
             //alert("~~~~~~~DEATH~~~~~~~~");
             if(target === sceneElements.mainShip) {
-                var killer="an AI ship.";
-                var victim=this.nid;
-                sceneElements.netShips.forEach(function (ship) {if (ship.objectID==hit.obj.parentID) killer = hit.obj.parent.parentShip.gameParameters.nid});
-                network.send({"sender":victim, "action":"broad", body:{"message":"Player "+victim+" was killed by player"+killer}});
+                var killer = "an AI ship.";
+                var victim;
+				if(this.playerName) {
+					victim = this.playerName;
+				}
+				else {
+					victim = "Player " + this.nid;
+				}
+                sceneElements.netShips.forEach(function (ship) {
+					if (ship.objectID==hit.obj.parentID) {
+						if (hit.obj.parent.parentShip.gameParameters.pname) {
+							killer = hit.obj.parent.parentShip.gameParameters.pname;
+						}
+						else {
+							killer = "Player " + hit.obj.parent.parentShip.gameParameters.nid;
+						}
+					}
+				});
+                network.send({"sender":victim, "action":"broad", body:{"message":victim+" was killed by "+killer}});
                 console.log(hit);
             }
             else if(sceneElements.AIShips.indexOf(target) !== -1) {
@@ -443,9 +467,11 @@ GameEngine.prototype.update = function () {
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
 		// pid
-		message.body.pid = this.pid;
+		message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
+		// name
+		message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -664,7 +690,7 @@ GameEngine.prototype.netUpdate = function (message) {
     try {
         // makes sure it's not the player's ship
 		// but that is is the player's planet
-        if(this.playerMode == "multi" && message.nid !== this.nid && message.pid == this.pid) {
+        if(this.playerMode == "multi" && message.nid !== this.nid && message.pid == this.planet) {
             // go through each net ship
             var found = false;
             for(var ns in sceneElements.netShips) {
@@ -699,6 +725,7 @@ GameEngine.prototype.netUpdate = function (message) {
             if(!found && this.netShipsAdded.indexOf(message.nid) === -1) {
                 var nets = $.extend(true, {}, netShip);
                 nets.gameParameters.nid = message.nid;
+                nets.gameParameters.pname = message.pname;
                 nets.drawParameters.position.x = message.x;
                 nets.drawParameters.position.y = message.y;
                 nets.drawParameters.position.z = message.z;

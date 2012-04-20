@@ -30,8 +30,8 @@ $(window).keypress(function (e){
             }
             break;
         }
-		// m = medium jump
-		case 109: {
+		// q = medium jump
+		case 113: {
 			if(!chatfocus) {
 				medJump();
 			}
