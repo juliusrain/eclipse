@@ -9,6 +9,7 @@ function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
+
     this.objID = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
@@ -140,6 +141,7 @@ function GraphicsEngine() {
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
         this.scene_loaded = true;
 
+
         //for loading models
         var self = this;
         for(var i = 0; i < objects.length; i++) {
@@ -150,9 +152,6 @@ function GraphicsEngine() {
         this.minimap.loadMinimap();
         this.jumpmap.loadJumpmap();
 
-        var dirlight = new THREE.DirectionalLight(0xaaaaaa);
-        dirlight.position.set(0, 500, 0).normalize();
-        this.gameplay_scene.add(dirlight);
 
         var dirlight2 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight2.position.set(0, -500, 0).normalize();
@@ -406,13 +405,8 @@ function GraphicsEngine() {
          *
          */
         function loadShip(gameObject, scene) {
-            if(gameObject.drawParameters.geometry.indexOf(".dae") != -1) {
-                var callback = function(collada) {loadCollada(collada, gameObject, scene)};
-                cloader.load(gameObject.drawParameters.geometry, callback);
-            } else if(gameObject.drawParameters.geometry.indexOf(".js") != -1) {
-                var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
-                jloader.load(gameObject.drawParameters.geometry, callback);
-            }
+            var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
+            jloader.load(gameObject.drawParameters.geometry, callback);
         }
 
         function loadAsteroidField(gameObject, scene) {
@@ -421,55 +415,6 @@ function GraphicsEngine() {
             console.log(gameObject.drawParameters.geometry);
         }
 
-        /*
-         *  Load model from COLLADA
-         *      gameObject: gameObject to be loaded from model
-         *      scene: scene to add model to
-         *
-         *  (used only for gameObjects)
-         */
-        function loadCollada (collada, gameObject, scene) {
-            var cmodel = collada.scene;//(geometry, new THREE.MeshFaceMaterial());
-            cmodel.useQuaternion = true;
-            cmodel.direction = new THREE.Vector3(0, 0, -1);
-            cmodel.name = gameObject.gameParameters.name;
-            cmodel.objectType = gameObject.type;
-
-            switch(cmodel.objectType) {
-                case PLAYER_SHIP: {
-                    cmodel.gameParameters = gameObject.gameParameters;
-                    cmodel.drawParameters = gameObject.drawParameters;
-                    //for 3rd person ship positioning
-                    cmodel.currentRoll = 0;
-                    cmodel.currentXOffset = 0;
-                    cmodel.currentYOffset = 0;
-
-                    loadLasers(cmodel, scene);
-                    sceneElements.mainShip = cmodel;
-
-                    break;
-                }
-                case AI_SHIP: {
-                    console.log("load ai ship");
-                    cmodel.gameParameters = gameObject.gameParameters;
-                    cmodel.drawParameters = gameObject.drawParameters;
-                    loadLasers(cmodel, scene);
-                    sceneElements.AIShips.push(cmodel);
-                    self.minimap.addMinimapObject(AI_SHIP)
-                    break;
-                }
-                case ASTEROID_FIELD: {
-                    
-                    break;
-                }
-            }
-
-
-            cmodel.position.set(cmodel.drawParameters.position.x, cmodel.drawParameters.position.y, cmodel.drawParameters.position.z);
-            self.gameplay_glow_scene.add(cmodel);
-            scene.add(cmodel);
-
-        }
 
         //JSON
         /*
@@ -483,6 +428,10 @@ function GraphicsEngine() {
         function loadJSON(geometry, gameObject, scene) {
             switch(gameObject.type) {
                 case PLAYER_SHIP: {
+                    if(gameEngine.player_state == null) {
+                        gameEngine.player_state = gameObject.gameParameters;
+                    }
+
                     var modelMesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
 
                     //set mesh parameters
@@ -512,7 +461,7 @@ function GraphicsEngine() {
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh
 
-                    modelMesh.position.set((Math.random()*3000+8000)*(1-Math.round(Math.random())*2), (Math.random()*3000+8000)*(1-Math.round(Math.random())*2), (Math.random()*3000+8000)*(1-Math.round(Math.random())*2));
+                    self.gameplay_camera.position.set((Math.random()*3000+1000)*(1-Math.round(Math.random())*2), (Math.random()*3000+1000)*(1-Math.round(Math.random())*2), (Math.random()*3000+1000)*(1-Math.round(Math.random())*2));
                     scene.add(modelMesh);
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
@@ -617,7 +566,7 @@ function GraphicsEngine() {
                     s.add(s8);
 
                     modelMesh.spheres = s;
-                    s.outer = s0;
+                        s.outer = s0;
                     s.inner = [s1, s2, s3, s4, s5, s6, s7, s8];
 
                     s.outer.visible = false;

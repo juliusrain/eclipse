@@ -16,8 +16,8 @@ $('#chatcompose').focus(function (){
     chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-	console.log('leave them kids alone!');
-	//document.getElementById('chatcompose').blur();
+    console.log('leave them kids alone!');
+    //document.getElementById('chatcompose').blur();
     $('#chatcontrol span').html('Ent');
     $('#chatcontrol').removeClass('on');
     chatfocus = false;
@@ -30,7 +30,7 @@ $(window).keypress(function (e){
         switch(e.keyCode){
             // j = toggle jump map
             case 106: {
-            //    toggleJumpMap();
+                toggleJumpMap();
                 break;
             }
             // l = bind/unbind cursor
@@ -40,13 +40,13 @@ $(window).keypress(function (e){
                 } 
                 break;
             }
-			/*
+            /*
             // space = fire weapon
             case 32: {
                 gameEngine.fireWeapon();
                 break;
             }
-			*/
+            */
             // t = auto repair
             case 116:{
                 toggleAutoRepair();
@@ -54,7 +54,7 @@ $(window).keypress(function (e){
             }
             // enter = chat box
             case 13: {
-				$('#chatcompose').focus();
+                $('#chatcompose').focus();
                 return false;
                 break;
             }
@@ -74,20 +74,20 @@ $(window).keypress(function (e){
     }
 });
 $(window).keydown(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = true;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = true;
+            return false;
+        }
+    }
 });
 $(window).keyup(function (e){
-	if(!chatfocus) {
-		if(e.keyCode === 32) {
-			shooting = false;
-			return false;
-		}
-	}
+    if(!chatfocus) {
+        if(e.keyCode === 32) {
+            shooting = false;
+            return false;
+        }
+    }
 });
 
 $('#chatcompose').keydown(function (e){
@@ -104,7 +104,7 @@ $('#chatcompose').keydown(function (e){
             newMessage(chatbox.val());
             chatbox.val("");
         }
-		console.log("teacher!");
+        console.log("teacher!");
     } else {
         // stop propagation of event so it doesn't affect ship steering
         e.stopImmediatePropagation();
@@ -116,10 +116,12 @@ function toggleJumpMap() {
     if($('#jumpmapbox:visible').length){
         $('#jumpmapbox').hide();
         graphicsEngine.toggleCursor(false);
+        graphicsEngine.jumpmap.setVisible(false);
         $('#jumpmapcontrol').removeClass('on');
     } else { // show jump map
         $('#jumpmapbox').show();
         graphicsEngine.toggleCursor(true);
+        graphicsEngine.jumpmap.setVisible(true);
         $('#jumpmapcontrol').addClass('on');
     }
 }

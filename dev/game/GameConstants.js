@@ -24,6 +24,7 @@ var EATING = 100;
 //for planet types
 var PLANET_TYPE = {};
 
+//pid for jumping/loading new scenes
 var GAS_GIANT = 0,
     ROCK_PLANET = 1;
 

@@ -1,26 +1,29 @@
 // Game Engine
 function GameEngine() {
-    this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
-    this.solarSystem = 0;
-    this.planet = 0;
 
-	this.playerName = "";
-	this.playerMode = "single";
-	if(window.location.hash) {
-		var amper = window.location.hash.indexOf("&");
-		if(amper !== -1) {
-			var portions = window.location.hash.split("&");
-			if(portions[0] === "#multi") {
-				this.playerMode = "multi";
-			}
-			if(portions.length > 1) {
-				this.playerName = portions[1];
-			}
-		}
-	}
+    this.game_state  = {
+        gameID: 0,// = <?php echo $number; ?>;//get from game maker?
+        solarSystem: 0,
+        planet: 0,
+    };
 
-    //this.resources = {};//load from game constants!
-    // TEMPORARY ***************************************
+    this.player_state = null;
+
+    this.playerName = "";
+    this.playerMode = "single";
+    if(window.location.hash) {
+        var amper = window.location.hash.indexOf("&");
+        if(amper !== -1) {
+            var portions = window.location.hash.split("&");
+            if(portions[0] === "#multi") {
+                this.playerMode = "multi";
+            }
+            if(portions.length > 1) {
+                this.playerName = portions[1];
+            }
+        }
+    }
+
     this.resources = {
         food:10000,
         fuel:10000,
@@ -33,20 +36,20 @@ function GameEngine() {
         food:0,
     };
     this.logicwait = 0;
-	this.playerDead = false;
+    this.playerDead = false;
 
     this.nid = Math.floor(Math.random() * 99999);
 
     ai = new AI();
-	this.numAI = 2;
-	this.nextWaveWait = 20;
+    this.numAI = 2;
+    this.nextWaveWait = 20;
 
     //start network client
     network = new Network();
     network.connect();
-	if(this.playerMode === "single") {
-    	network.disconnect();
-	}
+    if(this.playerMode === "single") {
+        network.disconnect();
+    }
     this.netShipsAdded = [];
     this.firing = false;
 
@@ -61,7 +64,7 @@ function GameEngine() {
 
 GameEngine.prototype.first = function () {
     graphicsEngine = new GraphicsEngine();
-    this.load(this.solarSystem, this.planet);
+    this.load(this.solarSystem, GAS_GIANT);
 };
 
 // Death Clause for Player Ship
@@ -91,10 +94,10 @@ GameEngine.prototype.die = function (){
         //console.log(JSON.stringify(message));
         network.send(message);
     }
-	if(!this.playerDead) {
-		this.playerDead = true;
-    	alert("YOU HAVE DIED.");
-	}
+    if(!this.playerDead) {
+        this.playerDead = true;
+        alert("YOU HAVE DIED.");
+    }
     // reset everything
     // health + game parameters
     $.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
@@ -122,54 +125,54 @@ GameEngine.prototype.die = function (){
         message.body.quat.y = sceneElements.mainShip.quaternion.y;
         message.body.quat.z = sceneElements.mainShip.quaternion.z;
         // shooting
-		shooting = false;
+        shooting = false;
         message.body.respawn = true;
         //console.log(JSON.stringify(message));
         network.send(message);
     }
-	this.playerDead = false;
+    this.playerDead = false;
 };
 
 // Death Clause for AI or net Ships
 GameEngine.prototype.kill = function (victim){
     victim.gameParameters.health = 0;
     graphicsEngine.addExplosionLarge(victim.position.x, victim.position.y, victim.position.z);
-	if(victim.gameParameters.hasOwnProperty('nid')) {
-		var vic = this.netShipsAdded.indexOf(victim.gameParameters.nid);
-		if(vic !== -1) {
-			this.netShipsAdded.splice(vic, 1);
-		}
-	}
+    if(victim.gameParameters.hasOwnProperty('nid')) {
+        var vic = this.netShipsAdded.indexOf(victim.gameParameters.nid);
+        if(vic !== -1) {
+            this.netShipsAdded.splice(vic, 1);
+        }
+    }
     graphicsEngine.removeSceneObject(victim.objectID);
 };
 
 // Check for remaining AIs, spawn more
 GameEngine.prototype.nextWave = function () {
-	// if there are no more AIs
-	if(!sceneElements.AIShips.length) {
-		if(!this.nextWaveWait) {
-			//respawn more AIs
-			this.numAI++;
-			for(var i = 0; i < this.numAI; i++) {
-				var newAI = {};
-				if(Math.round(Math.random())) {
-					newAI = $.extend(true, {}, AIShip);
-				}
-				else {
-					newAI = $.extend(true, {}, AIShip2);
-				}
-				newAI.gameParameters.health = 1000;
-				newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
-				newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
-				newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
-				graphicsEngine.addGameObject(newAI);
-			}
-			this.nextWaveWait = 20;
-		}
-		else{
-			this.nextWaveWait--;
-		}
-	}
+    // if there are no more AIs
+    if(!sceneElements.AIShips.length) {
+        if(!this.nextWaveWait) {
+            //respawn more AIs
+            this.numAI++;
+            for(var i = 0; i < this.numAI; i++) {
+                var newAI = {};
+                if(Math.round(Math.random())) {
+                    newAI = $.extend(true, {}, AIShip);
+                }
+                else {
+                    newAI = $.extend(true, {}, AIShip2);
+                }
+                newAI.gameParameters.health = 1000;
+                newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
+                newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
+                newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
+                graphicsEngine.addGameObject(newAI);
+            }
+            this.nextWaveWait = 20;
+        }
+        else{
+            this.nextWaveWait--;
+        }
+    }
 };
 
 
@@ -178,10 +181,9 @@ GameEngine.prototype.jump = function (ssid, pid){
     this.solarSystem = ssid;
     this.planet = pid;
     graphicsEngine.stopEngine();
-    this.save();
+//    this.save();
     graphicsEngine.deleteScene();
     this.load(ssid, pid);
-    // etc
 };
 
 // GameEngine save function
@@ -197,13 +199,12 @@ GameEngine.prototype.load = function (ssid, pid) {
     //     clear
     $('#loader').show();
     // determine winning or losing state
-    //     blah blah blah
 
     // get information from network
-    var received = network.retrievePlanet(this.gameID, ssid, pid);
+    var received = network.retrievePlanet(this.game_state.gameID, ssid, pid);
     graphicsEngine.loadGameplayObjects(received);
-    this.solarSystem = ssid;
-    this.planet = pid;
+    this.game_state.solarSystem = ssid;
+    this.game_state.planet = pid;
 
     // trigger GraphicsEngine
     graphicsEngine.startEngine();
@@ -345,12 +346,12 @@ GameEngine.prototype.updateCollisions = function() {
             // hit by a laser!
             this.laserHit(sceneElements.mainShip, colls[c]);
         }
-		else {
-			console.log('hit by something else!!!');
-			//graphicsEngine.gameplay_camera.quaternion.setFromEuler();
-			graphicsEngine.gameplay_camera.translate(100);
-			sceneElements.mainShip.gameParameters.health -= 200;
-		}
+        else {
+            console.log('hit by something else!!!');
+            //graphicsEngine.gameplay_camera.quaternion.setFromEuler();
+            graphicsEngine.gameplay_camera.translate(100);
+            sceneElements.mainShip.gameParameters.health -= 200;
+        }
     }
     // collisions with AI ships
     for(var s in sceneElements.AIShips) {
@@ -460,14 +461,14 @@ GameEngine.prototype.update = function () {
             }
         }
 
-		// shoot weapon
-		if(shooting) {
-			this.fireWeapon();
-		}
+        // shoot weapon
+        if(shooting) {
+            this.fireWeapon();
+        }
 
-		if(this.playerMode === "single") {
-			this.nextWave();
-		}
+        if(this.playerMode === "single") {
+            this.nextWave();
+        }
 
         // decrement waits
         if(this.timeouts.lasers > 0){
