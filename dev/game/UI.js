@@ -17,7 +17,6 @@ $('#chatcompose').focus(function (){
     chatfocus = true;
 });
 $('#chatcompose').blur(function (){
-	console.log('leave them kids alone!');
 	//document.getElementById('chatcompose').blur();
     $('#chatcontrol span').html('Ent');
     $('#chatcontrol').removeClass('on');
@@ -110,7 +109,6 @@ $('#chatcompose').keydown(function (e){
             newMessage(chatbox.val());
             chatbox.val("");
         }
-		console.log("teacher!");
     } else {
         // stop propagation of event so it doesn't affect ship steering
         e.stopImmediatePropagation();

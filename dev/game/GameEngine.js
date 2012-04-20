@@ -26,6 +26,10 @@ function GameEngine() {
         fuel:10000,
         metals:10000,
     };
+	this.miningStatus = 0;
+	this.miningTimeout = 0;
+	this.miningRange = 20000;
+	this.autoMining = true;
     this.stage = 0;
     this.autorepair = true;
     this.timeouts = {
@@ -165,6 +169,9 @@ GameEngine.prototype.nextWave = function () {
 				newAI.gameParameters.origin.x = Math.random() * 3000 - 1500;
 				newAI.gameParameters.origin.y = Math.random() * 3000 - 1500;
 				newAI.gameParameters.origin.z = Math.random() * 3000 - 1500;
+				newAI.gameParameters.dummy_target.x = Math.random() * 3000 - 1500;
+				newAI.gameParameters.dummy_target.y = Math.random() * 3000 - 1500;
+				newAI.gameParameters.dummy_target.z = Math.random() * 3000 - 1500;
 				graphicsEngine.addGameObject(newAI);
 			}
 			this.nextWaveWait = 20;
@@ -358,7 +365,7 @@ GameEngine.prototype.updateCollisions = function() {
                 // hit by a laser!
                 this.laserHit(sceneElements.AIShips[s], colls[c]);
             }
-			else {
+			else if(colls[c].obj === sceneElements.mainShip) {
 				graphicsEngine.gameplay_camera.translateZ(10);
 				var q = new THREE.Quaternion();
 				q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
@@ -472,6 +479,20 @@ GameEngine.prototype.update = function () {
             }
         }
 
+		// mining
+		if(!this.miningTimeout) {
+			this.miningTimeout = 2;
+			if(this.miningStatus) {
+				this.mine(this.miningTarget);
+			}
+			else {
+				this.mineAsteroids();
+			}
+		}
+		else {
+			this.miningTimeout--;
+		}
+
 		// shoot weapon
 		if(shooting) {
 			this.fireWeapon();
@@ -494,6 +515,103 @@ GameEngine.prototype.update = function () {
     }
     // check for collisions (every frame)
     this.updateCollisions();
+};
+
+// checks if the player is in range, then scans, then collects resources
+GameEngine.prototype.mineAsteroids = function () {
+	var min = null, dist = Infinity;
+	for(var a in sceneElements.env_objects[0].children) {
+		var xd = sceneElements.mainShip.position.x - sceneElements.env_objects[0].children[a].position.x,
+			yd = sceneElements.mainShip.position.y - sceneElements.env_objects[0].children[a].position.y,
+			zd = sceneElements.mainShip.position.z - sceneElements.env_objects[0].children[a].position.z;
+	    var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
+		// asteroid is in range and closer than all others [already checked]
+		if(actualDistance <= this.miningRange && actualDistance < dist) {
+			min = sceneElements.env_objects[0].children[a];
+			dist = actualDistance;
+		}
+	}
+	if(min) {
+		this.mine(min);
+	}
+};
+
+function scanvals(type) {
+	var type = typeof type == "undefined" ? 0 : type;
+	var weights = {food:20, fuel:30};
+	switch(type) {
+		case 1:
+			weights = {food:50, fuel:10};
+			break;
+		case 2:
+			weights = {food:10, fuel:60};
+			break;
+	}
+	var vals = {};
+	vals.food = Math.round(Math.random()*10 - 5) + weights.food;
+	vals.fuel = Math.round(Math.random()*10 - 5) + weights.fuel;
+	vals.metal = 100 - (vals.food + vals.fuel);
+	return vals;
+}
+
+
+// Mine
+// called upon user command
+// Scans, then collects resources
+GameEngine.prototype.mine = function (target) {
+	var xd = sceneElements.mainShip.position.x - target.position.x,
+		yd = sceneElements.mainShip.position.y - target.position.y,
+		zd = sceneElements.mainShip.position.z - target.position.z;
+	var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
+	// if target is out of range
+	if(actualDistance > this.miningRange) {
+		this.miningStatus = 0;
+		this.miningTarget = null;
+		target.mineProg = 0;
+		$('#miningprogress').hide();
+		return;
+	}
+	// if not mining, start scanning
+	if(this.miningStatus === 0) {
+		this.miningStatus = 1;
+		this.miningTarget = target;
+		target.mineProg = 0;
+		$('#miningbarinner').css('width', target.mineProg + '%');
+		$('#miningaction div').html('Scanning...');
+		$('#miningprogress').show();
+	}
+	// if scanning
+	else if(this.miningStatus === 1) {
+		target.mineWeights = scanvals(0);
+		$('#miningfood div').html(target.mineWeights.food + '%');
+		$('#miningfuel div').html(target.mineWeights.fuel + '%');
+		$('#miningmetal div').html(target.mineWeights.metal + '%');
+		target.mineProg++;
+		// if done scanning
+		if(target.mineProg >= 100) {
+			target.mineProg = 0;
+			this.miningStatus = 2;
+			target.mineVals = {food:0, fuel:0, metal:0};
+			$('#miningaction div').html('Mining Resources...');
+		}
+		$('#miningbarinner').css('width', target.mineProg + '%');
+	}
+	// if mining
+	else if(this.miningStatus === 2) {
+		this.resources.food += Math.round(target.mineWeights.food * Math.random());
+		this.resources.fuel += Math.round(target.mineWeights.fuel * Math.random());
+		this.resources.metals += Math.round(target.mineWeights.metal * Math.random());
+		target.mineProg++;
+		$('#miningbarinner').css('width', target.mineProg + '%');
+		// if done mining
+		if(target.mineProg >= 100) {
+			target.mineProg = 0;
+			this.miningStatus = 0;
+			$('#miningaction div').html('Done.');
+			$('#miningprogress').hide();
+			this.miningTimeout = 20;
+		}
+	}
 };
 
 // Fire Weapon

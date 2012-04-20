@@ -29,7 +29,7 @@ var playerShip = {  type: PLAYER_SHIP,
                                     turnFactor: 1.5, //also used by graphics engine
                                     longJumpCost: 90,
                                     medJumpCost: 50,
-                                    rechargeRate: 1,
+                                    rechargeRate: 0.5,
                                     rechargeCost: 1,
                                     currentCharge: 0,
                         },
