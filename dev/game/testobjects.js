@@ -92,7 +92,7 @@ var AIShip = {  type: AI_SHIP,
 
                         }
                     },
-                    orbit_radius: 8000,                                         
+                    orbit_radius: 800,
                     dummy_target: {
                         x: 0,
                         y: 0,
@@ -142,7 +142,7 @@ var AIShip2 = { type: AI_SHIP,
 
                         }
                     },
-                    orbit_radius: 8000,
+                    orbit_radius: 800,
                     dummy_target: {
                         x: 0,
                         y: 0,
