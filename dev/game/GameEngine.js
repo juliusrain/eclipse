@@ -1,6 +1,6 @@
 // Game Engine
 function GameEngine() {
-
+//
     this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
     this.solarSystem = 0;
     this.planet = ROCK_PLANET;
