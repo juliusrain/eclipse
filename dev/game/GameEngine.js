@@ -3,7 +3,7 @@ function GameEngine() {
 
     this.gameID = 0;// = <?php echo $number; ?>;//get from game maker?
     this.solarSystem = 0;
-    this.planet = GAS_GIANT;
+    this.planet = ROCK_PLANET;
 
     this.player_state = null;
 
