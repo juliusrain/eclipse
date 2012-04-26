@@ -84,7 +84,7 @@ AI.prototype.react = function() {
                 if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout === 0) {
                    
                    
-                        console.log(i + ": " + sceneElements.AIShips[i].gameParameters.dir_timeout);
+                        //console.log(i + ": " + sceneElements.AIShips[i].gameParameters.dir_timeout);
                         //if (sceneElements.AIShips[i].gameParameters.dir_timeout === 0){
                         
                             
@@ -129,7 +129,7 @@ AI.prototype.react = function() {
                 sceneElements.AIShips[i].translateZ(-AIship_speed);
             }
             else {
-                console.log("bfdbf");
+                //console.log("bfdbf");
             sceneElements.AIShips[i].turn(sceneElements.AIShips[i].gameParameters.origin.x, sceneElements.AIShips[i].gameParameters.origin.y, sceneElements.AIShips[i].gameParameters.origin.z);
             sceneElements.AIShips[i].translateZ(-AIship_speed);     
            

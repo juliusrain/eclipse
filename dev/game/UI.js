@@ -30,13 +30,13 @@ $(window).keypress(function (e){
             }
             break;
         }
-		// q = medium jump
-		case 113: {
-			if(!chatfocus) {
-				medJump();
-			}
-			break;
-		}
+        // q = medium jump
+        case 113: {
+            if(!chatfocus) {
+                medJump();
+            }
+            break;
+        }
         // l = bind/unbind cursor
         case 108: {
             if(!$('#jumpamapbox:visible').length && !chatfocus) {
@@ -150,7 +150,7 @@ function toggleCursor() {
 }
 
 function medJump() {
-	gameEngine.mediumJump();
+    gameEngine.mediumJump();
 }
 
 

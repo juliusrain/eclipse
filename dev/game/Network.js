@@ -83,12 +83,16 @@ Network.prototype.displayChat = function (sender, body) {
     node.slideDown(100, function (){$('#chatmessages').scrollTop($('#chatmessages').height()*1000)});
 }
 
-Network.prototype.broadcast = function (body) {
+Network.prototype.broadcast = function (body, duration) {
+    var duration = typeof duration == "number" ? duration : 5000;
     var broadcastBox = $("#broadcastBox");
     var node = $("<div>");
     node.text(body.message);
+    if(body.hasOwnProperty("message") && body.message.indexOf("WARNING!") === 0) {
+        node.html('<span style="color:red;">' + node.text() + '</span>');
+    }
     broadcastBox.append(node);
-    node.fadeOut(2000, function () {
+    node.fadeOut(duration, function () {
         node.remove()
     });
 }
