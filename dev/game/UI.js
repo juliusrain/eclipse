@@ -30,6 +30,12 @@ $(window).keypress(function (e){
             }
             break;
         }
+        // h = help
+        case 104: {
+            if(!chatfocus) {
+                toggleHelp();
+            }
+        }
         // q = medium jump
         case 113: {
             if(!chatfocus) {
@@ -122,6 +128,16 @@ function toggleJumpMap() {
         graphicsEngine.toggleCursor(true);
         graphicsEngine.jumpmap.setVisible(true);
         $('#jumpmapcontrol').addClass('on');
+    }
+}
+
+function toggleHelp() {
+    if($('#helpcontrol').hasClass('on')) {
+        $('#helpbox').hide();
+        $('#helpcontrol').removeClass('on');
+    } else {
+        $('#helpbox').show();
+        $('#helpcontrol').addClass('on');
     }
 }
 
