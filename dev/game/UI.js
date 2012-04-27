@@ -9,6 +9,7 @@ $(window).resize(sizeGame);
 $('#jumpmapcontrol').click(toggleJumpMap);
 $('#mouselockcontrol').click(toggleCursor);
 $('#medjumpcontrol').click(medJump);
+$('#helpcontrol').click(toggleHelp);
 $('#chatcontrol').click(toggleChat);
 $('#chatcompose').focus(function (){
     $('#chatcontrol').addClass('on');
@@ -23,6 +24,7 @@ $('#chatcompose').blur(function (){
 var mode = window.location.hash;
 if(!mode.match('#multi')) {
     $('#chatcontainer').remove();
+    $('#chatcontrol').hide();
 }
 
 // keyboard events
@@ -41,6 +43,7 @@ $(window).keypress(function (e){
             if(!chatfocus) {
                 toggleHelp();
             }
+            break;
         }
         // q = medium jump
         case 113: {
@@ -53,7 +56,7 @@ $(window).keypress(function (e){
         case 108: {
             if(!$('#jumpamapbox:visible').length && !chatfocus) {
                 toggleCursor();
-            } 
+            }
             break;
         }
         // t = auto repair

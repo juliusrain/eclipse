@@ -76,82 +76,82 @@ GameEngine.prototype.first = function () {
 
 // Death Clause for Player Ship
 GameEngine.prototype.die = function (){
-    sceneElements.mainShip.gameParameters.health = 0;
-    graphicsEngine.addExplosionLarge(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
-    this.logicwait = -1;
-    // transmit message to network
-    if(this.playerMode === "multi" && network.ws.readyState === 1) {
-        var message = {action:'pos', body:{}};
-        // pid
-        message.body.pid = this.planet;
-        // net id
-        message.body.nid = this.nid;
-        // name
-        message.body.pname = this.playerName;
-        // health
-        message.body.health = sceneElements.mainShip.gameParameters.health;
-        // positon
-        message.body.x = round2(sceneElements.mainShip.position.x);
-        message.body.y = round2(sceneElements.mainShip.position.y);
-        message.body.z = round2(sceneElements.mainShip.position.z);
-        // rotation
-        message.body.quat = {};
-        message.body.quat.w = sceneElements.mainShip.quaternion.w;
-        message.body.quat.x = sceneElements.mainShip.quaternion.x;
-        message.body.quat.y = sceneElements.mainShip.quaternion.y;
-        message.body.quat.z = sceneElements.mainShip.quaternion.z;
-        // shooting
-        message.body.dead = true;
-        //console.log(JSON.stringify(message));
-        network.send(message);
-    }
     if(!this.playerDead) {
         this.playerDead = true;
-        alert("YOU HAVE DIED.");
-    }
-    // reset everything
-    // health + game parameters
-    $.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
-    // new position
-    graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
-    graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
-    graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
-    // restore resources (if there aren't enough)
-    for(var r in this.resources) {
-        if(this.resources[r] < 1000) {
-            this.resources[r] = 1000;
+        sceneElements.mainShip.gameParameters.health = 0;
+        graphicsEngine.addExplosionLarge(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
+        this.logicwait = -1;
+        // transmit message to network
+        if(this.playerMode === "multi" && network.ws.readyState === 1) {
+            var message = {action:'pos', body:{}};
+            // pid
+            message.body.pid = this.planet;
+            // net id
+            message.body.nid = this.nid;
+            // name
+            message.body.pname = this.playerName;
+            // health
+            message.body.health = sceneElements.mainShip.gameParameters.health;
+            // positon
+            message.body.x = round2(sceneElements.mainShip.position.x);
+            message.body.y = round2(sceneElements.mainShip.position.y);
+            message.body.z = round2(sceneElements.mainShip.position.z);
+            // rotation
+            message.body.quat = {};
+            message.body.quat.w = sceneElements.mainShip.quaternion.w;
+            message.body.quat.x = sceneElements.mainShip.quaternion.x;
+            message.body.quat.y = sceneElements.mainShip.quaternion.y;
+            message.body.quat.z = sceneElements.mainShip.quaternion.z;
+            // shooting
+            message.body.dead = true;
+            //console.log(JSON.stringify(message));
+            network.send(message);
         }
+        alert("YOU HAVE DIED.");
+        // reset everything
+        // health + game parameters
+        $.extend(true, sceneElements.mainShip.gameParameters, playerShip.gameParameters);
+        // new position
+        graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
+        graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
+        graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
+        // restore resources (if there aren't enough)
+        for(var r in this.resources) {
+            if(this.resources[r] < 1000) {
+                this.resources[r] = 1000;
+            }
+        }
+        // resume
+        this.logicwait = 0;
+        // send the respawn signal
+        if(this.playerMode === "multi" && network.ws.readyState === 1) {
+            var message = {action:'pos', body:{}};
+            // pid
+            message.body.pid = this.planet;
+            // net id
+            message.body.nid = this.nid;
+            // name
+            message.body.pname = this.playerName;
+            // health
+            message.body.health = sceneElements.mainShip.gameParameters.health;
+            // positon
+            message.body.x = round2(sceneElements.mainShip.position.x);
+            message.body.y = round2(sceneElements.mainShip.position.y);
+            message.body.z = round2(sceneElements.mainShip.position.z);
+            // rotation
+            message.body.quat = {};
+            message.body.quat.w = sceneElements.mainShip.quaternion.w;
+            message.body.quat.x = sceneElements.mainShip.quaternion.x;
+            message.body.quat.y = sceneElements.mainShip.quaternion.y;
+            message.body.quat.z = sceneElements.mainShip.quaternion.z;
+            // shooting
+            shooting = false;
+            message.body.respawn = true;
+            //console.log(JSON.stringify(message));
+            network.send(message);
+        }
+        this.playerDead = false;
     }
-    // resume
-    this.logicwait = 0;
-    // send the respawn signal
-    if(this.playerMode === "multi" && network.ws.readyState === 1) {
-        var message = {action:'pos', body:{}};
-        // pid
-        message.body.pid = this.planet;
-        // net id
-        message.body.nid = this.nid;
-        // name
-        message.body.pname = this.playerName;
-        // health
-        message.body.health = sceneElements.mainShip.gameParameters.health;
-        // positon
-        message.body.x = round2(sceneElements.mainShip.position.x);
-        message.body.y = round2(sceneElements.mainShip.position.y);
-        message.body.z = round2(sceneElements.mainShip.position.z);
-        // rotation
-        message.body.quat = {};
-        message.body.quat.w = sceneElements.mainShip.quaternion.w;
-        message.body.quat.x = sceneElements.mainShip.quaternion.x;
-        message.body.quat.y = sceneElements.mainShip.quaternion.y;
-        message.body.quat.z = sceneElements.mainShip.quaternion.z;
-        // shooting
-        shooting = false;
-        message.body.respawn = true;
-        //console.log(JSON.stringify(message));
-        network.send(message);
-    }
-    this.playerDead = false;
 };
 
 // Death Clause for AI or net Ships
@@ -454,6 +454,7 @@ GameEngine.prototype.updateCollisions = function() {
             }
             else if(colls[c].obj === sceneElements.mainShip) {
                 graphicsEngine.gameplay_camera.translateZ(10);
+                network.broadcast({message:"WARNING! You hit an enemy ship!"});
                 var q = new THREE.Quaternion();
                 q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
                 graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
@@ -470,6 +471,14 @@ GameEngine.prototype.updateCollisions = function() {
             if(colls[c].obj.hasOwnProperty('fired')) {
                 // hit by a laser!
                 this.laserHit(sceneElements.netShips[s], colls[c]);
+            }
+            else if(colls[c].obj === sceneElements.mainShip) {
+                graphicsEngine.gameplay_camera.translateZ(10);
+                network.broadcast({message:"WARNING! You hit an enemy ship!"});
+                var q = new THREE.Quaternion();
+                q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
+                graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
+                sceneElements.mainShip.gameParameters.health -= 300;
             }
         }
     }
@@ -488,11 +497,15 @@ GameEngine.prototype.updateCollisions = function() {
                 }
                 else if(colls[c].obj === sceneElements.mainShip) {
                     console.log('asteroid bump');
+                    network.broadcast({message:"WARNING! You hit an asteroid and died!"});
+                    this.die();
+                    /*
                     graphicsEngine.gameplay_camera.translateZ(10);
                     var q = new THREE.Quaternion();
                     q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
                     graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
                     sceneElements.mainShip.gameParameters.health -= 500;
+                    */
                 }
             }
         }
@@ -659,6 +672,9 @@ GameEngine.prototype.mine = function (target) {
     var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
     // if target is out of range
     if(actualDistance > this.miningRange) {
+        if(this.miningStatus === 2) {
+            network.broadcast({message:"You have successfully mined resources."});
+        }
         this.miningStatus = 0;
         this.miningTarget = null;
         target.mineProg = 0;
@@ -702,6 +718,7 @@ GameEngine.prototype.mine = function (target) {
             target.mineProg = 0;
             this.miningStatus = 0;
             $('#miningaction div').html('Done.');
+            network.broadcast({message:"You have successfully mined resources."});
             $('#miningprogress').hide();
             this.miningTimeout = 100;
         }
@@ -729,6 +746,9 @@ GameEngine.prototype.mediumJump = function () {
         console.log('med. jump success');
         graphicsEngine.gameplay_camera.translateZ(-5000);
         sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.medJumpCost;
+    }
+    else {
+        network.broadcast({message: "WARNING! Not enough engine charge to make the jump."});
     }
 };
 
@@ -760,11 +780,10 @@ GameEngine.prototype.netUpdate = function (message) {
                     if(message.hasOwnProperty('dead') && message.dead) {
                         this.kill(sceneElements.netShips[ns]);
                     }
-                    if(message.hasOwnProperty('respawn') && message.respawn) {
-                        var rem = this.netShipsAdded.indexOf(message.nid);
-                        if(rem != -1) {
-                            this.netShipsAdded.splice(rem, 1);
-                        }
+                    // remove nid from netShipsAdded
+                    var rem = this.netShipsAdded.indexOf(message.nid);
+                    if(rem != -1) {
+                        this.netShipsAdded.splice(rem, 1);
                     }
                     break;
                 }
@@ -778,6 +797,7 @@ GameEngine.prototype.netUpdate = function (message) {
                 nets.drawParameters.position.y = message.y;
                 nets.drawParameters.position.z = message.z;
                 graphicsEngine.addGameObject(nets);
+                // add nid to netShipsAdded (to prevent multiple creations)
                 this.netShipsAdded.push(message.nid);
             }
         }
