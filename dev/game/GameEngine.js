@@ -198,7 +198,7 @@ GameEngine.prototype.nextWave = function () {
         }
         else{
             this.nextWaveWait--;
-            if(this.nextWaveWait === 10) {
+            if(this.nextWaveWait === 75) {
                 network.broadcast({message:"WARNING! A wave of enemy ships is approaching!"});
             }
         }
@@ -219,7 +219,7 @@ GameEngine.prototype.jump = function (ssid, pid){
         this.load(ssid, pid);
     }
     else {
-        network.broadcast({body: "Not enough engine charge to make the jump."});
+        network.broadcast({message: "WARNING! Not enough engine charge to make the jump."});
     }
     toggleJumpMap();
 };
@@ -612,15 +612,17 @@ GameEngine.prototype.update = function () {
 // checks if the player is in range, then scans, then collects resources
 GameEngine.prototype.mineAsteroids = function () {
     var min = null, dist = Infinity;
-    for(var a in sceneElements.env_objects[0].children) {
-        var xd = sceneElements.mainShip.position.x - sceneElements.env_objects[0].children[a].position.x,
-            yd = sceneElements.mainShip.position.y - sceneElements.env_objects[0].children[a].position.y,
-            zd = sceneElements.mainShip.position.z - sceneElements.env_objects[0].children[a].position.z;
-        var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
-        // asteroid is in range and closer than all others [already checked]
-        if(actualDistance <= this.miningRange && actualDistance < dist) {
-            min = sceneElements.env_objects[0].children[a];
-            dist = actualDistance;
+    if(typeof sceneElements.env_objects[0] == "object") {
+        for(var a in sceneElements.env_objects[0].children) {
+            var xd = sceneElements.mainShip.position.x - sceneElements.env_objects[0].children[a].position.x,
+                yd = sceneElements.mainShip.position.y - sceneElements.env_objects[0].children[a].position.y,
+                zd = sceneElements.mainShip.position.z - sceneElements.env_objects[0].children[a].position.z;
+            var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
+            // asteroid is in range and closer than all others [already checked]
+            if(actualDistance <= this.miningRange && actualDistance < dist) {
+                min = sceneElements.env_objects[0].children[a];
+                dist = actualDistance;
+            }
         }
     }
     if(min) {
