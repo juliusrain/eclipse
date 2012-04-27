@@ -19,6 +19,12 @@ $('#chatcompose').blur(function (){
     chatfocus = false;
 });
 
+// remove chatbox for single user
+var mode = window.location.hash;
+if(!mode.match('#multi')) {
+    $('#chatcontainer').remove();
+}
+
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
@@ -30,13 +36,19 @@ $(window).keypress(function (e){
             }
             break;
         }
-		// q = medium jump
-		case 113: {
-			if(!chatfocus) {
-				medJump();
-			}
-			break;
-		}
+        // h = help
+        case 104: {
+            if(!chatfocus) {
+                toggleHelp();
+            }
+        }
+        // q = medium jump
+        case 113: {
+            if(!chatfocus) {
+                medJump();
+            }
+            break;
+        }
         // l = bind/unbind cursor
         case 108: {
             if(!$('#jumpamapbox:visible').length && !chatfocus) {
@@ -125,6 +137,16 @@ function toggleJumpMap() {
     }
 }
 
+function toggleHelp() {
+    if($('#helpcontrol').hasClass('on')) {
+        $('#helpbox').hide();
+        $('#helpcontrol').removeClass('on');
+    } else {
+        $('#helpbox').show();
+        $('#helpcontrol').addClass('on');
+    }
+}
+
 function toggleAutoRepair() {
     if($('#autorepaircontrol').hasClass("on")){
         // auto repair is now off, turn it on
@@ -150,7 +172,7 @@ function toggleCursor() {
 }
 
 function medJump() {
-	gameEngine.mediumJump();
+    gameEngine.mediumJump();
 }
 
 

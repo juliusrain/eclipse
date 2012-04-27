@@ -23,14 +23,19 @@ function GameEngine() {
     }
 
     this.resources = {
-        food:10000,
-        fuel:10000,
-        metals:10000,
+        food:5000,
+        fuel:5000,
+        metals:5000,
     };
-	this.miningStatus = 0;
-	this.miningTimeout = 0;
-	this.miningRange = 20000;
-	this.autoMining = true;
+    this.rwarnings = {
+        food:0,
+        fuel:0,
+        metals:0,
+    };
+    this.miningStatus = 0;
+    this.miningTimeout = 0;
+    this.miningRange = 20000;
+    this.autoMining = true;
     this.stage = 0;
     this.autorepair = true;
     this.timeouts = {
@@ -77,12 +82,12 @@ GameEngine.prototype.die = function (){
     // transmit message to network
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
-		// pid
-		message.body.pid = this.planet;
+        // pid
+        message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
-		// name
-		message.body.pname = this.playerName;
+        // name
+        message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -111,17 +116,23 @@ GameEngine.prototype.die = function (){
     graphicsEngine.gameplay_camera.position.x = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.y = Math.random()*10000-5000;
     graphicsEngine.gameplay_camera.position.z = Math.random()*10000-5000;
+    // restore resources (if there aren't enough)
+    for(var r in this.resources) {
+        if(this.resources[r] < 1000) {
+            this.resources[r] = 1000;
+        }
+    }
     // resume
     this.logicwait = 0;
     // send the respawn signal
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
-		// pid
-		message.body.pid = this.planet;
+        // pid
+        message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
-		// name
-		message.body.pname = this.playerName;
+        // name
+        message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -158,56 +169,59 @@ GameEngine.prototype.kill = function (victim){
 
 // Check for remaining AIs, spawn more
 GameEngine.prototype.nextWave = function () {
-	// if there are no more AIs
-	if(!sceneElements.AIShips.length) {
-		if(!this.nextWaveWait) {
-			//respawn more AIs
-			this.numAI++;
-			for(var i = 0; i < this.numAI; i++) {
-				var newAI = {};
-				if(Math.round(Math.random())) {
-					newAI = $.extend(true, {}, AIShip);
-				}
-				else {
-					newAI = $.extend(true, {}, AIShip2);
-				}
-				newAI.gameParameters.health = 1000;
-				newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
-				newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
-				newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
-				newAI.gameParameters.origin.x = Math.random() * 3000 - 1500;
-				newAI.gameParameters.origin.y = Math.random() * 3000 - 1500;
-				newAI.gameParameters.origin.z = Math.random() * 3000 - 1500;
-				newAI.gameParameters.dummy_target.x = Math.random() * 3000 - 1500;
-				newAI.gameParameters.dummy_target.y = Math.random() * 3000 - 1500;
-				newAI.gameParameters.dummy_target.z = Math.random() * 3000 - 1500;
-				graphicsEngine.addGameObject(newAI);
-			}
-			this.nextWaveWait = 20;
-		}
-		else{
-			this.nextWaveWait--;
-		}
-	}
+    // if there are no more AIs
+    if(!sceneElements.AIShips.length) {
+        if(!this.nextWaveWait) {
+            //respawn more AIs
+            this.numAI++;
+            for(var i = 0; i < this.numAI; i++) {
+                var newAI = {};
+                if(Math.round(Math.random())) {
+                    newAI = $.extend(true, {}, AIShip);
+                }
+                else {
+                    newAI = $.extend(true, {}, AIShip2);
+                }
+                newAI.gameParameters.health = 1000;
+                newAI.drawParameters.position.x = Math.random() * 3000 - 1500;
+                newAI.drawParameters.position.y = Math.random() * 3000 - 1500;
+                newAI.drawParameters.position.z = Math.random() * 3000 - 1500;
+                newAI.gameParameters.origin.x = Math.random() * 3000 - 1500;
+                newAI.gameParameters.origin.y = Math.random() * 3000 - 1500;
+                newAI.gameParameters.origin.z = Math.random() * 3000 - 1500;
+                newAI.gameParameters.dummy_target.x = Math.random() * 3000 - 1500;
+                newAI.gameParameters.dummy_target.y = Math.random() * 3000 - 1500;
+                newAI.gameParameters.dummy_target.z = Math.random() * 3000 - 1500;
+                graphicsEngine.addGameObject(newAI);
+            }
+            this.nextWaveWait = 200;
+        }
+        else{
+            this.nextWaveWait--;
+            if(this.nextWaveWait === 75) {
+                network.broadcast({message:"WARNING! A wave of enemy ships is approaching!"});
+            }
+        }
+    }
 };
 
 
 //Jump function
 GameEngine.prototype.jump = function (ssid, pid){
-	if(sceneElements.mainShip.gameParameters.engine.currentCharge >= sceneElements.mainShip.gameParameters.engine.longJumpCost) {
-		sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.longJumpCost;
-	    this.solarSystem = ssid;
-	    this.planet = pid;
-	    network.disconnect();
-	    graphicsEngine.deleteScene();
-	//    graphicsEngine.stopEngine();
-	//    this.save();
-	    this.load(ssid, pid);
-	}
-	else {
-		network.broadcast({body: "Not enough engine charge to make the jump."});
-	}
-	toggleJumpMap();
+    if(sceneElements.mainShip.gameParameters.engine.currentCharge >= sceneElements.mainShip.gameParameters.engine.longJumpCost) {
+        sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.longJumpCost;
+        this.solarSystem = ssid;
+        this.planet = pid;
+        network.disconnect();
+        graphicsEngine.deleteScene();
+    //    graphicsEngine.stopEngine();
+    //    this.save();
+        this.load(ssid, pid);
+    }
+    else {
+        network.broadcast({message: "WARNING! Not enough engine charge to make the jump."});
+    }
+    toggleJumpMap();
 };
 
 // GameEngine save function
@@ -299,13 +313,16 @@ GameEngine.prototype.updateResources = function () {
     var engine = ship.engine;
     if(engine.currentCharge < 100){
         // recharge engines
-        if(this.resources.fuel >= engine.rechargeCost){
+        if(this.resources.fuel >= engine.rechargeCost) {
             // player can afford to charge
             this.resources.fuel -= engine.rechargeCost;
             engine.currentCharge += engine.rechargeRate;
             if(engine.currentCharge > 100){
                 engine.currentCharge = 100;
             }
+        }
+        else /*if(!this.rwarnings.fuel)*/ {
+            network.broadcast("WARNING! You do not have enough fuel to recharge your engines.");
         }
     }
     // eat food!
@@ -320,6 +337,32 @@ GameEngine.prototype.updateResources = function () {
     }
     else{
         this.timeouts.food--;
+    }
+    // produce low resources warning message
+    for(var r in this.resources) {
+        if(this.rwarnings[r] > 0) {
+            // remove warning if it got one and it went back up
+            if(this.resources[r] > 500) {
+                this.rwarnings[r] = 0;
+            }
+            // decrement towards another warning message
+            else {
+                this.rwarnings[r]--;
+            }
+        }
+        else {
+            // give warning if a resource dips too low
+            if(this.resources[r] === 0) {
+                this.rwarnings[r] = 100;
+                network.broadcast({message:"WARNING! YOU ARE OUT OF " + r.toUpperCase() + "!"});
+                network.broadcast({message:"Try mining an asteroid for resources."});
+            }
+            else if(this.resources[r] < 500) {
+                this.rwarnings[r] = 100;
+                network.broadcast({message:"WARNING! YOU ARE LOW ON " + r.toUpperCase() + "!"});
+                network.broadcast({message:"Try mining an asteroid for resources."});
+            }
+        }
     }
 };
 
@@ -343,41 +386,43 @@ GameEngine.prototype.updateVitalsInfo = function () {
 };
 
 GameEngine.prototype.laserHit = function(target, hit) {
-    // trigger explosion
-    graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
-    // reset lasers
-    hit.obj.hit = true;
-    if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
-        var damage = hit.obj.damage;
-        if(target.gameParameters.health - damage < 0) {
-            //alert("~~~~~~~DEATH~~~~~~~~");
-            if(target === sceneElements.mainShip) {
-                var killer = "an AI ship.";
-                var victim;
-				if(this.playerName) {
-					victim = this.playerName;
-				}
-				else {
-					victim = "Player " + this.nid;
-				}
-                sceneElements.netShips.forEach(function (ship) {
-					if (ship.objectID==hit.obj.parentID) {
-						if (hit.obj.parent.parentShip.gameParameters.pname) {
-							killer = hit.obj.parent.parentShip.gameParameters.pname;
-						}
-						else {
-							killer = "Player " + hit.obj.parent.parentShip.gameParameters.nid;
-						}
-					}
-				});
-                network.send({"sender":victim, "action":"broad", body:{"message":victim+" was killed by "+killer}});
-                console.log(hit);
+    if(typeof target === "object") {
+        // trigger explosion
+        graphicsEngine.addExplosionSmall(target.position.x + hit.where.x, target.position.y + hit.where.y, target.position.z + hit.where.z);
+        // reset lasers
+        hit.obj.hit = true;
+        if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
+            var damage = hit.obj.damage;
+            if(target.gameParameters.health - damage < 0) {
+                //alert("~~~~~~~DEATH~~~~~~~~");
+                if(target === sceneElements.mainShip) {
+                    var killer = "an AI ship.";
+                    var victim;
+                    if(this.playerName) {
+                        victim = this.playerName;
+                    }
+                    else {
+                        victim = "Player " + this.nid;
+                    }
+                    sceneElements.netShips.forEach(function (ship) {
+                        if (ship.objectID==hit.obj.parentID) {
+                            if (hit.obj.parent.parentShip.gameParameters.pname) {
+                                killer = hit.obj.parent.parentShip.gameParameters.pname;
+                            }
+                            else {
+                                killer = "Player " + hit.obj.parent.parentShip.gameParameters.nid;
+                            }
+                        }
+                    });
+                    network.send({"sender":victim, "action":"broad", body:{"message":victim+" was killed by "+killer}});
+                    console.log(hit);
+                }
+                else if(sceneElements.AIShips.indexOf(target) !== -1) {
+                    this.kill(target);
+                }
             }
-            else if(sceneElements.AIShips.indexOf(target) !== -1) {
-                this.kill(target);
-            }
+            target.gameParameters.health -= hit.obj.damage;
         }
-        target.gameParameters.health -= hit.obj.damage;
     }
 };
 
@@ -394,8 +439,8 @@ GameEngine.prototype.updateCollisions = function() {
         else {
             console.log('hit by something else!!!');
             //graphicsEngine.gameplay_camera.quaternion.setFromEuler();
-            graphicsEngine.gameplay_camera.translate(100);
-            sceneElements.mainShip.gameParameters.health -= 200;
+            //graphicsEngine.gameplay_camera.translate(100);
+            //sceneElements.mainShip.gameParameters.health -= 200;
         }
     }
     // collisions with AI ships
@@ -407,13 +452,14 @@ GameEngine.prototype.updateCollisions = function() {
                 // hit by a laser!
                 this.laserHit(sceneElements.AIShips[s], colls[c]);
             }
-			else if(colls[c].obj === sceneElements.mainShip) {
-				graphicsEngine.gameplay_camera.translateZ(10);
-				var q = new THREE.Quaternion();
-				q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
-				graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
-				sceneElements.mainShip.gameParameters.health -= 500;
-			}
+            else if(colls[c].obj === sceneElements.mainShip) {
+                graphicsEngine.gameplay_camera.translateZ(10);
+                var q = new THREE.Quaternion();
+                q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
+                graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
+                sceneElements.mainShip.gameParameters.health -= 300;
+                sceneElements.AIShips[s].gameParameters.health -= 200;
+            }
         }
     }
     // collisions with net ships
@@ -440,14 +486,14 @@ GameEngine.prototype.updateCollisions = function() {
                     // hit by a laser!
                     this.laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
                 }
-				else if(colls[c].obj === sceneElements.mainShip) {
-					console.log('asteroid bump');
-					graphicsEngine.gameplay_camera.translateZ(10);
-					var q = new THREE.Quaternion();
-					q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
-					graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
-					sceneElements.mainShip.gameParameters.health -= 500;
-				}
+                else if(colls[c].obj === sceneElements.mainShip) {
+                    console.log('asteroid bump');
+                    graphicsEngine.gameplay_camera.translateZ(10);
+                    var q = new THREE.Quaternion();
+                    q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
+                    graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
+                    sceneElements.mainShip.gameParameters.health -= 500;
+                }
             }
         }
     }
@@ -466,12 +512,12 @@ GameEngine.prototype.update = function () {
     // transmit message to network
     if(this.playerMode === "multi" && network.ws.readyState === 1) {
         var message = {action:'pos', body:{}};
-		// pid
-		message.body.pid = this.planet;
+        // pid
+        message.body.pid = this.planet;
         // net id
         message.body.nid = this.nid;
-		// name
-		message.body.pname = this.playerName;
+        // name
+        message.body.pname = this.playerName;
         // health
         message.body.health = sceneElements.mainShip.gameParameters.health;
         // positon
@@ -525,24 +571,24 @@ GameEngine.prototype.update = function () {
             }
         }
 
-		// mining
-		if(!this.miningTimeout) {
-			this.miningTimeout = 2;
-			if(this.miningStatus) {
-				this.mine(this.miningTarget);
-			}
-			else {
-				this.mineAsteroids();
-			}
-		}
-		else {
-			this.miningTimeout--;
-		}
+        // mining
+        if(!this.miningTimeout) {
+            this.miningTimeout = 2;
+            if(this.miningStatus) {
+                this.mine(this.miningTarget);
+            }
+            else {
+                this.mineAsteroids();
+            }
+        }
+        else {
+            this.miningTimeout--;
+        }
 
-		// shoot weapon
-		if(shooting) {
-			this.fireWeapon();
-		}
+        // shoot weapon
+        if(shooting) {
+            this.fireWeapon();
+        }
 
         if(this.playerMode === "single") {
             this.nextWave();
@@ -565,39 +611,41 @@ GameEngine.prototype.update = function () {
 
 // checks if the player is in range, then scans, then collects resources
 GameEngine.prototype.mineAsteroids = function () {
-	var min = null, dist = Infinity;
-	for(var a in sceneElements.env_objects[0].children) {
-		var xd = sceneElements.mainShip.position.x - sceneElements.env_objects[0].children[a].position.x,
-			yd = sceneElements.mainShip.position.y - sceneElements.env_objects[0].children[a].position.y,
-			zd = sceneElements.mainShip.position.z - sceneElements.env_objects[0].children[a].position.z;
-	    var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
-		// asteroid is in range and closer than all others [already checked]
-		if(actualDistance <= this.miningRange && actualDistance < dist) {
-			min = sceneElements.env_objects[0].children[a];
-			dist = actualDistance;
-		}
-	}
-	if(min) {
-		this.mine(min);
-	}
+    var min = null, dist = Infinity;
+    if(typeof sceneElements.env_objects[0] == "object") {
+        for(var a in sceneElements.env_objects[0].children) {
+            var xd = sceneElements.mainShip.position.x - sceneElements.env_objects[0].children[a].position.x,
+                yd = sceneElements.mainShip.position.y - sceneElements.env_objects[0].children[a].position.y,
+                zd = sceneElements.mainShip.position.z - sceneElements.env_objects[0].children[a].position.z;
+            var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
+            // asteroid is in range and closer than all others [already checked]
+            if(actualDistance <= this.miningRange && actualDistance < dist) {
+                min = sceneElements.env_objects[0].children[a];
+                dist = actualDistance;
+            }
+        }
+    }
+    if(min) {
+        this.mine(min);
+    }
 };
 
 function scanvals(type) {
-	var type = typeof type == "undefined" ? 0 : type;
-	var weights = {food:20, fuel:30};
-	switch(type) {
-		case 1:
-			weights = {food:50, fuel:10};
-			break;
-		case 2:
-			weights = {food:10, fuel:60};
-			break;
-	}
-	var vals = {};
-	vals.food = Math.round(Math.random()*10 - 5) + weights.food;
-	vals.fuel = Math.round(Math.random()*10 - 5) + weights.fuel;
-	vals.metal = 100 - (vals.food + vals.fuel);
-	return vals;
+    var type = typeof type == "undefined" ? 0 : type;
+    var weights = {food:20, fuel:30};
+    switch(type) {
+        case 1:
+            weights = {food:50, fuel:10};
+            break;
+        case 2:
+            weights = {food:10, fuel:60};
+            break;
+    }
+    var vals = {};
+    vals.food = Math.round(Math.random()*10 - 5) + weights.food;
+    vals.fuel = Math.round(Math.random()*10 - 5) + weights.fuel;
+    vals.metal = 100 - (vals.food + vals.fuel);
+    return vals;
 }
 
 
@@ -605,59 +653,59 @@ function scanvals(type) {
 // called upon user command
 // Scans, then collects resources
 GameEngine.prototype.mine = function (target) {
-	var xd = sceneElements.mainShip.position.x - target.position.x,
-		yd = sceneElements.mainShip.position.y - target.position.y,
-		zd = sceneElements.mainShip.position.z - target.position.z;
-	var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
-	// if target is out of range
-	if(actualDistance > this.miningRange) {
-		this.miningStatus = 0;
-		this.miningTarget = null;
-		target.mineProg = 0;
-		$('#miningprogress').hide();
-		return;
-	}
-	// if not mining, start scanning
-	if(this.miningStatus === 0) {
-		this.miningStatus = 1;
-		this.miningTarget = target;
-		target.mineProg = 0;
-		$('#miningbarinner').css('width', target.mineProg + '%');
-		$('#miningaction div').html('Scanning...');
-		$('#miningprogress').show();
-	}
-	// if scanning
-	else if(this.miningStatus === 1) {
-		target.mineWeights = scanvals(0);
-		$('#miningfood div').html(target.mineWeights.food + '%');
-		$('#miningfuel div').html(target.mineWeights.fuel + '%');
-		$('#miningmetal div').html(target.mineWeights.metal + '%');
-		target.mineProg++;
-		// if done scanning
-		if(target.mineProg >= 100) {
-			target.mineProg = 0;
-			this.miningStatus = 2;
-			target.mineVals = {food:0, fuel:0, metal:0};
-			$('#miningaction div').html('Mining Resources...');
-		}
-		$('#miningbarinner').css('width', target.mineProg + '%');
-	}
-	// if mining
-	else if(this.miningStatus === 2) {
-		this.resources.food += Math.round(target.mineWeights.food * Math.random());
-		this.resources.fuel += Math.round(target.mineWeights.fuel * Math.random());
-		this.resources.metals += Math.round(target.mineWeights.metal * Math.random());
-		target.mineProg++;
-		$('#miningbarinner').css('width', target.mineProg + '%');
-		// if done mining
-		if(target.mineProg >= 100) {
-			target.mineProg = 0;
-			this.miningStatus = 0;
-			$('#miningaction div').html('Done.');
-			$('#miningprogress').hide();
-			this.miningTimeout = 20;
-		}
-	}
+    var xd = sceneElements.mainShip.position.x - target.position.x,
+        yd = sceneElements.mainShip.position.y - target.position.y,
+        zd = sceneElements.mainShip.position.z - target.position.z;
+    var actualDistance = (xd * xd) + (yd * yd) + (zd * zd);
+    // if target is out of range
+    if(actualDistance > this.miningRange) {
+        this.miningStatus = 0;
+        this.miningTarget = null;
+        target.mineProg = 0;
+        $('#miningprogress').hide();
+        return;
+    }
+    // if not mining, start scanning
+    if(this.miningStatus === 0) {
+        this.miningStatus = 1;
+        this.miningTarget = target;
+        target.mineProg = 0;
+        $('#miningbarinner').css('width', target.mineProg + '%');
+        $('#miningaction div').html('Scanning...');
+        $('#miningprogress').show();
+    }
+    // if scanning
+    else if(this.miningStatus === 1) {
+        target.mineWeights = scanvals(0);
+        $('#miningfood div').html(target.mineWeights.food + '%');
+        $('#miningfuel div').html(target.mineWeights.fuel + '%');
+        $('#miningmetal div').html(target.mineWeights.metal + '%');
+        target.mineProg++;
+        // if done scanning
+        if(target.mineProg >= 100) {
+            target.mineProg = 0;
+            this.miningStatus = 2;
+            target.mineVals = {food:0, fuel:0, metal:0};
+            $('#miningaction div').html('Mining Resources...');
+        }
+        $('#miningbarinner').css('width', target.mineProg + '%');
+    }
+    // if mining
+    else if(this.miningStatus === 2) {
+        this.resources.food += Math.round(target.mineWeights.food * Math.random());
+        this.resources.fuel += Math.round(target.mineWeights.fuel * Math.random());
+        this.resources.metals += Math.round(target.mineWeights.metal * Math.random());
+        target.mineProg++;
+        $('#miningbarinner').css('width', target.mineProg + '%');
+        // if done mining
+        if(target.mineProg >= 100) {
+            target.mineProg = 0;
+            this.miningStatus = 0;
+            $('#miningaction div').html('Done.');
+            $('#miningprogress').hide();
+            this.miningTimeout = 100;
+        }
+    }
 };
 
 // Fire Weapon
@@ -677,11 +725,11 @@ GameEngine.prototype.fireWeapon = function () {
 // called upon user command
 // verifies that a jump can be made, then jumps forward
 GameEngine.prototype.mediumJump = function () {
-	if(sceneElements.mainShip.gameParameters.engine.currentCharge > sceneElements.mainShip.gameParameters.engine.medJumpCost) {
-		console.log('med. jump success');
-		graphicsEngine.gameplay_camera.translateZ(-5000);
-		sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.medJumpCost;
-	}
+    if(sceneElements.mainShip.gameParameters.engine.currentCharge > sceneElements.mainShip.gameParameters.engine.medJumpCost) {
+        console.log('med. jump success');
+        graphicsEngine.gameplay_camera.translateZ(-5000);
+        sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.medJumpCost;
+    }
 };
 
 // Receive Network Update
@@ -689,7 +737,7 @@ GameEngine.prototype.mediumJump = function () {
 GameEngine.prototype.netUpdate = function (message) {
     try {
         // makes sure it's not the player's ship
-		// but that is is the player's planet
+        // but that is is the player's planet
         if(this.playerMode == "multi" && message.nid !== this.nid && message.pid == this.planet) {
             // go through each net ship
             var found = false;
