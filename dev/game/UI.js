@@ -29,7 +29,6 @@ if(!mode.match('#multi')) {
 
 // keyboard events
 $(window).keypress(function (e){
-    //console.log(e);
     switch(e.keyCode) {
         // j = toggle jump map
         case 106: {
@@ -72,22 +71,6 @@ $(window).keypress(function (e){
             return false;
             break;
         }
-        //create explosion (for testing) p
-        case 112: {
-            if(!chatfocus) {
-                //graphicsEngine.addExplosionLarge(50, 0, -100);
-                sceneElements.AIShips[0].fireLaser();
-            }
-            break;
-        }
-        case 111: {
-            if(!chatfocus) {
-                var new_ship = jQuery.extend(true, {}, ship_template);
-                console.log(new_ship);
-                //graphicsEngine.addGameObject(new_ship);
-            }
-            break;
-        }
     }
 });
 $(window).keydown(function (e){
@@ -108,7 +91,6 @@ $(window).keyup(function (e){
 });
 
 $('#chatcompose').keydown(function (e){
-    //console.log(e);
     var chatbox=$("#chatcompose");
     if (e.which == 27) {
         // if user pressed esc, leave chat mode

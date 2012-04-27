@@ -67,7 +67,7 @@ function Jumpmap() {
         return ret;
     }
 
-    
+
     this.container.addEventListener('mousedown', onMouseDown, false);
     this.container.addEventListener('mousemove', onMouseMove, false);
 
@@ -81,7 +81,7 @@ function Jumpmap() {
         self.mouse.y = event.clientY - self.container.offsetTop;
         mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1;
         mouseY = -((event.clientY - self.container.offsetTop) / self.map_height) * 2 + 1;
-      
+
         self.tempVec.set(mouseX, mouseY, 0.5);
         self.projector.unprojectVector(self.tempVec, self.jumpmap_camera);
 
@@ -117,7 +117,7 @@ function Jumpmap() {
         self.mouse.y = event.clientY - self.container.offsetTop;
         mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1,
         mouseY = -((event.clientY - self.container.offsetTop) / self.map_height) * 2 + 1;
-        
+
         self.tempVec.set(mouseX, mouseY, 0.5);
         self.projector.unprojectVector(self.tempVec, self.jumpmap_camera);
 
@@ -169,7 +169,7 @@ function Jumpmap() {
             system.isParent = true;
             this.jumpmap_scene.add(system);
             this.suns.push(system);
-            
+
             //create planets around parent star
             for(var j = 0; j < ss.planets.length; j++) {
                 p = ss.planets[j];
@@ -265,7 +265,7 @@ function Jumpmap() {
             for(var i = 0; i < this.suns.length; i++) {
                 this.suns[i].rotation.y += 0.005;
             }
-                
+
             if(this.show_stats) {
                 this.stats.update();
             }

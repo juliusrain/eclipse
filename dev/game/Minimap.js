@@ -19,7 +19,6 @@ function Minimap(game_controls, game_camera) {
 
     this.minimap_scene = new THREE.Scene();
     this.minimap_camera = new THREE.OrthographicCamera(-halfWidth, halfWidth, halfHeight, -halfHeight, -1000, 1000);
-    //this.minimap_camera = new THREE.PerspectiveCamera(60, this.map_width/this.map_height, 0.1, 1e5);
     this.minimap_scene.add(this.minimap_camera);
 
 
@@ -196,7 +195,7 @@ function Minimap(game_controls, game_camera) {
             this.minimap_texture_scene.remove(minimap_child);
             this.renderer.deallocateObject(minimap_child);
         }
-        
+
         for(i = this.minimap_objects.length - 1; i >= 0; i--) {
             delete this.minimap_objects[i];
             this.minimap_objects.length--;
@@ -248,7 +247,7 @@ function Minimap(game_controls, game_camera) {
                         self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-                        
+
                         if(self.tempVec.z > 0) {
                             self.tempVec.z = 0;
                             self.tempVec.normalize();
@@ -259,7 +258,7 @@ function Minimap(game_controls, game_camera) {
                         self.tempVec.set(ship.position.x - self.game_camera.position.x, ship.position.y - self.game_camera.position.y, ship.position.z - self.game_camera.position.z).normalize();
                         self.tempQuat.copy(self.game_camera.quaternion).inverse();
                         self.tempQuat.multiplyVector3(self.tempVec, self.tempVec);
-                        
+
                         if(self.tempVec.z > 0) {
                             self.tempVec.z = 0;
                             self.tempVec.normalize();

@@ -7,7 +7,6 @@ function Network() {
 
 Network.prototype.retrievePlanet = function (gid, ssid, pid) {
     var received = [];
-//    var box = $.extend(true, {}, skybox);
     var box;
 
     switch(pid) {
@@ -30,7 +29,7 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
     received.push(asteroid_field);
     if(gameEngine.playerMode === "multi") {
         return received;
-    } 
+    }
     var ai1 = $.extend(true, {}, AIShip),
         ai2 = $.extend(true, {}, AIShip2);
     ai1.drawParameters.position.x = Math.random() * 1000 - 500;
