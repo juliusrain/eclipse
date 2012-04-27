@@ -19,6 +19,12 @@ $('#chatcompose').blur(function (){
     chatfocus = false;
 });
 
+// remove chatbox for single user
+var mode = window.location.hash;
+if(!mode.match('#multi')) {
+    $('#chatcontainer').remove();
+}
+
 // keyboard events
 $(window).keypress(function (e){
     //console.log(e);
