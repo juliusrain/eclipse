@@ -24,9 +24,9 @@ AI.prototype.react = function() {
     var i;
     
     
+    var seed = Date.now() * 0.0008;
     //loop through each ship 
     for (i in sceneElements.AIShips) {
-		var seed = Date.now() * 0.008;
         //var rad = this.angle * this.PI/180; 
         //get AI ship position
         var AIship_pos = sceneElements.AIShips[i].position;
@@ -65,7 +65,6 @@ AI.prototype.react = function() {
             else {
                 if (AIship_speed < this.max_speed)
                      AIship_speed += 0.02;
-            
             }
             sceneElements.AIShips[i].translateZ(-AIship_speed);
             
@@ -101,7 +100,6 @@ AI.prototype.react = function() {
                 } else if (sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout > 0 ) {
                     sceneElements.AIShips[i].gameParameters.weapons.lasers.timeout--;
                 }
-                 
                
                 
             }
@@ -118,20 +116,19 @@ AI.prototype.react = function() {
             
             if (cur_range < 400){           
                                    
-            var dummy = sceneElements.AIShips[i].gameParameters.dummy_target;
-           
+                var dummy = sceneElements.AIShips[i].gameParameters.dummy_target;
                 dummy.x = sceneElements.AIShips[i].gameParameters.origin.x + sceneElements.AIShips[i].gameParameters.orbit_radius * 2 * Math.cos(seed);              
                 dummy.y = sceneElements.AIShips[i].gameParameters.origin.y + sceneElements.AIShips[i].gameParameters.orbit_radius * 0.6 * Math.sin(seed);
 //                dummy.z = 2000*Math.sin(seed);
+
 //                console.log("x y: " + dummy.x + " " + dummy.y);
                 sceneElements.AIShips[i].turn(dummy.x, dummy.y, dummy.z);
 
                 sceneElements.AIShips[i].translateZ(-AIship_speed);
             }
             else {
-                console.log("bfdbf");
-            sceneElements.AIShips[i].turn(sceneElements.AIShips[i].gameParameters.origin.x, sceneElements.AIShips[i].gameParameters.origin.y, sceneElements.AIShips[i].gameParameters.origin.z);
-            sceneElements.AIShips[i].translateZ(-AIship_speed);     
+                sceneElements.AIShips[i].turn(sceneElements.AIShips[i].gameParameters.origin.x, sceneElements.AIShips[i].gameParameters.origin.y, sceneElements.AIShips[i].gameParameters.origin.z);
+                sceneElements.AIShips[i].translateZ(-AIship_speed);     
            
           
             }   

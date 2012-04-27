@@ -1,31 +1,26 @@
-//game engine
-
-//contains HUD elements, updated by graphics engine (crosshairs, etc...)
 var HUDElements = [];
 /* Create and initialize Threejs elements.
- * Rendering will take place through this object (singleton?)
+ * Rendering will take place within 'this' object (singleton)
  */
 function GraphicsEngine() {
 
     if(!Detector.webgl) Detector.addGetWebGLMessage();
 
-
     this.objID = 0; //used to assign id numbers to enemy ai to be drawn on minimap
     this.scene_loaded = false;
     this.isRunning = false;
 
-    this.glow = false;
+    this.glow = true;
+    this.show_stats = false;
 
+    //Get div for rendering
     this.container = document.getElementById('main');
-    //container
     this.canvas_width = parseInt($('#main').css('width'));
     this.canvas_height = parseInt($('#main').css('height'));
 
     //MAIN THREEJS RENDERER
     //main renderer
-    this.renderer = new THREE.WebGLRenderer({
-
-    });
+    this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(this.canvas_width, this.canvas_height);
     this.renderer.autoClear = false;
     this.container.appendChild(this.renderer.domElement);
@@ -37,8 +32,9 @@ function GraphicsEngine() {
     this.gameplay_camera.direction = new THREE.Vector3(0, 0, -1);
     this.gameplay_scene.add(this.gameplay_camera);
     this.gameplay_controls = new THREE.FlyControls(this.gameplay_camera);
-    this.gameplay_controls_factor = 1; //used to represent camera sensitivity, ends up being replaced by player ship's turnFactor param
+    this.gameplay_controls_factor = 1; //used to represent camera sensitivity, replaced by player ship's turnFactor parameter later in initialization
 
+    //EXPERIMENTAL
     if(this.glow) {
         //GLOW SCENE
         //glow scene elements
@@ -87,31 +83,32 @@ function GraphicsEngine() {
     this.minimap.objectType = MINIMAP;
     HUDElements.push(this.minimap);
 
+    //creat jumpmap
     this.jumpmap = new Jumpmap();
     this.jumpmap.loadJumpmap();
 
 
+    //internal function to dynamically assign IDs to renderable objects
     this.assignID = function() {
         var ret = this.objID;
         this.objID++;
         return ret;
     }
 
-    /////////////////////////////////
-    //stats (TEMPORARY) or can leave in as option
-    this.stats = new Stats();
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.top = '0px';
-    this.container.appendChild(this.stats.domElement);
-    ///////////////////////////////////
+
+    if(this.show_stats) {
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.top = '0px';
+        this.container.appendChild(this.stats.domElement);
+    }
 
 
 }
 
-
-////////////////////////////////
-
-    //resizing function for index.html
+    /*
+     * Resizing function.
+     */
     GraphicsEngine.prototype.resizePlayWindow = function() {
         this.canvas_width = parseInt($('#main').css('width'));
         this.canvas_height = parseInt($('#main').css('height'));
@@ -128,7 +125,6 @@ function GraphicsEngine() {
 
             this.blend_composer.reset();
         }
-
         this.minimap.resizeMinimap();
     }
 
@@ -142,16 +138,15 @@ function GraphicsEngine() {
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
         this.scene_loaded = true;
 
-
-        //for loading models
+        //load models/game objects from 'objects' array passed into function
         var self = this;
         for(var i = 0; i < objects.length; i++) {
             self.addGameObject(objects[i]);
         }
-
+        //populate minimap with appropriate objects
         this.minimap.loadMinimap();
 
-
+        //add scene lights
         var dirlight2 = new THREE.DirectionalLight(0xaaaaaa);
         dirlight2.position.set(0, -500, 0).normalize();
         this.gameplay_scene.add(dirlight2);
@@ -178,7 +173,6 @@ function GraphicsEngine() {
 
     /*
      *  Delete everything in the scene.
-     *  TODO deallocate textures, remove from scenelements/hudelements arrays
      */
     GraphicsEngine.prototype.deleteScene = function() {
 
@@ -211,9 +205,10 @@ function GraphicsEngine() {
             }
         }
 
+        //reset minimap
         this.minimap.deleteMinimap();
 
-        //clean sceneElements object
+        //clean sceneElements array
         sceneElements.mainShip = null;
         for(i = sceneElements.AIShips.length - 1; i >= 0; i--) {
             delete sceneElements.AIShips[i];
@@ -244,17 +239,18 @@ function GraphicsEngine() {
             sceneElements.missiles.length--;
         }
 
-
         this.scene_loaded = false;
         this.objectCount = 0;
     }
 
 //=================================================================
 //================= Scene manipulation functions ==================
-//adding/removing stuff after it's been created
 
-    //Takes the objectID parameter of the object to be removed
-    GraphicsEngine.prototype.removeSceneObject = function(OID) { //still have to consider removing from memory and SceneElements arrays
+    /*
+     * Input: objectID of object to be removed.
+     *
+     */
+    GraphicsEngine.prototype.removeSceneObject = function(OID) {
         this.minimap.removeMinimapObject(OID);
 
         var target;
@@ -312,32 +308,31 @@ function GraphicsEngine() {
         }
 
 
+        //remove object from glow scene if applicable 
+        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
+            target = this.gameplay_glow_scene.children[i];
+            if(target.objectID == OID) {
+                this.renderer.deallocateObject(target);
+                this.gameplay_glow_scene.remove(target);
+            }
 
-//        for(var i = 0; i < this.gameplay_glow_scene.children.length; i++) {
-//            target = this.gameplay_glow_scene.children[i];
-//            if(target.objectID == OID) {
-//                this.renderer.deallocateObject(target);
-//                this.gameplay_glow_scene.remove(target);
-//            }
-//
-//        }
+        }
 
     }
 
 
-    //change to take gameObject
+    /*
+     * Add object to scene to be rendered. Format must follow specified JSON format.
+     */
     GraphicsEngine.prototype.addGameObject = function(gameObject) {
         var jloader = new THREE.JSONLoader();
-        var cloader = new THREE.ColladaLoader();
         var self = this;
-
 
         switch(gameObject.type) {
             case SKYBOX: { //if skybox
                 loadSkybox(gameObject, this.gameplay_scene);
                 break;
             }
-
             case PLAYER_SHIP: {
                 loadShip(gameObject, this.gameplay_scene);
                 loadCrosshair(gameObject, this.gameplay_scene);
@@ -348,7 +343,6 @@ function GraphicsEngine() {
                 this.gameplay_controls.autoForward = true;
                 break;
             }
-
             case AI_SHIP: {
                 loadShip(gameObject, this.gameplay_scene);
                 break;
@@ -1194,7 +1188,9 @@ function GraphicsEngine() {
 
         function render() { //can have a separate function to update scene
             self.gameplay_controls.update(self.gameplay_controls_factor);
-            self.stats.update();
+            if(this.show_stats) {
+                self.stats.update();
+            }
 
             if(self.getSceneStatus()) {
                 updateMainShip();
@@ -1210,6 +1206,8 @@ function GraphicsEngine() {
                 self.jumpmap.updateJumpmap();
 
                 updateScene();
+
+
             }
             if(self.glow) {
                 self.glow_composer.render();
