@@ -1,6 +1,7 @@
 var HUDElements = [];
-/* Create and initialize Threejs elements.
- * Rendering will take place within 'this' object (singleton)
+/*
+ *  Create and initialize Threejs elements.
+ *  Rendering will take place within 'this' object (singleton)
  */
 function GraphicsEngine() {
 
@@ -10,7 +11,7 @@ function GraphicsEngine() {
     this.scene_loaded = false;
     this.isRunning = false;
 
-    this.glow = true;
+    this.glow = false; //EXPERIMENTAL
     this.show_stats = false;
 
     //Get div for rendering
@@ -107,7 +108,7 @@ function GraphicsEngine() {
 }
 
     /*
-     * Resizing function.
+     *  Resizing function.
      */
     GraphicsEngine.prototype.resizePlayWindow = function() {
         this.canvas_width = parseInt($('#main').css('width'));
@@ -133,7 +134,7 @@ function GraphicsEngine() {
 //==================== Loading Functions ===============================
 
     /*
-     *   Input: Array of gameObjects following specified format.
+     *  Input: Array of gameObjects following specified format.
      */
     GraphicsEngine.prototype.loadGameplayObjects = function(objects) {
         this.scene_loaded = true;
@@ -247,8 +248,7 @@ function GraphicsEngine() {
 //================= Scene manipulation functions ==================
 
     /*
-     * Input: objectID of object to be removed.
-     *
+     *  Input: objectID of object to be removed.
      */
     GraphicsEngine.prototype.removeSceneObject = function(OID) {
         this.minimap.removeMinimapObject(OID);
@@ -322,7 +322,8 @@ function GraphicsEngine() {
 
 
     /*
-     * Add object to scene to be rendered. Format must follow specified JSON format.
+     *  Add object to scene to be rendered. Format must follow specified JSON format.
+     *  Input: gameObject following specified JSON format.
      */
     GraphicsEngine.prototype.addGameObject = function(gameObject) {
         var jloader = new THREE.JSONLoader();
@@ -376,7 +377,7 @@ function GraphicsEngine() {
         }
 
         /*
-         *  Load skybox. (gameObject)
+         *  Load skybox.
          */
         function loadSkybox(gameObject, scene) {
             var shader = THREE.ShaderUtils.lib["cube"];
@@ -396,8 +397,7 @@ function GraphicsEngine() {
 
 
         /*
-         *  Load ship. (gameObject)
-         *
+         *  Load ship.
          */
         function loadShip(gameObject, scene) {
             var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
@@ -411,14 +411,11 @@ function GraphicsEngine() {
         }
 
 
-        //JSON
         /*
-        *  Load model from JSON
-        *      gameObject: gameObject to be loaded from model
-        *      scene: scene to add model to
-        *
-        *  (used only for gameObjects)
-        */
+         *  Load model from JSON
+         *      gameObject: gameObject to be loaded from model
+         *      scene: scene to add model to
+         */
         var sg = new THREE.SphereGeometry(10, 3, 2);
         function loadJSON(geometry, gameObject, scene) {
             switch(gameObject.type) {
@@ -438,7 +435,7 @@ function GraphicsEngine() {
                     modelMesh.objectID = self.assignID();
                     if(self.glow) {
                         var modelMeshDark = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({map: THREE.ImageUtils.loadTexture('temp/black.png'), ambient: 0xffffff, color: 0x000000}));
-                        //sync positions/rotations of normal and dark meshes
+                        //sync positions/rotations of normal and dark meshes (for rendering object that occlude glow)
                         modelMeshDark.useQuaternion = true;
                         modelMeshDark.name = gameObject.gameParameters.name + " dark";
                         modelMeshDark.objectID = modelMesh.objectID;
@@ -448,6 +445,7 @@ function GraphicsEngine() {
 
                     modelMesh.gameParameters = gameObject.gameParameters;
                     modelMesh.drawParameters = gameObject.drawParameters;
+
                     //for 3rd person ship positioning
                     modelMesh.currentRoll = 0;
                     modelMesh.currentXOffset = 0;
@@ -456,12 +454,14 @@ function GraphicsEngine() {
                     loadLasers(modelMesh, scene);
                     sceneElements.mainShip = modelMesh
 
+                    //randomize starting position of main player upon initialization
                     self.gameplay_camera.position.set((Math.random()*3000+1000)*(1-Math.round(Math.random())*2), (Math.random()*3000+1000)*(1-Math.round(Math.random())*2), (Math.random()*3000+1000)*(1-Math.round(Math.random())*2));
                     scene.add(modelMesh);
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
 
+                    //create hit spheres for main player ship
                     var s = new THREE.Object3D();
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
@@ -596,7 +596,7 @@ function GraphicsEngine() {
                     modelMesh.drawParameters = gameObject.drawParameters;
                     loadLasers(modelMesh, scene);
 
-
+                    //objects used for ship transformations within 3D scene
                     modelMesh.tempDir = new THREE.Vector3(0, 0, 0);
                     modelMesh.targetPos = new THREE.Vector3(0, 0, 0);
                     modelMesh.tempQuat = new THREE.Quaternion();
@@ -606,13 +606,10 @@ function GraphicsEngine() {
 
                     var mesh = modelMesh;
                     modelMesh.turn = function(x, y, z) {
-                        //set target position (might change depending on huy)
 
                         mesh.targetPos.set(x,y,z);
-                        //mesh.targetPos.set(mesh.position.x*l, mesh.position.y*l, mesh.position.z*l);
                          
                         //get new look direction vector
-                        //mesh.tempDir.set(x - mesh.position.x, y - mesh.position.y, z - mesh.position.z);
                         mesh.tempDir.set(x, y, z);
 
                         //copy inverse rotation and apply to direction to get new look in local coords
@@ -632,6 +629,7 @@ function GraphicsEngine() {
 
                         //update look direction
                         mesh.quaternion.multiplyVector3(mesh.FORWARD, mesh.direction);
+
                         //update up direction
                         mesh.quaternion.multiplyVector3(mesh.UP, mesh.up);
                     }
@@ -639,12 +637,14 @@ function GraphicsEngine() {
                     sceneElements.AIShips.push(modelMesh);
                     self.minimap.addMinimapObject(AI_SHIP, modelMesh.objectID);
 
+                    //set initial AI ship starting position
                     modelMesh.position.set(modelMesh.drawParameters.position.x, modelMesh.drawParameters.position.y, modelMesh.drawParameters.position.z);
                     scene.add(modelMesh);
                     if(self.glow) {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
 
+                    //create AI ship hit spheres
                     var s = new THREE.Object3D();
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
@@ -797,6 +797,7 @@ function GraphicsEngine() {
                         self.gameplay_glow_scene.add(modelMeshDark);
                     }
 
+                    //create net ship hit spheres
                     var s = new THREE.Object3D();
                     s.useQuaternion = true;
                     s.position = modelMesh.position;
@@ -941,6 +942,7 @@ function GraphicsEngine() {
                         s.position = asteroid_mesh.position;
                         s.quaternion = asteroid_mesh.quaternion;
 
+                        //hit spheres for each asteroid
                         //outer
                         s0 = new THREE.Mesh(sg, new THREE.MeshNormalMaterial());
                         s0.tposition = new THREE.Vector3();
@@ -997,8 +999,8 @@ function GraphicsEngine() {
 
         /*
          *  Creates lasers for a given ship (sceneObject).
-         *      parentShip: sceneObject that represents parent ship that lasers belong to
-         *      scene: scene to add lasers to
+         *      Input: parentShip: sceneObject that represents parent ship that lasers belong to
+         *             scene: scene to add lasers to
          */
         function loadLasers(parentShip, scene) { //called after initial parent JSON has been loaded, where parentShip is sceneObject
             var callback = function(geometry) {loadJSONLasers(geometry, parentShip, scene)};
@@ -1009,8 +1011,8 @@ function GraphicsEngine() {
          *  Creates mesh based on model, fills in parameters based on parentShip's parameters,
          *  fills in parameters necessary for drawing and computations, and populates container.
          *  (called by loadLasers only)
-         *      parentShip: sceneObject representing parent ship the lasers belong to
-         *      laserContainer: Object3D to hold individual lasers
+         *      Input: parentShip: sceneObject representing parent ship the lasers belong to
+         *             laserContainer: Object3D to hold individual lasers
          */
         function loadJSONLasers(geometry, parentShip, scene) {
             var laserContainer = new THREE.Object3D();
@@ -1052,7 +1054,7 @@ function GraphicsEngine() {
                 scene.add(laserContainer);
             }
 
-            //laser firing function to be called to fire laser;
+            //laser firing function to be called to fire laser for a given ship
             parentShip.fireLaser = function() {
                 for(var i = 0; i < laserContainer.children.length; i++) {
                     if(!laserContainer.children[i].fired) {
@@ -1104,10 +1106,19 @@ function GraphicsEngine() {
         }
     }
 
+    /* 
+     *  Creates a large explosion used for ship explostions.
+     *  Input: x, y, z coordinats.
+     */
     GraphicsEngine.prototype.addExplosionLarge = function(x, y, z) {
         var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_LARGE);
         sceneElements.explosions.push(e);
     }
+
+    /* 
+     *  Creates a small explosion to be used for laser impacts.
+     *  Input: x, y, z coordinats.
+     */
     GraphicsEngine.prototype.addExplosionSmall = function(x, y, z) {
         var e = new Explosion(x, y, z, this.gameplay_scene, this.renderer, EXPLOSION_SMALL);
         sceneElements.explosions.push(e);
@@ -1122,6 +1133,9 @@ function GraphicsEngine() {
 //================== Rendering functions ======================
 
 
+    /* 
+     *  Toggles cursor on/off.
+     */
     GraphicsEngine.prototype.toggleCursor = function(param) {
         if(typeof param == "boolean"){
             this.gameplay_controls.dragToLook = param;
@@ -1141,6 +1155,9 @@ function GraphicsEngine() {
         return this.isRunning;
     }
 
+    /*
+     *  Stops rendering.
+     */
     GraphicsEngine.prototype.stopEngine = function() {
         this.isRunning = false;
         console.log("stopping");
@@ -1148,7 +1165,6 @@ function GraphicsEngine() {
 
     /*
      *  Start rendering
-     *
      */
    GraphicsEngine.prototype.startEngine = function() {
         if(this.getRunningStatus()) {
@@ -1165,7 +1181,6 @@ function GraphicsEngine() {
             tempVecForward,
             tempVecUp,
             tempVecDir;
-
 
         initMathStructures();
         animate();
@@ -1193,6 +1208,7 @@ function GraphicsEngine() {
             }
 
             if(self.getSceneStatus()) {
+                //update main scene elements with respect to positions and animations
                 updateMainShip();
                 updateHUD(); //includes minimap
                 ai.react();
@@ -1202,11 +1218,10 @@ function GraphicsEngine() {
                 updateLasers();
                 updateExplosions();
 
-                //check if map is hidden or not before rendering
-                self.jumpmap.updateJumpmap();
-
-                updateScene();
-
+                //animate jumpmap
+                if(self.jumpmap.isVisible) {
+                    self.jumpmap.updateJumpmap();
+                }
 
             }
             if(self.glow) {
@@ -1218,10 +1233,7 @@ function GraphicsEngine() {
             }
         }
 
-
-
-
-
+        //initialize objects used for computing 3D transformations and rotations.
         function initMathStructures() {
             tempVec = new THREE.Vector3();
             tempVecDir = new THREE.Vector3();
@@ -1231,10 +1243,10 @@ function GraphicsEngine() {
             tempMat = new THREE.Matrix4();
         }
 
-
         var sceneObject, diff, speed,
             maxRoll, negRoll,
             maxXOffset, maxYOffset, negX, negY;
+        //update position of main player ship
         function updateMainShip() {
             sceneObject = sceneElements.mainShip;
             speed = sceneObject.gameParameters.engine.speed;
@@ -1244,7 +1256,6 @@ function GraphicsEngine() {
                 self.gameplay_controls.movementSpeed = speed;
             }
             sceneObject.position.copy(self.gameplay_camera.position);
-            //self.gameplay_camera.quaternion.multiplyVector3(tempVecUp, self.gameplay_camera.up);
             //tilt left or right depending on roll
             if(self.gameplay_controls.moveState.rollRight == 1) {
                 if(sceneObject.drawParameters.tiltRotationCurrent < sceneObject.drawParameters.tiltRotationMax) {
@@ -1329,10 +1340,10 @@ function GraphicsEngine() {
             sceneObject.translateY(sceneObject.currentYOffset);
 
             sceneObject.translateZ(-95); //(distance from camera)
-//            console.log(sceneObject.position.x, sceneObject.position.y, sceneObject.position.z);
         }
 
         var HUDObject;
+        //update HUD
         function updateHUD() { //includes crosshair, ring around mainship to show other ships,
             //draw crosshair
             for(var i = 0; i < HUDElements.length; i++) {
@@ -1355,15 +1366,15 @@ function GraphicsEngine() {
             }
         }
 
+        //update laser positions in scene if fired
         function updateLasers() {
-
             var sceneLasers = sceneElements.lasers;
             for(var i = 0; i < sceneLasers.length; i++) {
                 sceneLasers[i].update();
             }
-
         }
 
+        //update explosions in scene if any explosions are currently being rendered
         function updateExplosions() {
             for(var i = sceneElements.explosions.length - 1; i >= 0 && sceneElements.explosions[i] instanceof Explosion; i--) {
                 sceneElements.explosions[i].updateExplosion();
@@ -1373,100 +1384,4 @@ function GraphicsEngine() {
                 }
             }
         }
-
-        //temporary
-////////////////////////////////////////////////////////////////////////////////////////
-        /*
-         *  Function to update the objects in the scene (~= game engine for now)
-         */
-        function updateScene() {
-            for(i = 0; i < sceneElements.AIShips.length; i++) {
-                sceneObject = sceneElements.AIShips[i];
-                switch(sceneObject.objectType) {
-                    case AI_SHIP: {
-                        switch(sceneObject.objectID) {
-                            case 1: {
-
-                                //TODO: NEED TO CONVERT THIS INTO aiTurn() function
-//
-//                                //calculate object's current look direction
-//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-////                                sceneObject.direction.normalize();
-//
-//                                //multiply reference UP by quaternion to keep current transformed up 
-//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-//
-//                                //object's new look direction
-//                                tempVecDir.set(tempSphere1.position.x - sceneObject.position.x ,tempSphere1.position.y - sceneObject.position.y, tempSphere1.position.z - sceneObject.position.z);
-//
-//                                //invert ship quaternion and apply to new look dir to get it in local coords
-//                                tempQuat.copy(sceneObject.quaternion).inverse();
-//                                tempQuat.multiplyVector3(tempVecDir, tempVecDir);
-//                                tempVecDir.normalize();
-//
-//                                if(tempVecDir.x > 0.5) {
-//                                    tempVecDir.x = 0.5;
-//                                }
-//                                if(tempVecDir.y > 0.5) {
-//                                    tempVecDir.y = 0.5;
-//                                }
-//
-//
-//                                //set a rotation(roll) based on x offset of forward dir and new look dir (in local coords)
-//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVecDir.x); //get max angle based on huy's direction vector
-//
-//                                //look at new dir (world coords)
-//                                tempMat.lookAt(sceneObject.position, tempSphere1.position, sceneObject.up);
-//                                sceneObject.quaternion.setFromRotationMatrix(tempMat); //reset the quaternion with new look dir
-//
-//                                //apply turn (roll) rotation calculated earlier
-//                                sceneObject.quaternion.multiplySelf(tempQuat);
-                                //go forward
-//                                sceneObject.turn(tempSphere1.position.x, tempSphere1.position.y, tempSphere1.position.z);
-//                                sceneObject.translateZ(-5);
-
-                                break;
-                            }
-                            case 2: {
-
-//                                //calculate object's current look direction
-//                                sceneObject.quaternion.multiplyVector3(tempVecForward, sceneObject.direction);
-//                                sceneObject.direction.normalize();
-//
-//                                //multiply reference UP by quaternion to keep current UP
-//                                sceneObject.quaternion.multiplyVector3(tempVecUp, sceneObject.up);
-//
-//                                //object's new look direction
-//                                tempVecDir.set(tempSphere2.position.x - sceneObject.position.x ,tempSphere2.position.y - sceneObject.position.y, tempSphere2.position.z - sceneObject.position.z);
-//
-//                                //invert ship quaternion and apply to new look dir
-//                                tempQuat.copy(sceneObject.quaternion).inverse();
-//                                tempQuat.multiplyVector3(tempVecDir, tempVec);
-//                                tempVec.normalize();
-//
-//                                //set a rotation based on x offset of forward dir and new look dir (local coords)
-//                                tempQuat.setFromAxisAngle(tempVecForward, (Math.PI * 0.25) * tempVec.x);
-//
-//                                //look at new dir (world coords)
-//                                tempMat.lookAt(sceneObject.position, tempSphere2.position, sceneObject.up);
-//                                sceneObject.quaternion.setFromRotationMatrix(tempMat);
-//
-//                                //apply turn rotation
-//                                sceneObject.quaternion.multiplySelf(tempQuat);
-                               // sceneObject.turn(tempSphere2.position.x, tempSphere2.position.y, tempSphere2.position.z);
-//                                sceneObject.turn(sceneElements.mainShip.position.x, sceneElements.mainShip.position.y, sceneElements.mainShip.position.z);
-
-                                //go forward
-                                //sceneObject.translateZ(-3);
-                                break;
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
-////////////////////////////////////////////////////////////////////////////////////////
-
     }

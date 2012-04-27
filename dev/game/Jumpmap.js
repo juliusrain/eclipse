@@ -1,7 +1,11 @@
 
-
+/*
+ *  Created by Graphics Engine. Used to render the Jumpmap.
+ */
 function Jumpmap() {
     this.visible = false;
+
+    this.show_stats = false;
 
     this.maxZ = 1000;
     this.minZ = 300;
@@ -48,12 +52,12 @@ function Jumpmap() {
 
     this.selected = null;
     this.suns = [];
-
-    //////////////
-    this.stats = new Stats();
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.top = '0px';
-    this.container.appendChild(this.stats.domElement);
+    if(this.show_stats) {
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.top = '0px';
+        this.container.appendChild(this.stats.domElement);
+    }
 
     //unique id's assigned to each system created
     this.ssID = 0;
@@ -71,12 +75,12 @@ function Jumpmap() {
 
     var self = this;
     var mouseX, mouseY;
+    //mouse event listner to register clicks
     function onMouseDown(event) {
         self.mouse.x = event.clientX - self.container.offsetLeft;
         self.mouse.y = event.clientY - self.container.offsetTop;
         mouseX = ((event.clientX - self.container.offsetLeft) / self.map_width) * 2 - 1;
         mouseY = -((event.clientY - self.container.offsetTop) / self.map_height) * 2 + 1;
-//            console.log(self.mouse.x, self.mouse.y);
       
         self.tempVec.set(mouseX, mouseY, 0.5);
         self.projector.unprojectVector(self.tempVec, self.jumpmap_camera);
@@ -89,14 +93,11 @@ function Jumpmap() {
                 self.zoomed_in = !self.zoomed_in;
             } else if(!self.intersects[0].object.isParent && self.zoomed_in) { //else if is a regular planet, assign a function to it
                 if(self.intersects[0].object.type == GAS_GIANT) {
-//                    console.log("gas");
                     gameEngine.jump(0, GAS_GIANT);
                 } else if(self.intersects[0].object.type == ROCK_PLANET) {
-//                    console.log("rock");
                     gameEngine.jump(0, ROCK_PLANET);
                 }
             }
-//            console.log(self.zoomed_in);
             if(!self.zoomed_in) {
                 self.selected = null;
             }
@@ -108,9 +109,9 @@ function Jumpmap() {
                 self.maxY = self.intersects[0].object.parentCoords.y;
             }
         }
-
     }
 
+    //mouse event listener to register mouse movement
     function onMouseMove(event) {
         self.mouse.x = event.clientX - self.container.offsetLeft;
         self.mouse.y = event.clientY - self.container.offsetTop;
@@ -136,9 +137,10 @@ function Jumpmap() {
 
 }
 
-
+    /*
+     *  Populate Jumpmap. Reads data from global JSON file.
+     */
     Jumpmap.prototype.loadJumpmap = function() {
-
         var sphereGeometry = new THREE.SphereGeometry(20, 20, 20);
         var rock_map = new THREE.ImageUtils.loadTexture("textures/planets/planet_texture_rock.jpg");
         var gas_map = THREE.ImageUtils.loadTexture("textures/planets/planet_texture_gas.jpg");
@@ -156,6 +158,7 @@ function Jumpmap() {
         });
         var ss, p;
         var system, planet;
+        //create sectors (ie stars)
         for(var i = 0; i < sector.length; i++) {
             ss = sector[i];
             system = new THREE.Mesh(sphereGeometry, sun_material);
@@ -167,6 +170,7 @@ function Jumpmap() {
             this.jumpmap_scene.add(system);
             this.suns.push(system);
             
+            //create planets around parent star
             for(var j = 0; j < ss.planets.length; j++) {
                 p = ss.planets[j];
                 if(p.type == ROCK_PLANET) {
@@ -186,6 +190,7 @@ function Jumpmap() {
 
         }
 
+        //add lights to jump scene
         var dirlight = new THREE.DirectionalLight(0xaaaaaa);
         dirlight.position.set(0, 0, 100).normalize();
         this.jumpmap_scene.add(dirlight);
@@ -199,7 +204,10 @@ function Jumpmap() {
         this.jumpmap_scene.add(dirlight2);
     }
 
-
+    /*
+     *  Sets jumpmap status to visible.
+     *      Input: boolean variable.
+     */
     Jumpmap.prototype.setVisible = function(b) {
         this.visible = b;
         if(!this.visible) {
@@ -207,54 +215,62 @@ function Jumpmap() {
             this.zoomed_in = false;
         }
     }
+    /*
+     *  Gets visibility status of jump map.
+     */
+    Jumpmap.prototype.isVisible = function() {
+        return this.visible;
+    }
 
+    /*
+     *  Update jumpmap animations when visible.
+     */
     Jumpmap.prototype.updateJumpmap = function() {
         if(this.visible) {
 
-        var out_factor = 0.075;
-            in_factor = 0.1;
-        if(!this.zoomed_in) {
-            //z
-            this.currentZ += out_factor * (this.maxZ - this.currentZ);
+            var out_factor = 0.075;
+                in_factor = 0.1;
+            if(!this.zoomed_in) {
+                //z
+                this.currentZ += out_factor * (this.maxZ - this.currentZ);
 
-            //x
-            this.currentX -= out_factor * this.currentX;
+                //x
+                this.currentX -= out_factor * this.currentX;
 
-            //y
-            this.currentY -= out_factor * this.currentY;
-        } else {
-            //z
-            this.currentZ -= in_factor * (this.currentZ - this.minZ);
+                //y
+                this.currentY -= out_factor * this.currentY;
+            } else {
+                //z
+                this.currentZ -= in_factor * (this.currentZ - this.minZ);
 
-            //x
-            this.currentX -= in_factor * (this.currentX - this.maxX);
+                //x
+                this.currentX -= in_factor * (this.currentX - this.maxX);
 
-            //y
-            this.currentY -= in_factor * (this.currentY - this.maxY);
+                //y
+                this.currentY -= in_factor * (this.currentY - this.maxY);
+            }
+            this.jumpmap_camera.position.set(this.currentX, this.currentY, this.currentZ);
+
+            if(this.selected != null && !this.selected.isParent) {
+                this.selected.rotation.y += 0.025;
+                $('#jumpinfobox').fadeIn('fast');
+                $('#jumpinfobox').html(this.selected.name);
+                $('#jumpinfobox').css('left', this.mouse.x);
+                $('#jumpinfobox').css('top', this.mouse.y);
+            } else {
+                $('#jumpinfobox').empty();
+                $('#jumpinfobox').hide();
+            }
+
+            for(var i = 0; i < this.suns.length; i++) {
+                this.suns[i].rotation.y += 0.005;
+            }
+                
+            if(this.show_stats) {
+                this.stats.update();
+            }
+
+            this.renderer.clear();
+            this.composer.render(0.01);
         }
-        this.jumpmap_camera.position.set(this.currentX, this.currentY, this.currentZ);
-
-        if(this.selected != null && !this.selected.isParent) {
-            this.selected.rotation.y += 0.025;
-            $('#jumpinfobox').fadeIn('fast');
-            $('#jumpinfobox').html(this.selected.name);
-            $('#jumpinfobox').css('left', this.mouse.x);
-            $('#jumpinfobox').css('top', this.mouse.y);
-        } else {
-            $('#jumpinfobox').empty();
-            $('#jumpinfobox').hide();
-        }
-
-        for(var i = 0; i < this.suns.length; i++) {
-            this.suns[i].rotation.y += 0.005;
-        }
-
-        this.stats.update();
-
-        this.renderer.clear();
-//        this.renderer.render(this.jumpmap_scene, this.jumpmap_camera);
-        this.composer.render(0.01);
-        }
-
-
     }

@@ -1,18 +1,13 @@
 
 /*
  *  Created by Graphics Engine upon loading a scene.
- *
+ *      Input: game controls and camera from graphics engine.
  */
-
-/*
- *  render to buffer, use as texture for quad,
- *
- *  draws based on contents of sceneElements array, uses graphics engine's renderer
- */
-
 function Minimap(game_controls, game_camera) {
 
     this.minimap_objects = [];
+
+    this.show_stats = false;
 
     this.container = document.getElementById('minimap');
 
@@ -55,14 +50,14 @@ function Minimap(game_controls, game_camera) {
     this.container.appendChild(this.renderer.domElement);
 
 
-/////////////////////////////
-//     this.stats = new Stats();
-//     this.stats.domElement.style.position = 'absolute';
-//     this.stats.domElement.style.top = '0px';
-//     this.container.appendChild(this.stats.domElement);
-/////////////////////////////
+    if(this.show_stats) {
+        this.stats = new Stats();
+        this.stats.domElement.style.position = 'absolute';
+        this.stats.domElement.style.top = '0px';
+        this.container.appendChild(this.stats.domElement);
+    }
 
-
+    //objects used for computing 3D transformations and rotations.
     this.tempVec = new THREE.Vector3();
     this.tempVecForward = new THREE.Vector3(0, 0, -1);
     this.tempVecBackward = new THREE.Vector3(0, 0, 1);
@@ -73,6 +68,9 @@ function Minimap(game_controls, game_camera) {
 
 }
 
+    /*
+     *  Resize function.
+     */
     Minimap.prototype.resizeMinimap = function() {
         this.map_width = this.container.clientWidth;
         this.map_height = this.container.clientHeight;
@@ -88,25 +86,16 @@ function Minimap(game_controls, game_camera) {
         this.minimap_texture_camera.updateProjectionMatrix();
     }
 
-
+    /*
+     *  Populate minimap with appropriate objects. Called by Graphics Engine.
+     */
     Minimap.prototype.loadMinimap = function() {
-        //addLights(this.minimap_texture_scene);
 
         this.minimap_texture_camera.position.z = 10;
 
         var self = this;
 
         drawCircle(this.minimap_texture_scene);
-
-
-//        //draw onto texture
-//        var plane_geometry = new THREE.PlaneGeometry(this.map_width, this.map_height);
-//        var sceneMaterial = new THREE.MeshBasicMaterial({color: 0xffffff, map: this.minimap_texture});
-//        var quad = new THREE.Mesh(plane_geometry, sceneMaterial);
-//        quad.position.z = -500;
-//
-//        this.minimap_scene.add(quad);
-
 
         function drawCircle(scene) { 
             var line_geometry = new THREE.Geometry();
@@ -127,15 +116,12 @@ function Minimap(game_controls, game_camera) {
             scene.add(circle);
         }
 
-        function addLights(tex_scene) {
-            var dirLight = new THREE.DirectionalLight(0xffffff);
-            dirLight.position.z = -1;
-            tex_scene.add(dirLight);
-        }
-
     }
 
-    //takes constant representing what type of object to add
+    /*
+     *  Add an object to minimap.
+     *      Input: type and ID of object to be added.
+     */
     Minimap.prototype.addMinimapObject = function(objectType, OID) {
         var minimap_object;
         switch(objectType) {
@@ -168,7 +154,11 @@ function Minimap(game_controls, game_camera) {
         this.minimap_texture_scene.add(minimap_object);
         this.minimap_objects.push(minimap_object);
     }
-
+    
+    /* 
+     * Remove a ship from the minimap.
+     *     Input: object ID of object to be removed.
+     */
     Minimap.prototype.removeMinimapObject = function(objectID) {
         var target;
         //remove from scene
@@ -191,6 +181,9 @@ function Minimap(game_controls, game_camera) {
         }
     }
 
+    /*
+     *  Reset minimap.
+     */
     Minimap.prototype.deleteMinimap = function() {
         var i = 0;
         var minimap_child;
@@ -211,10 +204,13 @@ function Minimap(game_controls, game_camera) {
 
     }
 
-    //for each ship in sceneElements array, draw ship based on its position
+    /*
+     *  Update ship positions on minimap.
+     */
     Minimap.prototype.updateMinimap = function() {
-
-//         this.stats.update();
+        if(this.show_stats) {
+            this.stats.update();
+        }
 
         var self = this;
         update();
@@ -226,6 +222,7 @@ function Minimap(game_controls, game_camera) {
         //render quad scene with texture applied
         this.renderer.render(this.minimap_scene, this.minimap_camera);
 
+        //update ship positions on minimap
         function update() {
             var minimap_object, ship;
             //assumes that each ai ship has a corresponding object on minimap
