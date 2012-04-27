@@ -35,7 +35,7 @@ class Application(tornado.web.Application):
         
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-	    self.write(db.test())
+	    self.write("These aren't the droids you're looking for.")
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     listeners = set()
@@ -69,14 +69,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                     logging.info(message)
                     for listener in WSHandler.listeners:
                         listener.write_message(message)
-                elif action == "new":
-                    pass
-                elif action == "retr":
-                    pass
-                elif action == "save":
-                    pass
-                elif action == "over":
-                    pass
                 else:
                     logging.info("unknown action %r" % action)
                     logging.info(message)
