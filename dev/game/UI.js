@@ -23,6 +23,7 @@ $('#chatcompose').blur(function (){
 var mode = window.location.hash;
 if(!mode.match('#multi')) {
     $('#chatcontainer').remove();
+    $('#chatcontrol').remove();
 }
 
 // keyboard events
