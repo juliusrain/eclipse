@@ -29,7 +29,7 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             this.fire_sprite_container.fade_factor = 0.01;
 
             var fire_texture = THREE.ImageUtils.loadTexture("textures/explosions/exp1.png");
-            
+
             sCount = 20;
             sSize = 10;
             for(var i = 0; i < sCount; i++) {
@@ -209,7 +209,6 @@ function Explosion(x, y, z, scene, renderer, explosion_type) { //plus other vars
             delete this.explosion.contents[i];
             this.explosion.contents.length--;
         }
-        //console.log("explosion deleted");
     }
 }
 

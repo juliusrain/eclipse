@@ -23,35 +23,35 @@ class Application(tornado.web.Application):
         handlers = [
             (options.ROOT, MainHandler),
             (options.ROOT+"ws", WSHandler),
-        ]        
+        ]
         settings = {
             "debug": options.DEBUG,
             "xsrf_cookies": True,
             "autoescape": None,
             "cookie_secret": "43oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=",
         }
-        
+
         tornado.web.Application.__init__(self, handlers, **settings)
-        
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-	    self.write("These aren't the droids you're looking for.")
+        self.write("These aren't the droids you're looking for.")
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     listeners = set()
-    
+
     def allow_draft76(self):
         # for iOS 5.0 Safari
         return True
-        
+
     def open(self):
         WSHandler.listeners.add(self)
         logging.info("new listener: %d listener(s)" % len(WSHandler.listeners))
-    
+
     def on_close(self):
         WSHandler.listeners.remove(self)
         logging.info("listener removed: %d listener(s)" % len(WSHandler.listeners))
-        
+
     def on_message(self, message):
         try:
             parsed = tornado.escape.json_decode(message)
@@ -76,7 +76,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
                 logging.error("No action found in parsed JSON string.")
         except ValueError:
             logging.error("WTF that wasn't JSON.")
-            
+
 def main():
     tornado.options.parse_config_file("server.conf")
     tornado.options.parse_command_line()

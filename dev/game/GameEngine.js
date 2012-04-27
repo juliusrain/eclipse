@@ -59,14 +59,6 @@ function GameEngine() {
     }
     this.netShipsAdded = [];
     this.firing = false;
-
-    // new game portion - NO NEED FOR THIS!
-       // call database, create new game(?)
-       // call database, retrieve types info, generate solar systems/planets
-    // create graphicsEngine
-    //graphicsEngine = new GraphicsEngine();
-    //this.load(this.solarSystem, this.planet);
-    //graphicsEngine.loadGameplayObjects(gameObjects);
 }
 
 GameEngine.prototype.first = function () {
@@ -104,7 +96,6 @@ GameEngine.prototype.die = function (){
             message.body.quat.z = sceneElements.mainShip.quaternion.z;
             // shooting
             message.body.dead = true;
-            //console.log(JSON.stringify(message));
             network.send(message);
         }
         alert("YOU HAVE DIED.");
@@ -147,7 +138,6 @@ GameEngine.prototype.die = function (){
             // shooting
             shooting = false;
             message.body.respawn = true;
-            //console.log(JSON.stringify(message));
             network.send(message);
         }
         this.playerDead = false;
@@ -214,8 +204,6 @@ GameEngine.prototype.jump = function (ssid, pid){
         this.planet = pid;
         network.disconnect();
         graphicsEngine.deleteScene();
-    //    graphicsEngine.stopEngine();
-    //    this.save();
         this.load(ssid, pid);
     }
     else {
@@ -233,28 +221,17 @@ GameEngine.prototype.save = function () {
 // GameEngine load function
 // called when jumping into another system
 GameEngine.prototype.load = function (ssid, pid) {
-    // wipe everything
-    //     clear
-    //$('#loader').show();
-    // determine winning or losing state
-
     // get information from network
-    console.log("preparing to load");
     var received = network.retrievePlanet(this.gameID, ssid, pid);
-    console.log(received);
-    console.log("got stuff, pushing it in");
     graphicsEngine.loadGameplayObjects(received);
-    console.log("graphics engine has it now");
     this.solarSystem = ssid;
     this.planet = pid;
-    console.log("doing other stuff");
 
     // trigger GraphicsEngine
     graphicsEngine.startEngine();
     network.connect();
     // remove loader screen
     $('#loader').hide();
-    //console.log('hey this is really where I am! ' + sceneElements.mainShip.position);
 };
 
 GameEngine.prototype.updateResourcesBar = function () {
@@ -320,9 +297,6 @@ GameEngine.prototype.updateResources = function () {
             if(engine.currentCharge > 100){
                 engine.currentCharge = 100;
             }
-        }
-        else /*if(!this.rwarnings.fuel)*/ {
-            network.broadcast("WARNING! You do not have enough fuel to recharge your engines.");
         }
     }
     // eat food!
@@ -394,7 +368,6 @@ GameEngine.prototype.laserHit = function(target, hit) {
         if(hit.obj.hasOwnProperty('damage') && target.hasOwnProperty('gameParameters') && target.gameParameters.hasOwnProperty('health')) {
             var damage = hit.obj.damage;
             if(target.gameParameters.health - damage < 0) {
-                //alert("~~~~~~~DEATH~~~~~~~~");
                 if(target === sceneElements.mainShip) {
                     var killer = "an AI ship.";
                     var victim;
@@ -415,7 +388,6 @@ GameEngine.prototype.laserHit = function(target, hit) {
                         }
                     });
                     network.send({"sender":victim, "action":"broad", body:{"message":victim+" was killed by "+killer}});
-                    console.log(hit);
                 }
                 else if(sceneElements.AIShips.indexOf(target) !== -1) {
                     this.kill(target);
@@ -435,12 +407,6 @@ GameEngine.prototype.updateCollisions = function() {
         if(colls[c].obj.hasOwnProperty('fired')) {
             // hit by a laser!
             this.laserHit(sceneElements.mainShip, colls[c]);
-        }
-        else {
-            console.log('hit by something else!!!');
-            //graphicsEngine.gameplay_camera.quaternion.setFromEuler();
-            //graphicsEngine.gameplay_camera.translate(100);
-            //sceneElements.mainShip.gameParameters.health -= 200;
         }
     }
     // collisions with AI ships
@@ -496,16 +462,8 @@ GameEngine.prototype.updateCollisions = function() {
                     this.laserHit(sceneElements.env_objects[eo].children[ec], colls[c]);
                 }
                 else if(colls[c].obj === sceneElements.mainShip) {
-                    console.log('asteroid bump');
                     network.broadcast({message:"WARNING! You hit an asteroid and died!"});
                     this.die();
-                    /*
-                    graphicsEngine.gameplay_camera.translateZ(10);
-                    var q = new THREE.Quaternion();
-                    q.setFromAxisAngle(graphicsEngine.gameplay_camera.up, -Math.PI/12);
-                    graphicsEngine.gameplay_camera.quaternion.multiplySelf(q);
-                    sceneElements.mainShip.gameParameters.health -= 500;
-                    */
                 }
             }
         }
@@ -537,9 +495,6 @@ GameEngine.prototype.update = function () {
         message.body.x = round2(sceneElements.mainShip.position.x);
         message.body.y = round2(sceneElements.mainShip.position.y);
         message.body.z = round2(sceneElements.mainShip.position.z);
-        //message.body.x = round2(graphicsEngine.gameplay_camera.position.x);
-        //message.body.y = round2(graphicsEngine.gameplay_camera.position.y);
-        //message.body.z = round2(graphicsEngine.gameplay_camera.position.z);
         // rotation
         message.body.quat = {};
         message.body.quat.w = sceneElements.mainShip.quaternion.w;
@@ -551,11 +506,10 @@ GameEngine.prototype.update = function () {
             message.body.firing = true;
             this.firing = false;
         }
-        //console.log(JSON.stringify(message));
         network.send(message);
     }
+    //update things that don't need to be done strictly each frame
     if(this.logicwait === 0) {
-        //update things that don't need to be done strictly each frame
 
         // update resources
         this.updateResources();
@@ -730,7 +684,6 @@ GameEngine.prototype.mine = function (target) {
 // checks if the selected weapon can be fired, then triggers weapons fire
 GameEngine.prototype.fireWeapon = function () {
     if(this.timeouts.lasers === 0 && sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge >= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost) {
-//        console.log("FFFFFFIIIIIIIIIIIIIIIRRRRRRRRRRRRRRRRREEE " + sceneElements.mainShip.gameParameters.weapons.lasers.fireCost + '!!!!!');
         sceneElements.mainShip.fireLaser();
         sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge -= sceneElements.mainShip.gameParameters.weapons.lasers.fireCost;
         this.timeouts.lasers = 3;
@@ -746,7 +699,6 @@ GameEngine.prototype.fireWeapon = function () {
 // verifies that a jump can be made, then jumps forward
 GameEngine.prototype.mediumJump = function () {
     if(sceneElements.mainShip.gameParameters.engine.currentCharge > sceneElements.mainShip.gameParameters.engine.medJumpCost) {
-        console.log('med. jump success');
         graphicsEngine.gameplay_camera.translateZ(-5000);
         sceneElements.mainShip.gameParameters.engine.currentCharge -= sceneElements.mainShip.gameParameters.engine.medJumpCost;
     }
@@ -806,153 +758,135 @@ GameEngine.prototype.netUpdate = function (message) {
         }
     }
     catch (e) {
-        
+
     }
 };
 
+/* CUSTOM COLLISION DETECTION SECTION */
 
-        function cAdd(coords1, coords2){
-            var coords = {};
-            for(a in coords1){
-                if(a != 'x' && a != 'y' && a != 'z'){
-                    coords[a] = coords1[a];
-                }
-            }
-            coords.x = (coords1.x + coords2.x);
-            coords.y = (coords1.y + coords2.y);
-            coords.z = (coords1.z + coords2.z);
-            return coords;
+function cAdd(coords1, coords2){
+    var coords = {};
+    for(a in coords1){
+        if(a != 'x' && a != 'y' && a != 'z'){
+            coords[a] = coords1[a];
         }
-        function intersect(obj1, obj2){
-            var xd = obj1.x - obj2.x,
-                yd = obj1.y - obj2.y,
-                zd = obj1.z - obj2.z,
-                rr = obj1.r + obj2.r;
-            var actualDistance = (xd * xd) + (yd * yd) + (zd * zd),
-                minDistance = (rr * rr);
-            if(actualDistance <= minDistance){
-                // a hit!
-                var hitLocation = new THREE.Vector3(xd, yd, zd);
-                hitLocation.normalize();
-                //console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' hit:'+(hitLocation.x * obj2.r)+'x'+(hitLocation.y * obj2.r)+'x'+(hitLocation.z * obj2.r));
-                return {x:(hitLocation.x * obj2.r), y:(hitLocation.y * obj2.r), z:(hitLocation.z * obj2.r)};
+    }
+    coords.x = (coords1.x + coords2.x);
+    coords.y = (coords1.y + coords2.y);
+    coords.z = (coords1.z + coords2.z);
+    return coords;
+}
+function intersect(obj1, obj2){
+    var xd = obj1.x - obj2.x,
+        yd = obj1.y - obj2.y,
+        zd = obj1.z - obj2.z,
+        rr = obj1.r + obj2.r;
+    var actualDistance = (xd * xd) + (yd * yd) + (zd * zd),
+        minDistance = (rr * rr);
+    if(actualDistance <= minDistance){
+        // a hit!
+        var hitLocation = new THREE.Vector3(xd, yd, zd);
+        hitLocation.normalize();
+        return {x:(hitLocation.x * obj2.r), y:(hitLocation.y * obj2.r), z:(hitLocation.z * obj2.r)};
+    }
+    return false;
+}
+function collision(obj){
+    var hits = [];
+    var objects = [];
+    objects.push(sceneElements.mainShip);
+    objects = objects.concat(sceneElements.AIShips);
+    for(var i in sceneElements.lasers) {
+        objects = objects.concat(sceneElements.lasers[i].children);
+    }
+    if(sceneElements.hasOwnProperty('missiles')) {
+        objects = objects.concat(sceneElements.missiles);
+    } if(sceneElements.hasOwnProperty('netShips')) {
+        objects = objects.concat(sceneElements.netShips);
+    }
+    if(sceneElements.hasOwnProperty('env_objects')) {
+        for(var env in sceneElements.env_objects) {
+            if(sceneElements.env_objects[env].objectType == ASTEROID_FIELD) {
+                continue;
             }
-            //console.log('obj1:'+obj1.x+'x'+obj1.y+'x'+obj1.z+'r'+obj1.r+' obj2:'+obj2.x+'x'+obj2.y+'x'+obj2.z+'r'+obj2.r+' miss');
-            return false;
+            if(sceneElements.env_objects[env].hasOwnProperty('children')) {
+                objects = objects.concat(sceneElements.env_objects[env].children);
+            }
         }
-        function collision(obj){
-            var hits = [];
-            var objects = [];
-            objects.push(sceneElements.mainShip);
-            //console.log(objects.length);
-            //console.log(sceneElements.AIShips.length);
-            objects = objects.concat(sceneElements.AIShips);
-            //console.log(objects.length);
-            for(var i in sceneElements.lasers) {
-                objects = objects.concat(sceneElements.lasers[i].children);
-                //console.log(objects.length);
+    }
+    // go through each object in the scene
+    for(candidate in objects){
+        // don't check against itself
+        if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired && objects[candidate].parent.parentShip != obj) // it's an active laser
+                || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){ // it's another object
+            // check if there are spheres
+            var cspheres = undefined, ospheres = undefined;
+            if(typeof objects[candidate].spheres == "object") {
+                cspheres = objects[candidate].spheres;
             }
-            if(sceneElements.hasOwnProperty('missiles')) {
-                objects = objects.concat(sceneElements.missiles);
+            else if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
+                cspheres = objects[candidate].gameParameters.spheres;
             }
-            if(sceneElements.hasOwnProperty('netShips')) {
-                objects = objects.concat(sceneElements.netShips);
+            if(typeof obj.spheres == "object") {
+                ospheres = obj.spheres;
             }
-            if(sceneElements.hasOwnProperty('env_objects')) {
-                for(var env in sceneElements.env_objects) {
-                    if(sceneElements.env_objects[env].objectType == ASTEROID_FIELD) {
-                        continue;
-                    }
-                    if(sceneElements.env_objects[env].hasOwnProperty('children')) {
-                        objects = objects.concat(sceneElements.env_objects[env].children);
-                    }
-                }
+            else if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
+                ospheres = obj.gameParameters.spheres;
             }
-            //console.log(objects.length);
-            // go through each object in the scene
-            for(candidate in objects){
-                // don't check against itself
-                if((objects[candidate].hasOwnProperty('fired') && objects[candidate].fired && objects[candidate].parent.parentShip != obj) // it's an active laser
-                        || (objects[candidate] !== obj && !objects[candidate].hasOwnProperty('fired'))){ // it's another object
-                    //console.log('not me, not an unfired laser');
-                    // check if there are spheres
-                    var cspheres = undefined, ospheres = undefined;
-                    if(typeof objects[candidate].spheres == "object") {
-                        cspheres = objects[candidate].spheres;
-                    }
-                    else if(typeof objects[candidate].gameParameters == "object" && typeof objects[candidate].gameParameters.spheres == "object") {
-                        cspheres = objects[candidate].gameParameters.spheres;
-                    }
-                    if(typeof obj.spheres == "object") {
-                        ospheres = obj.spheres;
-                    }
-                    else if(typeof obj.gameParameters == "object" && typeof obj.gameParameters.spheres == "object") {
-                        ospheres = obj.gameParameters.spheres;
-                    }
-                    if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
-                        //console.log('spheres present');
-                        // check outer.gameParameters.spheres
-                        var crelative, ospheres, cfixed, ofixed;
-                        crelative = cspheres.outer.hasOwnProperty('tposition') ? cspheres.outer.tposition : cspheres.outer;
-                        orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
-                        cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
-                        ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : obj.position;
+            if(typeof cspheres == "object" && typeof cspheres.outer == "object" && typeof ospheres == "object" && typeof ospheres.outer == "object"){
+                // check outer.gameParameters.spheres
+                var crelative, ospheres, cfixed, ofixed;
+                crelative = cspheres.outer.hasOwnProperty('tposition') ? cspheres.outer.tposition : cspheres.outer;
+                orelative = ospheres.outer.hasOwnProperty('tposition') ? ospheres.outer.tposition : ospheres.outer;
+                cfixed = cspheres.hasOwnProperty('position') ? cspheres.position : objects[candidate].position;
+                ofixed = ospheres.hasOwnProperty('position') ? ospheres.position : obj.position;
 
-                        if(cspheres.outer.hasOwnProperty('tposition')) {
-                            cspheres.quaternion.multiplyVector3(cspheres.outer.position, crelative);
-                        }
-                        if(ospheres.outer.hasOwnProperty('tposition')) {
-                            ospheres.quaternion.multiplyVector3(ospheres.outer.position, orelative);
-                        }
-//                        if(cspheres.hasOwnProperty('tposition')) {
-//                            cspheres.quaternion.multiplyVector3(cfixed.position, cfixed); 
-//                        }
-//                        if(ospheres.hasOwnProperty('tposition')) {
-//                            ospheres.quaternion.multiplyVector3(ofixed.position, ofixed); 
-//                        }
-                        var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
-                        //var oHit = intersect(cAdd(cspheres.outer, objects[candidate].position), cAdd(ospheres.outer, obj.position));
-                        if(oHit){
-                            //console.log('hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                            // check for inner.gameParameters.spheres
-                            var check = false,
-                                cand = [cspheres.outer],
-                                subj = [ospheres.outer];
-                            if(typeof cspheres.inner == "object" && cspheres.inner.length != 0){
-                                check = true;
-                                cand = cspheres.inner;
-                            }
-                            if(typeof ospheres.inner == "object" && ospheres.inner.length != 0){
-                                check = true;
-                                subj = ospheres.inner;
-                            }
-                            // check inner spheres
-                            if(check){
-                                for(c in cand){
-                                    for(s in subj){
-                                        crelative = cand[c].hasOwnProperty('tposition') ? cand[c].tposition : cand[c];
-                                        orelative = subj[s].hasOwnProperty('tposition') ? subj[s].tposition : subj[s];
-                                        if(cand[c].hasOwnProperty('tposition')) {
-                                            cspheres.quaternion.multiplyVector3(cand[c].position, crelative);
-                                        }
-                                        if(subj[s].hasOwnProperty('tposition')) {
-                                            ospheres.quaternion.multiplyVector3(subj[s].position, orelative);
-                                        }
-                                        var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
-                                        //var iHit = intersect(cAdd(cand[c], objects[candidate].position), cAdd(subj[s], obj.position));
-                                        if(iHit){
-                                            hits.push({where:iHit, obj:objects[candidate]});
-                                        }
-                                    }
+                if(cspheres.outer.hasOwnProperty('tposition')) {
+                    cspheres.quaternion.multiplyVector3(cspheres.outer.position, crelative);
+                }
+                if(ospheres.outer.hasOwnProperty('tposition')) {
+                    ospheres.quaternion.multiplyVector3(ospheres.outer.position, orelative);
+                }
+                var oHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
+                if(oHit){
+                    // check for inner.gameParameters.spheres
+                    var check = false,
+                        cand = [cspheres.outer],
+                        subj = [ospheres.outer];
+                    if(typeof cspheres.inner == "object" && cspheres.inner.length != 0){
+                        check = true;
+                        cand = cspheres.inner;
+                    }
+                    if(typeof ospheres.inner == "object" && ospheres.inner.length != 0){
+                        check = true;
+                        subj = ospheres.inner;
+                    }
+                    // check inner spheres
+                    if(check){
+                        for(c in cand){
+                            for(s in subj){
+                                crelative = cand[c].hasOwnProperty('tposition') ? cand[c].tposition : cand[c];
+                                orelative = subj[s].hasOwnProperty('tposition') ? subj[s].tposition : subj[s];
+                                if(cand[c].hasOwnProperty('tposition')) {
+                                    cspheres.quaternion.multiplyVector3(cand[c].position, crelative);
+                                }
+                                if(subj[s].hasOwnProperty('tposition')) {
+                                    ospheres.quaternion.multiplyVector3(subj[s].position, orelative);
+                                }
+                                var iHit = intersect(cAdd(crelative, cfixed), cAdd(orelative, ofixed));
+                                if(iHit){
+                                    hits.push({where:iHit, obj:objects[candidate]});
                                 }
                             }
-                            // don't check innder spheres; mark as collision
-                            else{
-                                hits.push({where:oHit, obj:objects[candidate]});
-                            }
                         }
+                    }
+                    // don't check innder spheres; mark as collision
+                    else{
+                        hits.push({where:oHit, obj:objects[candidate]});
                     }
                 }
             }
-            return hits;
         }
+    }
+    return hits;
+}

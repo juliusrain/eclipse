@@ -407,7 +407,6 @@ function GraphicsEngine() {
         function loadAsteroidField(gameObject, scene) {
             var callback = function(geometry) {loadJSON(geometry, gameObject, scene)};
             jloader.load(gameObject.drawParameters.geometry, callback);
-            console.log(gameObject.drawParameters.geometry);
         }
 
 

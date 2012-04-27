@@ -21,7 +21,6 @@ function sizeElements(){
     centerTop = parseInt($("#top").height());
     $("#bottom").css({
         'width':ww,
-        //'top':wh-(parseInt($("#bottom").css("height"))),
         'left':0,
     });
     centerBottom = wh-(parseInt($("#bottom").css("height")));
@@ -38,20 +37,10 @@ function sizeElements(){
         'top':centerTop,
         'left':5*ww/6,
     });
-    //$('#bottom').css('bottom', 0);
     $("#minimap").css({
         'width':ww/7,
         'height':ww/7,
-        //'left':10,
-        //'bottom':10,
     });
-    //$('#main')
-    /*$("#middle").css({
-        'width':4*ww/6,
-        'height':centerHeight,
-        'top':centerTop,
-        'left':ww/6,
-    });*/
     $('#minibox').height(parseInt($('#minibox').width()));
     $('#minibox').css('top', parseInt($('#left').css('top'))+$('#left').height()-$('#minibox').height()*1.25);
 };

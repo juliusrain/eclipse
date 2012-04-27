@@ -24,4 +24,3 @@ var sector = [
         ]
     },
 ];
-//PLANET_TYPE[sectormap[i].planets[j].type].small_texture

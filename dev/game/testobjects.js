@@ -56,7 +56,6 @@ var playerShip = {  type: PLAYER_SHIP,
                     drawParameters: {   //graphics/drawing related parameters
                         shipID: 0,
                         geometry: "models/ships/player_ship002w.js",
-//                        geometry: "models/ships/AIship002.js",
                         laserModel: "models/lasers/laser.js",
                         material: "", //not sure if this will be needed, still waiting on textured blender model
                         crosshair: "textures/crosshair/crosshair.png", //can have different types of crosshairs for different ships
@@ -107,7 +106,6 @@ var AIShip = {  type: AI_SHIP,
                 },
                 drawParameters: {
                     shipID: 1,
-//                    geometry: "models/ships/player_ship001w.js",
                     geometry: "models/ships/AIship002.js",
                     material: "", //not sure if this will be needed, still waiting on textured blender model
                     laserModel: "models/lasers/laser.js",
