@@ -736,6 +736,9 @@ GameEngine.prototype.fireWeapon = function () {
         this.timeouts.lasers = 3;
         this.firing = true;
     }
+    else if(sceneElements.mainShip.gameParameters.weapons.lasers.currentCharge < sceneElements.mainShip.gameParameters.weapons.lasers.fireCost) {
+        network.broadcast({message: "WARNING! Not enough weapons charge to fire the lasers."});
+    }
 };
 
 // Medium Jump

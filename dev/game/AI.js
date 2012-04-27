@@ -51,7 +51,7 @@ AI.prototype.react = function() {
         if (p2ai_distance <= square_radar && cur_range <= square_flying) {
               
             //vector from player to aiship
-            var player2ship = {x: (player_pos.x - AIship_pos.x), y: (player_pos.y - AIship_pos.y), z: (player_pos.z- AIship_pos.z)};
+            //var player2ship = {x: (player_pos.x - AIship_pos.x), y: (player_pos.y - AIship_pos.y), z: (player_pos.z- AIship_pos.z)};
                 
             
             var ai_dir = sceneElements.AIShips[i].direction;

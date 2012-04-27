@@ -25,7 +25,8 @@ Network.prototype.retrievePlanet = function (gid, ssid, pid) {
         box.parameters.textures[i] = "textures/" + box.parameters.textures[i];
     }
     received.push(box);
-    received.push(playerShip);
+    var ps = $.extend(true, {}, playerShip);
+    received.push(ps);
     received.push(asteroid_field);
     if(gameEngine.playerMode === "multi") {
         return received;
